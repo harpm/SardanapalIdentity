@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Sardanapal Core\Sardanapal.ModelBase\Sardanapal.ModelBase.csproj" />
+    <PackageReference Include="Sardanapal.DomainModel" Version="0.1.0" />
   </ItemGroup>
 
 

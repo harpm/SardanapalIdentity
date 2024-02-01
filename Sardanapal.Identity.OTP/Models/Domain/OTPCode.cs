@@ -1,10 +1,5 @@
-﻿using Sardanapal.ModelBase.Model.Domain;
-using System;
-using System.Collections.Generic;
+﻿using Sardanapal.DomainModel.Domain;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sardanapal.Identity.OTP.Models.Domain
 {

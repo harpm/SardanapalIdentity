@@ -1,4 +1,4 @@
-﻿using Sardanapal.ModelBase.Model.Domain;
+﻿using Sardanapal.DomainModel.Domain;
 
 namespace Sardanapal.Identity.OTP.Models.Cach;
 
