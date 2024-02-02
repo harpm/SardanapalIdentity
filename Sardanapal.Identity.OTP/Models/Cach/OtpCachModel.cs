@@ -10,7 +10,7 @@ public class OtpCachModel<TKey> : IBaseEntityModel<TKey>
     /// <summary>
     /// This can be MobileNumber, EmailAddress or anything else 
     /// </summary>
-    public TKey UserId { get; set; }
+    public long PhoneNumber { get; set; }
     
     public string Code { get; set; }
     

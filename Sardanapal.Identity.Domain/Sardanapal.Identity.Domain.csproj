@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Sardanapal.DomainModel" Version="0.1.0" />
-    <PackageReference Include="Sardanapal.RedisCach" Version="0.1.1" />
   </ItemGroup>
-
 
 </Project>

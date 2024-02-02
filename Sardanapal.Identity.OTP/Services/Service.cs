@@ -1,4 +1,4 @@
-namespace  Sardanapal.Identity.OTP.Services;
+namespace Sardanapal.Identity.OTP.Services;
 
 public class OtpService
 {

@@ -7,7 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.3.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
+    <ProjectReference Include="..\Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj" />
     <ProjectReference Include="..\Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj" />
+    <ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
   </ItemGroup>
 
 </Project>
