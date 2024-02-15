@@ -7,11 +7,6 @@ public class OtpCachModel<TKey> : IBaseEntityModel<TKey>
 {
     public TKey Id { get; set; }
     
-    /// <summary>
-    /// This can be MobileNumber, EmailAddress or anything else 
-    /// </summary>
-    public long PhoneNumber { get; set; }
-    
     public string Code { get; set; }
     
     public DateTime ExpireTime { get; set; }

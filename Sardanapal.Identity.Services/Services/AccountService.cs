@@ -9,7 +9,9 @@ namespace Sardanapal.Identity.Services.Services
 {
     public interface IAccountServiceBase
     {
-        public Response<LoginDto> Login(LoginVM Model);
+        Task<Response<LoginDto>> Login(LoginVM Model);
+        Task<Response> RequestOtp(OtpRequestVM Model);
+        Task<Response<LoginDto>> LoginWithOtp(OtpLoginVM Model);
     }
 
     public abstract class AccountServiceBase<TKey, TUser, TRole, TOtpCachModel> : IAccountServiceBase
@@ -24,10 +26,11 @@ namespace Sardanapal.Identity.Services.Services
         private OtpService OtpService { get; set; }
 
         protected virtual string ServiceName { get; set; }
+        protected byte roleId;
 
-        public AccountServiceBase()
+        public AccountServiceBase(byte _roleId)
         {
-            
+            roleId = _roleId;
         }
 
         public async Task<Response<LoginDto>> Login(LoginVM Model)
@@ -38,6 +41,60 @@ namespace Sardanapal.Identity.Services.Services
             {
                 string token = await userManagerService.Login(Model.Username, Model.Password);
                 result.Set(StatusCode.Succeeded, new LoginDto() { Token = token });
+            }
+            catch (Exception ex)
+            {
+                result.Set(StatusCode.Exception, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<Response> RequestOtp(OtpRequestVM Model)
+        {
+            var result = new Response(ServiceName, OperationType.Function);
+
+            try
+            {
+                if (Model == null)
+                {
+                    var user = await userManagerService.GetUser(Model.Username, Model.Email, Model.PhoneNumber);
+                    string otpCode = OtpService.GenerateNewOtp();
+                    await CacheService.Add(new TOtpCachModel()
+                    {
+                        Id = user.Id,
+                        Code = otpCode,
+                        Role = roleId
+                    });
+
+                    result.Set(StatusCode.Succeeded, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Set(StatusCode.Exception, ex);
+            }
+
+            return result;
+        }
+
+        public async Task<Response<LoginDto>> LoginWithOtp(OtpLoginVM Model)
+        {
+            var result = new Response<LoginDto>();
+
+            try
+            {
+                var otps = await CacheService.GetAll();
+                if (otps.Value
+                    .Where(x => x.Code == Model.OtpCode && x.Role == roleId && x.ExpireTime < DateTime.UtcNow)
+                    .Any())
+                {
+                    result.Set(StatusCode.Succeeded);
+                }
+                else
+                {
+                    result.Set(StatusCode.Canceled);
+                }
             }
             catch (Exception ex)
             {

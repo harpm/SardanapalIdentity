@@ -2,6 +2,7 @@
 using Sardanapal.RedisCache.Services;
 using Sardanapal.Identity.OTP.Models.Cach;
 using Sardanapal.ViewModel.Response;
+using Sardanapal.RedisCache.Models;
 
 namespace Sardanapal.Identity.OTP.Services
 {
@@ -19,6 +20,13 @@ namespace Sardanapal.Identity.OTP.Services
         public OtpCachService(IConnectionMultiplexer _conn, int _expireTime) : base(_conn, _expireTime)
         {
 
+        }
+
+        public override Task<CacheResponse<TKey>> Add(TOtpCachModel Model)
+        {
+            Model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
+
+            return base.Add(Model);
         }
 
         public async Task RemoveExpireds()
