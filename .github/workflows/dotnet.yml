@@ -56,7 +56,7 @@ jobs:
       - name: Push package ViewModel
         run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.ViewModel/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
 
-  update_domain_model:
+  update_dto:
     runs-on: ubuntu-latest
 
     steps:
@@ -77,7 +77,7 @@ jobs:
       - name: Push package Dto
         run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Dto/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
 
-  update_redis_cach:
+  update_domain:
     runs-on: ubuntu-latest
 
     steps:
@@ -121,7 +121,7 @@ jobs:
       - name: Push package OTP
         run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.OTP/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
 
-  update_interface_panel:
+  update_services:
     runs-on: ubuntu-latest
 
     steps:
@@ -142,7 +142,7 @@ jobs:
       - name: Push package Services
         run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Services/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
         
-  update_interface_panel:
+  update_authorization:
     runs-on: ubuntu-latest
 
     steps:
