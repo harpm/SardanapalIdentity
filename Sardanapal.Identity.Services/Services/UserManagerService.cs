@@ -22,13 +22,14 @@ public interface IUserManagerService<TKey, TUser, TRole>
         , string? lastname = null);
 }
 
-public class UserManagerService<TKey, TUser, TRole> : IUserManagerService<TKey, TUser, TRole>
+public class UserManagerService<TKey, TUser, TRole, TUR> : IUserManagerService<TKey, TUser, TRole>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TUser : class, IUserBase<TKey>, new()
     where TRole : class, IRoleBase<byte>, new()
+    where TUR : UserRoleBase<TKey>, new()
 {
     protected virtual byte _currentRole { get; }
-    protected SdIdentityUnitOfWorkBase<TKey> _context;
+    protected SdIdentityUnitOfWorkBase<TKey, TUser, TRole, TUR> _context;
     protected ITokenService _tokenService;
 
     public DbSet<TUser> Users
@@ -47,7 +48,7 @@ public class UserManagerService<TKey, TUser, TRole> : IUserManagerService<TKey, 
         }
     }
 
-    public UserManagerService(SdIdentityUnitOfWorkBase<TKey> context, ITokenService tokenService, byte curRole)
+    public UserManagerService(SdIdentityUnitOfWorkBase<TKey, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole)
     {
         _context = context;
         _tokenService = tokenService;

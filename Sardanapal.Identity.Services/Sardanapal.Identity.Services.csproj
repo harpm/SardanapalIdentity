@@ -1,22 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Sardanapal Identity Services</Title>
+		<Version>0.1.0</Version>
+		<Authors>Harpm</Authors>
+		<Company>Sardanapal</Company>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.3.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.3.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj" />
-    <ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
-    <ProjectReference Include="..\Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj" />
-    <ProjectReference Include="..\Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj" />
-    <ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
+	</ItemGroup>
 
 </Project>

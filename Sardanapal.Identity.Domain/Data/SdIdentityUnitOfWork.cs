@@ -4,16 +4,22 @@ using Sardanapal.ModelBase.UnitOfWork;
 
 namespace Sardanapal.Identity.Domain.Data;
 
-public class SdIdentityUnitOfWorkBase<TKey> : DbContext, IUnitOfWork
+public class SdIdentityUnitOfWorkBase<TKey, TUser, TRole, TUR> : DbContext, IUnitOfWork
     where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TUser : class, IUserBase<TKey>, new()
+    where TRole : class, IRoleBase<byte>, new()
+    where TUR : UserRoleBase<TKey>, new()
 {
-    public DbSet<UserBase<TKey>> Users { get; set; }
-    public DbSet<RoleBase<byte>> Roles { get; set; }
-    public DbSet<UserRole<TKey>> UserRoles { get; set; }
+    public DbSet<TUser> Users { get; set; }
+    public DbSet<TRole> Roles { get; set; }
+    public DbSet<TUR> UserRoles { get; set; }
 }
 
-public class SdIdentityUnitOfWork<TKey> : SdIdentityUnitOfWorkBase<TKey>, IUnitOfWork
+public class SdIdentityUnitOfWork<TKey, TUser, TRole, TUR> : SdIdentityUnitOfWorkBase<TKey, TUser, TRole, TUR>, IUnitOfWork
     where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TUser : class, IUserBase<TKey>, new()
+    where TRole : class, IRoleBase<byte>, new()
+    where TUR : UserRoleBase<TKey>, new()
 {
 
 }
