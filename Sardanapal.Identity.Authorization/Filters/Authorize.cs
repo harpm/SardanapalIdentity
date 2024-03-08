@@ -19,7 +19,7 @@ public class AuthorizeAttribute : ActionFilterAttribute
 
         try
         {
-            string token = context.HttpContext.Request.Headers
+            string? token = context.HttpContext.Request.Headers
                 .Where(h => h.Key == "Auth")
                 .Select(h => h.Value)
                 .FirstOrDefault();
@@ -46,7 +46,7 @@ public class AuthorizeAttribute : ActionFilterAttribute
     {
         try
         {
-            string token = context.HttpContext.Request.Headers
+            string? token = context.HttpContext.Request.Headers
                 .Where(h => h.Key == "Auth")
                 .Select(h => h.Value)
                 .FirstOrDefault();

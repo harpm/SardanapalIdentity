@@ -19,9 +19,9 @@ public class HasRoleAttribute : ActionFilterAttribute
 
         try
         {
-            ITokenService tokenService = context.HttpContext.RequestServices.GetService(typeof(ITokenService)) as ITokenService;
+            ITokenService? tokenService = context?.HttpContext?.RequestServices?.GetService(typeof(ITokenService)) as ITokenService;
 
-            string token = context.HttpContext.Request.Headers
+            string? token = context?.HttpContext.Request.Headers
                 .Where(h => h.Key == "Auth")
                 .Select(h => h.Value)
                 .FirstOrDefault();
@@ -38,7 +38,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                 }
             }
         }
-        catch (Exception ex)
+        catch
         {
             context.Result = new UnauthorizedResult();
         }
@@ -48,9 +48,9 @@ public class HasRoleAttribute : ActionFilterAttribute
     {
         try
         {
-            ITokenService tokenService = context.HttpContext.RequestServices.GetService(typeof(ITokenService)) as ITokenService;
+            ITokenService? tokenService = context?.HttpContext?.RequestServices?.GetService(typeof(ITokenService)) as ITokenService;
 
-            string token = context.HttpContext.Request.Headers
+            string? token = context?.HttpContext.Request.Headers
                 .Where(h => h.Key == "Auth")
                 .Select(h => h.Value)
                 .FirstOrDefault();
@@ -71,7 +71,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                 }
             }
         }
-        catch (Exception ex)
+        catch
         {
             context.Result = new UnauthorizedResult();
         }

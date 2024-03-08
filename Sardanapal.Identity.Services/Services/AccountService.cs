@@ -23,13 +23,13 @@ public abstract class AccountServiceBase<TKey, TUser, TRole, TOtpCachModel> : IA
 {
     protected IUserManagerService<TKey, TUser, TRole> userManagerService;
     protected IOtpCachService<TKey, TOtpCachModel> CacheService { get; set; }
-
-    private OtpService OtpService { get; set; }
-
     protected virtual string ServiceName { get; set; }
     protected readonly byte roleId;
 
-    public AccountServiceBase(byte _roleId)
+    public AccountServiceBase(IUserManagerService<TKey, TUser, TRole> _userManagerService
+        , IOtpCachService<TKey, TOtpCachModel> _cacheService
+        , OtpService _otpService
+        , byte _roleId)
     {
         roleId = _roleId;
     }
@@ -60,15 +60,20 @@ public abstract class AccountServiceBase<TKey, TUser, TRole, TOtpCachModel> : IA
             if (Model == null)
             {
                 var user = await userManagerService.GetUser(Model.Email, Model.PhoneNumber);
-                string otpCode = OtpService.GenerateNewOtp();
-                await CacheService.Add(new TOtpCachModel()
+                if (user != null)
                 {
-                    Id = user.Id,
-                    Code = otpCode,
-                    Role = roleId
-                });
+                    await CacheService.Add(new TOtpCachModel()
+                    {
+                        Id = user.Id,
+                        Role = roleId
+                    });
 
-                result.Set(StatusCode.Succeeded, user.Id);
+                    result.Set(StatusCode.Succeeded, user.Id);
+                }
+                else
+                {
+                    result.Set(StatusCode.Failed);
+                }
             }
         }
         catch (Exception ex)
