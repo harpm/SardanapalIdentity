@@ -88,7 +88,7 @@ jobs:
       - name: Clean the build files
         run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Domain/Sardanapal.Identity.Domain.csproj
       - name: Restore dependencies
-        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Identity.Domain/Sardanapal.Identity.Domain.csproj
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Domain/Sardanapal.Identity.Domain.csproj
       - name: Build
         run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Domain/Sardanapal.Identity.Domain.csproj --no-restore --configuration release
       - name: Push package Domain
