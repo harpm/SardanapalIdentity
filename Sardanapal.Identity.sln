@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.ViewMod
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Dto", "Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj", "{3430A1CA-5B0C-427F-AC38-E8C4F4E6F023}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Domain", "Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj", "{7D390899-0469-47E5-884F-A9DA3B04F6DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Domain", "Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj", "{7D390899-0469-47E5-884F-A9DA3B04F6DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Authorization", "Sardanapal.Identity.Authorization\Sardanapal.Identity.Authorization.csproj", "{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{7D390899-0469-47E5-884F-A9DA3B04F6DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D390899-0469-47E5-884F-A9DA3B04F6DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D390899-0469-47E5-884F-A9DA3B04F6DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

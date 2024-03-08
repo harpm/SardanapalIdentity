@@ -1,34 +1,32 @@
 ﻿using Sardanapal.DomainModel.Domain;
 using System.ComponentModel.DataAnnotations;
 
-namespace Sardanapal.Identity.OTP.Models.Domain
+namespace Sardanapal.Identity.OTP.Models.Domain;
+
+public interface IOTPCode<TKey>
+    : IBaseEntityModel<TKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
 {
-    public interface IOTPCode<TKey>
-        : IBaseEntityModel<TKey>
-        where TKey : IComparable<TKey>, IEquatable<TKey>
-    {
-        string Code { get; set; }
+    string Code { get; set; }
 
-        TKey  UserId { get; set; }
+    TKey UserId { get; set; }
 
-        DateTime ExpireTime { get; set; }
+    DateTime ExpireTime { get; set; }
 
-        byte? Role { get; set; }
-    }
+    byte? Role { get; set; }
+}
 
-    public class OTPCode<TKey> : BaseEntityModel<TKey>
-        where TKey : IComparable<TKey>, IEquatable<TKey>
-    {
-        [Required]
-        [MaxLength(6)]
-        public string Code { get; set; }
+public class OTPCode<TKey> : BaseEntityModel<TKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+{
+    [Required]
+    public virtual string Code { get; set; }
 
-        [Required]
-        public virtual TKey UserId { get; set; }
+    [Required]
+    public virtual TKey UserId { get; set; }
 
-        [Required]
-        public DateTime ExpireTime { get; set; }
+    [Required]
+    public virtual DateTime ExpireTime { get; set; }
 
-        public byte? Role { get; set; }
-    }
+    public virtual byte? Role { get; set; }
 }

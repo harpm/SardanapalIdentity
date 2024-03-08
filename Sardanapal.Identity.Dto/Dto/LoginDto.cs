@@ -1,5 +1,4 @@
-﻿
-namespace Sardanapal.Identity.Dto;
+﻿namespace Sardanapal.Identity.Dto;
 
 public class LoginDto
 {
