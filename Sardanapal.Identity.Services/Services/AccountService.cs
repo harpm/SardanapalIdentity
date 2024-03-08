@@ -28,7 +28,6 @@ public abstract class AccountServiceBase<TKey, TUser, TRole, TOtpCachModel> : IA
 
     public AccountServiceBase(IUserManagerService<TKey, TUser, TRole> _userManagerService
         , IOtpCachService<TKey, TOtpCachModel> _cacheService
-        , OtpService _otpService
         , byte _roleId)
     {
         roleId = _roleId;
