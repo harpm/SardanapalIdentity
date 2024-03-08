@@ -8,7 +8,7 @@ public interface IRoleBase<TKey> : IBaseEntityModel<TKey>
 
 }
 
-public class RoleBase<TKey> : BaseEntityModel<TKey>
+public abstract class RoleBase<TKey> : BaseEntityModel<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public virtual string Title { get; set; }
