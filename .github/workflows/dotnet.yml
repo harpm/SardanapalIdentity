@@ -1,0 +1,164 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  update_share:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Share/Sardanapal.Identity.Share.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Share/Sardanapal.Identity.Share.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Share/Sardanapal.Identity.Share.csproj --no-restore --configuration release
+      - name: Push package Share
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.Share/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+
+  update_view_model:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: build
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.ViewModel/Sardanapal.ViewModel.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.ViewModel/Sardanapal.ViewModel.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.ViewModel/Sardanapal.Identity.ViewModel.csproj --no-restore --configuration release
+      - name: Push package ViewModel
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.ViewModel/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+
+  update_domain_model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Dto/Sardanapal.Dto.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Dto/Sardanapal.Dto.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Dto/Sardanapal.Dto.csproj --no-restore --configuration release
+      - name: Push package Dto
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Dto/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+
+  update_redis_cach:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Domain/Sardanapal.Domain.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Domain/Sardanapal.Domain.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Domain/Sardanapal.Domain.csproj --no-restore --configuration release
+      - name: Push package Domain
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Domain/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+
+  update_OTP:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.OTP/Sardanapal.OTP.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.OTP/Sardanapal.OTP.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.OTP/Sardanapal.OTP.csproj --no-restore --configuration release
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.OTP/Sardanapal.OTP.csproj
+      - name: Push package OTP
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.OTP/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+
+  update_interface_panel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Services/Sardanapal.Services.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Services/Sardanapal.Services.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Services/Sardanapal.Services.csproj --no-restore --configuration release
+      - name: Push package Services
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Services/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+        
+  update_interface_panel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Add nuget source
+        run: dotnet nuget add source --username harpm --password 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 --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
+      - name: Clean the build files
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Authorization/Sardanapal.Authorization.csproj
+      - name: Restore dependencies
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Authorization/Sardanapal.Authorization.csproj
+      - name: Build
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Authorization/Sardanapal.Authorization.csproj --no-restore --configuration release
+      - name: Push package Authorization
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Authorization/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
