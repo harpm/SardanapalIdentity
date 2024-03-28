@@ -16,7 +16,7 @@ public interface IOTPCode<TKey>
     byte? Role { get; set; }
 }
 
-public class OTPCode<TKey> : BaseEntityModel<TKey>
+public class OTPCode<TKey> : BaseEntityModel<Guid>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     [Required]

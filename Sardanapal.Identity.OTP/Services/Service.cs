@@ -19,11 +19,10 @@ public interface IOtpService<TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditabl
 
 }
 
-public class OtpService<UnitOfWork, TKey, OtpEntity, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM> : _ServicePanel<UnitOfWork, Guid, OtpEntity, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+public class OtpService<UnitOfWork, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM> : _ServicePanel<UnitOfWork, Guid, OTPCode<TKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpService<TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>, IOtpService<TKey, TNewVM, ValidateOtpVM<TKey>>
     where UnitOfWork : DbContext
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where OtpEntity : OTPCode<TKey>
     where TListItemVM : OtpListItemVM<Guid>
     where TSearchVM : OtpSearchVM
     where TVM : OtpVM<TKey>
@@ -31,6 +30,9 @@ public class OtpService<UnitOfWork, TKey, OtpEntity, TListItemVM, TSearchVM, TVM
     where TEditableVM : OtpEditableVM<TKey>
 {
     public int expireTime { get; set; }
+
+    public override string ServiceName => "OtpService";
+
     public OtpService(UnitOfWork unitOfWork, IMapper _Mapper, IRequestService _Context, int expireTime)
         : base(unitOfWork, _Mapper, _Context)
     {
