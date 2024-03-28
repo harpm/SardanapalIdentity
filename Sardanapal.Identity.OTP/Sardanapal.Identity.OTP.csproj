@@ -13,9 +13,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Sardanapal.DomainModel" Version="0.1.0" />
-		<PackageReference Include="Sardanapal.Identity.ViewModel" Version="0.1.1" />
-		<PackageReference Include="Sardanapal.InterfacePanel" Version="0.1.0" />
-		<PackageReference Include="Sardanapal.RedisCach" Version="0.1.1" />
+		<PackageReference Include="Sardanapal.Identity.ViewModel" Version="0.1.3" />
+		<PackageReference Include="Sardanapal.InterfacePanel" Version="0.1.1" />
+		<PackageReference Include="Sardanapal.RedisCach" Version="0.1.3" />
 	</ItemGroup>
 
 

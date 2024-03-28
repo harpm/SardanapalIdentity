@@ -2,7 +2,7 @@
 
 namespace Sardanapal.Identity.OTP.Models.Cach;
 
-public class OtpCachModel<TKey> : IBaseEntityModel<TKey>
+public class OtpCachModel<TKey> : IBaseEntityModel<TKey>, IOtpModel<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public TKey Id { get; set; }

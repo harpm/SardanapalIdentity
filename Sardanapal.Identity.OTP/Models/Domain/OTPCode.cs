@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Sardanapal.Identity.OTP.Models.Domain;
 
 public interface IOTPCode<TKey>
-    : IBaseEntityModel<TKey>
+    : IBaseEntityModel<TKey>, IOtpModel<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     string Code { get; set; }
