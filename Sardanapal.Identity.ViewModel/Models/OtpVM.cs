@@ -8,12 +8,12 @@ public class OtpListItemVM<TKey> : BaseListItem<TKey>
     
 }
 
-public abstract class OtpSearchVM
+public class OtpSearchVM
 {
 
 }
 
-public abstract class NewOtpVM<TKey>
+public class NewOtpVM<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public string Code { get; set; }
@@ -22,14 +22,22 @@ public abstract class NewOtpVM<TKey>
     public byte RoleId { get; set; }
 }
 
-public abstract class OtpEditableVM<TKey> : NewOtpVM<TKey>
+public class OtpEditableVM<TKey> : NewOtpVM<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
 
 }
 
-public abstract class OtpVM<TKey>
+public class OtpVM<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
 
+}
+
+public class ValidateOtpVM<TKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+{
+    public string Code { get; set; }
+    public TKey UserId { get; set; }
+    public byte RoleId { get; set; }
 }
