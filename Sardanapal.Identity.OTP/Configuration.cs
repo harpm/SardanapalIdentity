@@ -8,6 +8,17 @@ namespace Sardanapal.Identity.OTP
 {
     public static class Configuration
     {
+        /// <summary>
+        /// This will add otp services to the DI
+        /// </summary>
+        /// <typeparam name="TUnitOfWork"></typeparam>
+        /// <typeparam name="TUserKey"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="useCach">
+        /// If true the Otp will be saved in cach
+        /// otherwise otp codes will be saved in main database
+        /// </param>
+        /// <returns></returns>
         public static IServiceCollection AddOtpService<TUnitOfWork, TUserKey>(this IServiceCollection services, bool useCach)
             where TUnitOfWork : DbContext
             where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>

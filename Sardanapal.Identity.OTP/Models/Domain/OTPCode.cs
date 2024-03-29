@@ -3,27 +3,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sardanapal.Identity.OTP.Models.Domain;
 
-public interface IOTPCode<TKey>
-    : IBaseEntityModel<TKey>, IOtpModel<TKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public interface IOTPCode<TUserKey>
+    : IBaseEntityModel<TUserKey>, IOtpModel<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     string Code { get; set; }
 
-    TKey UserId { get; set; }
+    TUserKey UserId { get; set; }
 
     DateTime ExpireTime { get; set; }
 
     byte? Role { get; set; }
 }
 
-public class OTPCode<TKey> : BaseEntityModel<Guid>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public class OTPCode<TUserKey> : BaseEntityModel<Guid>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     [Required]
     public virtual string Code { get; set; }
 
     [Required]
-    public virtual TKey UserId { get; set; }
+    public virtual TUserKey UserId { get; set; }
 
     [Required]
     public virtual DateTime ExpireTime { get; set; }

@@ -1,11 +1,12 @@
 ﻿
 namespace Sardanapal.Identity.OTP.Models;
 
-public interface IOtpModel<TKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public interface IOtpModel<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
-    TKey Id { get; set; }
+    Guid Id { get; set; }
     string Code { get; set; }
     DateTime ExpireTime { get; set; }
+    TUserKey UserId { get; set; }
     byte Role { get; set; }
 }

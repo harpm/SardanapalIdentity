@@ -7,27 +7,27 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpService<TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM> : _IServicePanel<Guid, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TKey, TNewVM, ValidateOtpVM<TKey>>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public interface IOtpService<TUserKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM> : _IServicePanel<Guid, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpService<TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TListItemVM : OtpListItemVM<Guid>
     where TSearchVM : OtpSearchVM
-    where TVM : OtpVM<TKey>
-    where TNewVM : NewOtpVM<TKey>
-    where TEditableVM : OtpEditableVM<TKey>
+    where TVM : OtpVM<TUserKey>
+    where TNewVM : NewOtpVM<TUserKey>
+    where TEditableVM : OtpEditableVM<TUserKey>
 {
 
 }
 
-public class OtpService<UnitOfWork, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM> : _ServicePanel<UnitOfWork, Guid, OTPCode<TKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>, IOtpService<TKey, TNewVM, ValidateOtpVM<TKey>>
+public class OtpService<UnitOfWork, TUserKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM> : _ServicePanel<UnitOfWork, Guid, OTPCode<TUserKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpService<TUserKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>, IOtpService<TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
     where UnitOfWork : DbContext
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TListItemVM : OtpListItemVM<Guid>
     where TSearchVM : OtpSearchVM
-    where TVM : OtpVM<TKey>
-    where TNewVM : NewOtpVM<TKey>
-    where TEditableVM : OtpEditableVM<TKey>
+    where TVM : OtpVM<TUserKey>
+    where TNewVM : NewOtpVM<TUserKey>
+    where TEditableVM : OtpEditableVM<TUserKey>
 {
     public int expireTime { get; set; }
 
@@ -45,7 +45,7 @@ public class OtpService<UnitOfWork, TKey, TListItemVM, TSearchVM, TVM, TNewVM, T
         await this.UnitOfWork.SaveChangesAsync();
     }
 
-    public Task<IResponse<bool>> ValidateOtp(ValidateOtpVM<TKey> model)
+    public Task<IResponse<bool>> ValidateOtp(ValidateOtpVM<TUserKey> model)
     {
         throw new NotImplementedException();
     }

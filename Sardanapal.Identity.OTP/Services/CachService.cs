@@ -6,17 +6,17 @@ using Sardanapal.Identity.ViewModel.Models;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TKey, TOtpCachModel> : ICacheService<TOtpCachModel, NewOtpVM<TKey>, OtpEditableVM<TKey>>
-    , IOtpService<TKey, NewOtpVM<TKey>, ValidateOtpVM<TKey>>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : OtpCachModel<TKey>, new()
+public interface IOtpCachService<TUserKey, TOtpCachModel> : ICacheService<TOtpCachModel, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
+    , IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TOtpCachModel : OtpCachModel<TUserKey>, new()
 {
 
 }
 
-public class OtpCachService<TKey, TOtpCachModel> : CacheService<TOtpCachModel, NewOtpVM<TKey>, OtpEditableVM<TKey>>
-    , IOtpService<TKey, NewOtpVM<TKey>, ValidateOtpVM<TKey>>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public class OtpCachService<TUserKey, TOtpCachModel> : CacheService<TOtpCachModel, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
+    , IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TOtpCachModel : OtpCachModel<Guid>, new()
 {
     protected override string Key => "Otp";
@@ -39,7 +39,7 @@ public class OtpCachService<TKey, TOtpCachModel> : CacheService<TOtpCachModel, N
         otpHelper = _otpHelper;
     }
 
-    public override Task<IResponse<Guid>> Add(NewOtpVM<TKey> Model)
+    public override Task<IResponse<Guid>> Add(NewOtpVM<TUserKey> Model)
     {
         Model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
         Model.Code = otpHelper.GenerateNewOtp();
@@ -47,7 +47,7 @@ public class OtpCachService<TKey, TOtpCachModel> : CacheService<TOtpCachModel, N
         return base.Add(Model);
     }
 
-    public Task<IResponse<bool>> ValidateOtp(ValidateOtpVM<TKey> model)
+    public Task<IResponse<bool>> ValidateOtp(ValidateOtpVM<TUserKey> model)
     {
         throw new NotImplementedException();
     }

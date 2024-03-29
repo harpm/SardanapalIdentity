@@ -3,9 +3,9 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpService<TKey, TNewVM, TValidateVM>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TNewVM : class
+public interface IOtpService<TUserKey, TNewVM, TValidateVM>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TNewVM : NewOtpVM<TUserKey>
     where TValidateVM : class
 {
     int expireTime { get; set; }
