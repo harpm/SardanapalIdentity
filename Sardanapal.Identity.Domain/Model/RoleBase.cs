@@ -8,12 +8,11 @@ public interface IRoleBase<TKey> : IBaseEntityModel<TKey>
     string Title { get; set; }
 }
 
-public class RoleBase<TKey, TUser, TUR> : BaseEntityModel<TKey>, IRoleBase<TKey>
+public class RoleBase<TKey, TUserKey> : BaseEntityModel<TKey>, IRoleBase<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TUser : class, IUserBase<TKey>
-    where TUR : UserRoleBase<TKey, TUser, RoleBase<TKey, TUser, TUR>>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual string Title { get; set; }
-    public virtual ICollection<TUR> UserRoles { get; set; }
-        = new HashSet<TUR>();
+    public virtual ICollection<UserRoleBase<TUserKey>> UserRoles { get; set; }
+        = new HashSet<UserRoleBase<TUserKey>>();
 }

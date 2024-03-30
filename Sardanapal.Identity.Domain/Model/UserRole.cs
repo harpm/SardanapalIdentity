@@ -9,14 +9,12 @@ public interface IUserRoleBase<TUserKey> : IBaseEntityModel<long>
     byte RoleId { get; set; }
 }
 
-public class UserRoleBase<TUserKey, TUser, TRole> : BaseEntityModel<long>
+public class UserRoleBase<TUserKey> : BaseEntityModel<long>, IUserRoleBase<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : IUserBase<TUserKey>
-    where TRole : IRoleBase<TUserKey>
 {
     public TUserKey UserId { get; set; }
     
     public byte RoleId { get; set; }
 
-    public virtual TRole Roles { get; set; }
+    public virtual RoleBase<byte, TUserKey> Roles { get; set; }
 }
