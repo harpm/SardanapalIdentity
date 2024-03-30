@@ -2,9 +2,21 @@
 
 namespace Sardanapal.Identity.Domain.Model;
 
-public abstract class UserRoleBase<TKey> : BaseEntityModel<long>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public interface IUserRoleBase<TUserKey> : IBaseEntityModel<long>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
-    public TKey UserId { get; set; }
+    TUserKey UserId { get; set; }
+    byte RoleId { get; set; }
+}
+
+public abstract class UserRoleBase<TUserKey, TUser, TRole> : BaseEntityModel<long>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TUser : IUserBase<TUserKey>
+    where TRole : IRoleBase<TUserKey>
+{
+    public TUserKey UserId { get; set; }
+    
     public byte RoleId { get; set; }
+
+    public virtual TRole Roles { get; set; }
 }
