@@ -6,8 +6,8 @@ using Sardanapal.Identity.Services.Statics;
 namespace Sardanapal.Identity.Services.Services;
 public interface IUserManagerService<TKey, TUser, TRole>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TUser : IUserBase<TKey>, new()
-    where TRole : IRoleBase<byte>, new()
+    where TUser : class, IUserBase<TKey>, new()
+    where TRole : class, IRoleBase<byte>, new()
 {
     Task<TUser?> GetUser(string? email = null, long? phoneNumber = null);
     Task<string> Login(string username, string password);
@@ -24,8 +24,8 @@ public interface IUserManagerService<TKey, TUser, TRole>
 
 public class UserManagerService<TKey, TUser, TRole, TUR> : IUserManagerService<TKey, TUser, TRole>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TUser : class, IUserBase<TKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
+    where TUser : UserBase<TKey>, new()
+    where TRole : RoleBase<byte, TKey>, new()
     where TUR : UserRoleBase<TKey>, new()
 {
     protected virtual byte _currentRole { get; }
@@ -107,6 +107,18 @@ public class UserManagerService<TKey, TUser, TRole, TUR> : IUserManagerService<T
 
         var user = await _context.Users.Where(x => x.Username == username
             && x.HashedPassword == md5Pass)
+            .FirstAsync();
+
+        string token = _tokenService.GenerateToken(username, _currentRole);
+
+        return token;
+    }
+
+    public async Task<string> LoginViaOtp(TKey userId)
+    {
+        var username = await _context.Users.AsNoTracking()
+            .Where(x => x.Id.Equals(userId) && x.UserRoles.Any(w => w.RoleId == _currentRole))
+            .Select(x => x.Username)
             .FirstAsync();
 
         string token = _tokenService.GenerateToken(username, _currentRole);
