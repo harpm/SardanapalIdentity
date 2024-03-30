@@ -8,11 +8,10 @@ public interface IRoleBase<TKey> : IBaseEntityModel<TKey>
     string Title { get; set; }
 }
 
-public abstract class RoleBase<TRole, TKey, TUser, TUR> : BaseEntityModel<TKey>
+public class RoleBase<TKey, TUser, TUR> : BaseEntityModel<TKey>, IRoleBase<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TRole : IRoleBase<TKey>
     where TUser : class, IUserBase<TKey>
-    where TUR : UserRoleBase<TKey, TUser, TRole>
+    where TUR : UserRoleBase<TKey, TUser, RoleBase<TKey, TUser, TUR>>
 {
     public virtual string Title { get; set; }
     public virtual ICollection<TUR> UserRoles { get; set; }

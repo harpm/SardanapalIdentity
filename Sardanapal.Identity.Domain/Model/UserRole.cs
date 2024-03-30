@@ -9,7 +9,7 @@ public interface IUserRoleBase<TUserKey> : IBaseEntityModel<long>
     byte RoleId { get; set; }
 }
 
-public abstract class UserRoleBase<TUserKey, TUser, TRole> : BaseEntityModel<long>
+public class UserRoleBase<TUserKey, TUser, TRole> : BaseEntityModel<long>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : IUserBase<TUserKey>
     where TRole : IRoleBase<TUserKey>
