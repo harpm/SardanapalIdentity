@@ -3,8 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sardanapal.Identity.OTP.Models.Domain;
 
-public interface IOTPCode<TUserKey>
-    : IBaseEntityModel<TUserKey>, IOtpModel<TUserKey>
+public interface IOTPModel<TUserKey> : IBaseEntityModel<Guid>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     string Code { get; set; }
@@ -16,7 +15,7 @@ public interface IOTPCode<TUserKey>
     byte? Role { get; set; }
 }
 
-public class OTPCode<TUserKey> : BaseEntityModel<Guid>
+public class OTPModel<TUserKey> : BaseEntityModel<Guid>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     [Required]

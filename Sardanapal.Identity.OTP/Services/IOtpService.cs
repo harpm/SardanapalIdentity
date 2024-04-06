@@ -1,12 +1,11 @@
-﻿using Sardanapal.Identity.ViewModel.Models;
-using Sardanapal.ViewModel.Response;
+﻿using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
 public interface IOtpService<TUserKey, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TNewVM : NewOtpVM<TUserKey>
-    where TValidateVM : class
+    where TNewVM : class, new()
+    where TValidateVM : class, new()
 {
     int expireTime { get; set; }
 
