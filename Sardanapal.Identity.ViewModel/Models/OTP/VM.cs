@@ -5,7 +5,7 @@ namespace Sardanapal.Identity.ViewModel.Models.VM;
 public class OtpListItemVM<TKey> : BaseListItem<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
-
+    public DateTime ExpireTime { get; set; }
 }
 
 public class OtpSearchVM
