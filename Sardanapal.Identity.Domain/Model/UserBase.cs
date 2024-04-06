@@ -9,8 +9,10 @@ public interface IUserBase<TKey> : IBaseEntityModel<TKey>
     string LastName { get; set; }
     string Username { get; set; }
     string HashedPassword { get; set; }
-    string Email { get; set; }
-    long PhoneNumber { get; set; }
+    string? Email { get; set; }
+    bool VerifiedEmail { get; set; }
+    long? PhoneNumber { get; set; }
+    bool VerifiedPhoneNumber { get; set; }
 }
 
 public class UserBase<TKey> : BaseEntityModel<TKey>
@@ -21,8 +23,10 @@ public class UserBase<TKey> : BaseEntityModel<TKey>
     public virtual string LastName { get; set; }
     public virtual string Username { get; set; }
     public virtual string HashedPassword { get; set; }
-    public virtual string Email { get; set; }
-    public virtual long PhoneNumber { get; set; }
+    public virtual string? Email { get; set; }
+    public virtual bool VerifiedEmail { get; set; }
+    public virtual long? PhoneNumber { get; set; }
+    public virtual bool VerifiedPhoneNumber { get; set; }
     public virtual ICollection<UserRoleBase<TKey>> UserRoles { get; set; }
         = new HashSet<UserRoleBase<TKey>>();
 }
