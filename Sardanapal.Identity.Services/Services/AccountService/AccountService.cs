@@ -51,7 +51,7 @@ public abstract class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, 
 public interface IOtpAccountServiceBase<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
-    Task<Response<TUserKey>> RequestOtp(OtpRequestVM Model);
+    Task<Response<TUserKey>> RequestLoginOtp(OtpRequestVM Model);
     Task<Response<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model);
 }
 
@@ -64,36 +64,40 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
 {
+    protected IOtpUserManagerService<TUserKey, TUser, TRole> userManagerService;
 
     public OtpAccountServiceBase(IOtpUserManagerService<TUserKey, TUser, TRole> _userManagerService, byte _roleId)
         : base(_userManagerService, _roleId)
     {
-
+        this.userManagerService = _userManagerService;
     }
 
-    public async Task<IResponse<TUserKey>> RequestOtp(OtpRequestVM Model)
+    public async Task<IResponse<TUserKey>> RequestLoginOtp(OtpRequestVM Model)
     {
         var result = new Response<TUserKey>(ServiceName, OperationType.Function);
 
         return await result.Create(async () =>
         {
-            if (Model == null)
+            if (Model != null)
             {
-                //var user = await userManagerService.GetUser(Model.Email, Model.PhoneNumber);
-                //if (user != null)
-                //{
-                //    await OtpService.Add(new NewOtpVM<TUserKey>()
-                //    {
-                //        UserId = user.Id,
-                //        RoleId = roleId
-                //    });
-
-                //    result.Set(StatusCode.Succeeded, user.Id);
-                //}
-                //else
-                //{
-                //    result.Set(StatusCode.Failed);
-                //}
+                if (Model.PhoneNumber.HasValue)
+                {
+                    TUserKey userId = await userManagerService.RequestLoginUser(Model.PhoneNumber.Value);
+                    result.Set(StatusCode.Succeeded, userId);
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.Email))
+                {
+                    TUserKey userId = await userManagerService.RequestLoginUser(Model.Email);
+                    result.Set(StatusCode.Succeeded, userId);
+                }
+                else
+                {
+                    result.Set(StatusCode.Canceled);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.Canceled);
             }
 
             return result;
@@ -106,17 +110,41 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
 
         return await result.Create(async () =>
         {
-            //var otps = await OtpService.ValidateOtp(Model);
-            //if (otps.Data)
-            //{
-            //    // TODO: should generate token
+            var token = await userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
 
-            //    result.Set(StatusCode.Succeeded);
-            //}
-            //else
-            //{
-            //    result.Set(StatusCode.Canceled);
-            //}
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+
+            result.Set(StatusCode.Succeeded, new LoginDto()
+            {
+                Token = token
+            });
+            }
+            else
+            {
+                result.Set(StatusCode.Failed);
+                result.DeveloperMessages = new string[] { "Failed generating token!" };
+            }
+
+            return result;
+        });
+    }
+
+    public async Task<IResponse<bool>> RegisterWithOtp(ValidateOtpVM<TUserKey> Model)
+    {
+        var result = new Response<bool>();
+
+        return await result.Create(async () =>
+        {
+            var isValid = await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
+            if (isValid)
+            {
+                result.Set(StatusCode.Succeeded);
+            }
+            else
+            {
+                result.Set(StatusCode.Failed);
+            }
 
             return result;
         });

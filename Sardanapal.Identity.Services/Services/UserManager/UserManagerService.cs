@@ -150,9 +150,12 @@ public interface IOtpUserManagerService<TUserKey, TUser, TRole> : IUserManagerSe
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
 {
+    Task<TUserKey> RequestLoginUser(long phonenumber);
+    Task<TUserKey> RequestLoginUser(string email);
     Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName);
     Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName);
-    Task<bool> VerifyOtpCode(string code, TUserKey id, byte roleId);
+    Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId);
+    Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId);
 }
 
 public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerService<TUserKey, TUser, TRole, TUR>
@@ -169,6 +172,50 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
 
     {
         OtpService = _otpService;
+    }
+
+    public async Task<TUserKey> RequestLoginUser(long phonenumber)
+    {
+        var user = await this.Users
+            .Where(x => x.PhoneNumber == phonenumber)
+            .FirstOrDefaultAsync();
+
+        if (user != null)
+        {
+            await OtpService.Add(new NewOtpVM<TUserKey>()
+            {
+                UserId = user.Id,
+                RoleId = _currentRole
+            });
+
+            return user.Id;
+        }
+        else
+        {
+            throw new Exception("User phone number not found!");
+        }
+    }
+
+    public async Task<TUserKey> RequestLoginUser(string email)
+    {
+        var user = await this.Users
+            .Where(x => x.Email == email)
+            .FirstOrDefaultAsync();
+
+        if (user != null)
+        {
+            await OtpService.Add(new NewOtpVM<TUserKey>()
+            {
+                UserId = user.Id,
+                RoleId = _currentRole
+            });
+
+            return user.Id;
+        }
+        else
+        {
+            throw new Exception("User email not found!");
+        }
     }
 
     public async Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName)
@@ -245,7 +292,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         return curUser.Id;
     }
 
-    public async Task<bool> VerifyOtpCode(string code, TUserKey id, byte roleId)
+    public async Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId)
     {
         var curUser = await Users
             .Where(x => x.Id.Equals(id))
@@ -265,6 +312,10 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
                 {
                     curUser.VerifiedPhoneNumber = true;
                 }
+                else
+                {
+                    return false;
+                }
 
                 _context.Set<TUser>().Update(curUser);
                 await _context.SaveChangesAsync();
@@ -273,6 +324,31 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
             }
 
             return false;
+        }
+        else
+        {
+            throw new Exception("Invalid user id!");
+        }
+    }
+
+    public async Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId)
+    {
+        var curUser = await Users
+            .Where(x => x.Id.Equals(id))
+            .FirstOrDefaultAsync();
+
+        if (curUser != null)
+        {
+            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey> { UserId = id, Code = code, RoleId = roleId });
+
+            if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
+            {
+                string token = _tokenService.GenerateToken(curUser.Username, _currentRole);
+
+                return token;
+            }
+
+            return string.Empty;
         }
         else
         {
