@@ -12,6 +12,7 @@ public interface ITokenService
 
     bool ValidateToken(string token);
     public bool ValidateTokenRole(string token, byte roleId);
+    public bool ValidateTokenRoles(string token, byte[] roleIds);
     string GenerateToken(string username, byte roleId);
 }
 public class TokenService : ITokenService
@@ -33,6 +34,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    // TODO: Needs review
     public bool ValidateToken(string token)
     {
         try
@@ -56,6 +58,43 @@ public class TokenService : ITokenService
             return true;
         }
         catch
+        {
+            // Log the reason why the token is not valid
+            return false;
+        }
+    }
+
+    public bool ValidateTokenRoles(string token, byte[] roleIds)
+    {
+        try
+        {
+            var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = Info.Issuer,
+                ValidateAudience = true,
+                ValidAudience = Info.Audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = SymmetricKey,
+                ValidateLifetime = true
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var claimsPrinc = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+            if (claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
+                && roleIds.Select(r => r.ToString()).Contains(c.Value)))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (SecurityTokenValidationException ex)
         {
             // Log the reason why the token is not valid
             return false;
