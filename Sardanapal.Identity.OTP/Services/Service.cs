@@ -20,10 +20,10 @@ public interface IOtpService<TUserKey, TSearchVM, TVM, TNewVM, TEditableVM>
 
 }
 
-public class OtpService<UnitOfWork, TUserKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    : EfCrudService<UnitOfWork, Guid, OTPModel<TUserKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+public class OtpService<TContext, TUserKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+    : EfCrudService<TContext, Guid, OTPModel<TUserKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
-    where UnitOfWork : DbContext
+    where TContext : DbContext
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TListItemVM : OtpListItemVM<Guid>
     where TSearchVM : OtpSearchVM, new()
@@ -35,7 +35,7 @@ public class OtpService<UnitOfWork, TUserKey, TListItemVM, TSearchVM, TVM, TNewV
 
     public override string ServiceName => "OtpService";
 
-    public OtpService(UnitOfWork unitOfWork, IMapper _Mapper, IRequestService _Context, int expireTime)
+    public OtpService(TContext unitOfWork, IMapper _Mapper, IRequestService _Context, int expireTime)
         : base(unitOfWork, _Mapper, _Context)
     {
         this.expireTime = expireTime;

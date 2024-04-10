@@ -7,8 +7,10 @@ using Sardanapal.Identity.ViewModel.Models.VM;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
-public interface IOtpAccountServiceBase<TUserKey>
+public interface IOtpAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM> : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TLoginVM : LoginVM
+    where TLoginDto : LoginDto
 {
     Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM Model);
     Task<IResponse<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model);

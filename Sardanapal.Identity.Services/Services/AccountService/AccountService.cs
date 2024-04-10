@@ -14,7 +14,7 @@ public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     Task<IResponse<LoginDto>> Login(LoginVM Model);
 }
 
-public abstract class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
     : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
