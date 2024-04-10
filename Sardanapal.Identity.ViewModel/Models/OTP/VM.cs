@@ -41,8 +41,14 @@ public class ValidateOtpVM<TUserKey>
     public byte RoleId { get; set; }
 }
 
-public class OtpRequestVM
+public class OtpLoginRequestVM
 {
     public string? Email { get; set; }
     public long? PhoneNumber { get; set; }
+}
+
+public class OtpRegisterRequestVM : OtpLoginRequestVM
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
 }
