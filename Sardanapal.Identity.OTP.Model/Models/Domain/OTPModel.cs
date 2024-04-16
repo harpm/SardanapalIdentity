@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sardanapal.Identity.OTP.Models.Domain;
 
-public interface IOTPModel<TUserKey> : IBaseEntityModel<Guid>, ICachModel<Guid>
+public interface IOTPModel<TUserKey, TKey> : IBaseEntityModel<TKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     string Code { get; set; }
 
@@ -16,8 +17,9 @@ public interface IOTPModel<TUserKey> : IBaseEntityModel<Guid>, ICachModel<Guid>
     byte? Role { get; set; }
 }
 
-public class OTPModel<TUserKey> : BaseEntityModel<Guid>, IOTPModel<TUserKey>
+public class OTPModel<TUserKey, TKey> : BaseEntityModel<TKey>, IOTPModel<TUserKey, TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     [Required]
     public virtual string Code { get; set; }
