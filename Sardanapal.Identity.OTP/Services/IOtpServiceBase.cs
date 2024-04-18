@@ -2,14 +2,15 @@
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpService<TUserKey, TNewVM, TValidateVM>
+public interface IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
     where TNewVM : class, new()
     where TValidateVM : class, new()
 {
     int expireTime { get; set; }
 
-    Task<IResponse<Guid>> Add(TNewVM model);
+    Task<IResponse<TKey>> Add(TNewVM model);
     Task<IResponse<bool>> ValidateOtp(TValidateVM model);
     Task RemoveExpireds();
 }

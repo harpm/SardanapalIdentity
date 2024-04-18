@@ -2,27 +2,30 @@
 using Sardanapal.RedisCache.Services;
 using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.OTP.Models.Domain;
-using Sardanapal.Identity.ViewModel.Models.VM;
 using AutoMapper;
 using System.Text.Json;
+using Sardanapal.Identity.OTP.Model.Models.VM;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TUserKey, TOtpCachModel>
-    : ICacheService<OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
-    , IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
+public interface IOtpCachService<TUserKey, TKey, TOtpCachModel>
+    : ICacheService<TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, CachNewOtpVM<TUserKey, TKey>, CachOtpEditableVM<TUserKey, TKey>>
+    , IOtpServiceBase<TUserKey, TKey, CachNewOtpVM<TUserKey, TKey>, ValidateOtpVM<TUserKey>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TOtpCachModel : OTPModel<TUserKey>, new()
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TOtpCachModel : OTPModel<TUserKey, TKey>, new()
 {
 
 }
 
-public class OtpCachService<TUserKey, TOtpCachModel> : CacheService<OTPModel<TUserKey>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
-    , IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
+public class OtpCachService<TUserKey, TKey, TOtpCachModel>
+    : CacheService<OTPModel<TUserKey, TKey>, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, CachNewOtpVM<TUserKey, TKey>, CachOtpEditableVM<TUserKey, TKey>>
+    , IOtpCachService<TUserKey, TKey, TOtpCachModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TOtpCachModel : OTPModel<Guid>, new()
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TOtpCachModel : OTPModel<TUserKey, TKey>, new()
 {
-    protected override string Key => "Otp";
+    protected override string key => "Otp";
 
     public int expireTime
     {
@@ -42,7 +45,7 @@ public class OtpCachService<TUserKey, TOtpCachModel> : CacheService<OTPModel<TUs
         otpHelper = _otpHelper;
     }
 
-    public override Task<IResponse<Guid>> Add(NewOtpVM<TUserKey> Model)
+    public override Task<IResponse<TKey>> Add(CachNewOtpVM<TUserKey, TKey> Model)
     {
         Model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
         Model.Code = otpHelper.GenerateNewOtp();
@@ -62,21 +65,18 @@ public class OtpCachService<TUserKey, TOtpCachModel> : CacheService<OTPModel<TUs
     /// <returns></returns>
     public async Task RemoveExpireds()
     {
-        var allOtps = await GetCurrentDatabase().HashGetAllAsync(new RedisKey(Key));
+        var allOtps = await GetCurrentDatabase().HashGetAllAsync(new RedisKey(key));
 
         var ids = allOtps
-            .Select(x => JsonSerializer.Deserialize<OTPModel<TUserKey>>(x.Value))
+            .Select(x => JsonSerializer.Deserialize<OTPModel<TUserKey, TKey>>(x.Value))
             .AsEnumerable()
             .Where(x => x?.ExpireTime <= DateTime.UtcNow)
-            .Select(x => x?.Id)
+            .Select(x => x.Id)
             .ToList();
 
         foreach (var id in ids)
         {
-            if (id.HasValue)
-            {
-                await Delete(id.Value);
-            }
+            await Delete(id);
         }
     }
 }

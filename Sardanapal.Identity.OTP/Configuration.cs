@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Sardanapal.Identity.OTP.Model.Models.VM;
 using Sardanapal.Identity.OTP.Models.Domain;
 using Sardanapal.Identity.OTP.Services;
-using Sardanapal.Identity.ViewModel.Models.VM;
 
 namespace Sardanapal.Identity.OTP
 {
     public static class Configuration
     {
         /// <summary>
-        /// This will add otp services to the DI
+        /// This will add OTP services to the DI container
         /// </summary>
         /// <typeparam name="TContext"></typeparam>
         /// <typeparam name="TUserKey"></typeparam>
@@ -25,13 +25,13 @@ namespace Sardanapal.Identity.OTP
         {
             if (useCach)
             {
-                services.AddScoped<IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
-                    , OtpCachService<TUserKey, OTPModel<Guid>>>();
+                services.AddScoped<IOtpServiceBase<TUserKey, Guid, CachNewOtpVM<TUserKey, Guid>, ValidateOtpVM<TUserKey>>
+                    , OtpCachService<TUserKey, Guid, OTPModel<TUserKey, Guid>>>();
             }
             else
             {
-                services.AddScoped<IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
-                    , OtpService<TContext, TUserKey, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>>();
+                services.AddScoped<IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
+                    , OtpService<TContext, TUserKey, Guid, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>>();
             }
             return services;
         }

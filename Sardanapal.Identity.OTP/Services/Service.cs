@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Ef.Service.Services;
+using Sardanapal.Identity.OTP.Model.Models.VM;
 using Sardanapal.Identity.OTP.Models.Domain;
-using Sardanapal.Identity.ViewModel.Models.VM;
 using Sardanapal.InterfacePanel.Service;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpService<TUserKey, TSearchVM, TVM, TNewVM, TEditableVM>
+public interface IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM>
     : ICrudService<TUserKey, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
+    , IOtpServiceBase<TUserKey, TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
     where TSearchVM : OtpSearchVM, new()
     where TVM : OtpVM, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
@@ -20,12 +21,13 @@ public interface IOtpService<TUserKey, TSearchVM, TVM, TNewVM, TEditableVM>
 
 }
 
-public class OtpService<TContext, TUserKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    : EfCrudService<TContext, Guid, OTPModel<TUserKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
+public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+    : EfCrudService<TContext, TKey, OTPModel<TUserKey, TKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM, ValidateOtpVM<TUserKey>>
     where TContext : DbContext
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TListItemVM : OtpListItemVM<Guid>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TListItemVM : OtpListItemVM<TKey>
     where TSearchVM : OtpSearchVM, new()
     where TVM : OtpVM, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
