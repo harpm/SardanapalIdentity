@@ -1,9 +1,9 @@
 ﻿
 using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.Dto;
+using Sardanapal.Identity.OTP.Model.Models.VM;
 using Sardanapal.Identity.Services.Services.UserManager;
 using Sardanapal.Identity.ViewModel.Models.Account;
-using Sardanapal.Identity.ViewModel.Models.VM;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
@@ -40,7 +40,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     {
         var result = new Response<TUserKey>(ServiceName, OperationType.Function);
 
-        return await result.Create(async () =>
+        return await result.FillAsync(async () =>
         {
             dynamic identifier = model.PhoneNumber.HasValue ? model.PhoneNumber
                 : !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null;
@@ -65,7 +65,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     {
         var result = new Response<LoginDto>();
 
-        return await result.Create(async () =>
+        return await result.FillAsync(async () =>
         {
             var token = await userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
 
@@ -89,7 +89,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     public async Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRegisterRequestVM model)
     {
         var result = new Response<TUserKey>();
-        return await result.Create(async () =>
+        return await result.FillAsync(async () =>
         {
             dynamic identifier = model.PhoneNumber.HasValue ? model.PhoneNumber
                 : !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null;
@@ -114,7 +114,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     {
         var result = new Response<bool>();
 
-        return await result.Create(async () =>
+        return await result.FillAsync(async () =>
         {
             var isValid = await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
             if (isValid)

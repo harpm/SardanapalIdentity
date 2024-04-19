@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Sardanapal.Identity.Share.Options;
+using Sardanapal.ViewModel.Response;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -10,34 +11,44 @@ public interface ITokenService
 {
     IdentityInfo Info { get; set; }
 
-    bool ValidateToken(string token);
-    public bool ValidateTokenRole(string token, byte roleId);
-    public bool ValidateTokenRoles(string token, byte[] roleIds);
-    string GenerateToken<TUserKey>(TUserKey uid, byte roleId);
+    IResponse<ClaimsPrincipal> ValidateToken(string token);
+    IResponse<bool> ValidateTokenRole(string token, byte roleId);
+    IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds);
+    IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId);
 }
 public class TokenService : ITokenService
 {
+    public string ServiceName => "TokenService";
+
     public IdentityInfo Info { get; set; }
 
-    public string GenerateToken<TUserKey>(TUserKey uid, byte roleId)
+    public IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
     {
-        var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
-        var Credentials = new SigningCredentials(SymmetricKey, SecurityAlgorithms.HmacSha256);
-        var Claims = new[]
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
+
+        return result.Fill(() =>
         {
-            new Claim(ClaimTypes.NameIdentifier, uid.ToString()),
-            new Claim(ClaimTypes.Role, roleId.ToString())
-        };
-        var token = new JwtSecurityToken(Info.Issuer, Info.Audience, Claims
-            , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
-            , signingCredentials: Credentials);
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
+            var Credentials = new SigningCredentials(SymmetricKey, SecurityAlgorithms.HmacSha256);
+            var Claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, uid.ToString()),
+                new Claim(ClaimTypes.Role, roleId.ToString())
+            };
+            var token = new JwtSecurityToken(Info.Issuer, Info.Audience, Claims
+                , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
+                , signingCredentials: Credentials);
+            result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
+            return result;
+        });
     }
 
     // TODO: Needs review
-    public bool ValidateToken(string token)
+    public IResponse<ClaimsPrincipal> ValidateToken(string token)
     {
-        try
+        IResponse<ClaimsPrincipal> result = new Response<ClaimsPrincipal>(ServiceName, OperationType.Function);
+
+        return result.Fill(() =>
         {
             var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
 
@@ -53,20 +64,17 @@ public class TokenService : ITokenService
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            result.Set(StatusCode.Succeeded, tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken));
 
-            return true;
-        }
-        catch
-        {
-            // Log the reason why the token is not valid
-            return false;
-        }
+            return result;
+        });
     }
 
-    public bool ValidateTokenRoles(string token, byte[] roleIds)
+    public IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds)
     {
-        try
+        IResponse<bool> result = new Response(ServiceName, OperationType.Function);
+
+        return result.Fill(() => 
         {
             var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
 
@@ -84,26 +92,18 @@ public class TokenService : ITokenService
             var tokenHandler = new JwtSecurityTokenHandler();
             var claimsPrinc = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-            if (claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
-                && roleIds.Select(r => r.ToString()).Contains(c.Value)))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch (SecurityTokenValidationException ex)
-        {
-            // Log the reason why the token is not valid
-            return false;
-        }
+            result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
+                && roleIds.Select(r => r.ToString()).Contains(c.Value)));
+            
+            return result;
+        });
     }
 
-    public bool ValidateTokenRole(string token, byte roleId)
+    public IResponse<bool> ValidateTokenRole(string token, byte roleId)
     {
-        try
+        IResponse<bool> result = new Response(ServiceName, OperationType.Function);
+
+        return result.Fill(() =>
         {
             var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
 
@@ -121,19 +121,8 @@ public class TokenService : ITokenService
             var tokenHandler = new JwtSecurityTokenHandler();
             var claimsPrinc = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
-            if (claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        catch (SecurityTokenValidationException ex)
-        {
-            // Log the reason why the token is not valid
-            return false;
-        }
+            result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()));
+            return result;
+        });
     }
 }

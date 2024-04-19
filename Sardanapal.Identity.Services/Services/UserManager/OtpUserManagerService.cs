@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sardanapal.Identity.Domain.Data;
 using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.OTP.Services;
-using Sardanapal.Identity.ViewModel.Models.VM;
+using Sardanapal.Identity.OTP.Model.Models.VM;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
@@ -212,9 +212,8 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {
-                string token = _tokenService.GenerateToken(curUser.Username, _currentRole);
-
-                return token;
+                var tokenRes = _tokenService.GenerateToken(curUser.Username, _currentRole);
+                return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
             }
 
             return string.Empty;

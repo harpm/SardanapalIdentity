@@ -2,6 +2,7 @@
 using Sardanapal.Identity.Domain.Data;
 using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.Services.Statics;
+using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
@@ -109,9 +110,9 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
             && x.HashedPassword == md5Pass)
             .FirstAsync();
 
-        string token = _tokenService.GenerateToken(user.Id, _currentRole);
+        var tokenRes = _tokenService.GenerateToken(user.Id, _currentRole);
 
-        return token;
+        return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
     }
 
     public async Task<TUserKey> RegisterUser(string username, string password)
