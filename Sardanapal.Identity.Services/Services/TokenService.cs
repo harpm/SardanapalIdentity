@@ -11,7 +11,7 @@ public interface ITokenService
 {
     IdentityInfo Info { get; set; }
 
-    IResponse<ClaimsPrincipal> ValidateToken(string token);
+    IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims);
     IResponse<bool> ValidateTokenRole(string token, byte roleId);
     IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds);
     IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId);
@@ -44,11 +44,12 @@ public class TokenService : ITokenService
     }
 
     // TODO: Needs review
-    public IResponse<ClaimsPrincipal> ValidateToken(string token)
+    public IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims)
     {
-        IResponse<ClaimsPrincipal> result = new Response<ClaimsPrincipal>(ServiceName, OperationType.Function);
-
-        return result.Fill(() =>
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Function);
+        claims = new ClaimsPrincipal();
+        
+        try
         {
             var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
 
@@ -64,10 +65,17 @@ public class TokenService : ITokenService
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            result.Set(StatusCode.Succeeded, tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken));
+            claims = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
 
+            result.Set(StatusCode.Succeeded, true);
             return result;
-        });
+        }
+        catch (Exception ex)
+        {
+            result.Set(StatusCode.Exception, ex);
+        }
+
+        return result;
     }
 
     public IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds)
