@@ -9,8 +9,6 @@ namespace Sardanapal.Identity.Services.Services;
 
 public interface ITokenService
 {
-    IdentityInfo Info { get; set; }
-
     IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims);
     IResponse<bool> ValidateTokenRole(string token, byte roleId);
     IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds);
@@ -20,7 +18,12 @@ public class TokenService : ITokenService
 {
     public string ServiceName => "TokenService";
 
-    public IdentityInfo Info { get; set; }
+    public readonly IdentityInfo Info;
+
+    public TokenService(IdentityInfo identityInfo)
+    {
+        this.Info = identityInfo;
+    }
 
     public IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
     {
