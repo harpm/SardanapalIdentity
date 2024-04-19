@@ -109,22 +109,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
             && x.HashedPassword == md5Pass)
             .FirstAsync();
 
-        string token = _tokenService.GenerateToken(username, _currentRole);
-
-        return token;
-    }
-
-    public async Task<string> LoginViaOtp(TUserKey userId)
-    {
-        var username = await (from user in _context.Set<TUser>().AsNoTracking()
-                       join ur in _context.Set<TUR>().AsNoTracking() on user.Id equals ur.UserId
-                       where user.Id.Equals(userId) && ur.RoleId == _currentRole
-                       select user.Username).FirstOrDefaultAsync();
-
-        if (string.IsNullOrWhiteSpace(username))
-            throw new NullReferenceException("The user is not available");
-
-        string token = _tokenService.GenerateToken(username, _currentRole);
+        string token = _tokenService.GenerateToken(user.Id, _currentRole);
 
         return token;
     }

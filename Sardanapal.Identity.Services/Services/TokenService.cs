@@ -13,21 +13,21 @@ public interface ITokenService
     bool ValidateToken(string token);
     public bool ValidateTokenRole(string token, byte roleId);
     public bool ValidateTokenRoles(string token, byte[] roleIds);
-    string GenerateToken(string username, byte roleId);
+    string GenerateToken<TUserKey>(TUserKey uid, byte roleId);
 }
 public class TokenService : ITokenService
 {
     public IdentityInfo Info { get; set; }
 
-    public string GenerateToken(string username, byte roleId)
+    public string GenerateToken<TUserKey>(TUserKey uid, byte roleId)
     {
         var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
         var Credentials = new SigningCredentials(SymmetricKey, SecurityAlgorithms.HmacSha256);
         var Claims = new[]
         {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, roleId.ToString()),
-            };
+            new Claim(ClaimTypes.NameIdentifier, uid.ToString()),
+            new Claim(ClaimTypes.Role, roleId.ToString())
+        };
         var token = new JwtSecurityToken(Info.Issuer, Info.Audience, Claims
             , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
             , signingCredentials: Credentials);

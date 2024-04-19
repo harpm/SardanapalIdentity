@@ -71,7 +71,6 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-
                 result.Set(StatusCode.Succeeded, new LoginDto()
                 {
                     Token = token

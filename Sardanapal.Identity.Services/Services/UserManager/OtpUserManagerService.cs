@@ -203,7 +203,12 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey> { UserId = id, Code = code, RoleId = roleId });
+            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey>
+            {
+                UserId = id,
+                Code = code,
+                RoleId = roleId
+            });
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {

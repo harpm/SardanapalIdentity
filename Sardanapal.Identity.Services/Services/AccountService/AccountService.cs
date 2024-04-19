@@ -39,7 +39,6 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
 
         return await result.Create(async () =>
         {
-
             string token = await userManagerService.Login(Model.Username, Model.Password);
             result.Set(StatusCode.Succeeded, new LoginDto() { Token = token });
 
