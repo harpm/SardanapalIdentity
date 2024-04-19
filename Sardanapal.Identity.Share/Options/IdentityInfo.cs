@@ -12,16 +12,16 @@ public class IdentityInfo
     public int ExpirationTime { get; set; }
     public int? OTPLength { get; set; }
 
-    public void SetConfigValues(IConfiguration config)
+    public IdentityInfo(IConfiguration config)
     {
         ConnectionString = config.GetConnectionString("Main");
         RedisConnectionString = config.GetConnectionString("Redis");
         var TokenProvider = config.GetSection("TokenProvider");
-        Audience = TokenProvider.GetValue<string>("Audience");
-        Issuer = TokenProvider.GetValue<string>("Issuer");
-        SecretKey = TokenProvider.GetValue<string>("SecretKey");
-        ExpirationTime = TokenProvider.GetValue<int>("TokenExpireTime");
-        OTPLength = TokenProvider.GetValue<int>("OtpLength");
+        Audience = TokenProvider.GetSection("Audience").Value;
+        Issuer = TokenProvider.GetSection("Issuer").Value;
+        SecretKey = TokenProvider.GetSection("SecretKey").Value;
+        ExpirationTime = Convert.ToInt32(TokenProvider.GetSection("TokenExpireTime").Value);
+        OTPLength = Convert.ToInt32(TokenProvider.GetSection("OtpLength").Value);
     }
 }
 
