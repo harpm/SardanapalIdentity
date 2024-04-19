@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Sardanapal.Identity.Authorization.Data;
 using Sardanapal.Identity.Services.Services;
 
 namespace Sardanapal.Identity.Authorization.Filters;
@@ -19,21 +20,10 @@ public class AuthorizeAttribute : ActionFilterAttribute
 
         try
         {
-            string? token = context.HttpContext.Request.Headers
-                .Where(h => h.Key == "Auth")
-                .Select(h => h.Value)
-                .FirstOrDefault();
-
-            if (string.IsNullOrWhiteSpace(token))
+            IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
+            if (!idHolder.IsAuthorized)
             {
                 context.Result = new UnauthorizedResult();
-            }
-            else
-            {
-                if (!_tokenService.ValidateToken(token))
-                {
-                    context.Result = new UnauthorizedResult();
-                }
             }
         }
         catch (Exception ex)
@@ -46,26 +36,16 @@ public class AuthorizeAttribute : ActionFilterAttribute
     {
         try
         {
-            string? token = context.HttpContext.Request.Headers
-                .Where(h => h.Key == "Auth")
-                .Select(h => h.Value)
-                .FirstOrDefault();
-
-            if (string.IsNullOrWhiteSpace(token))
+            IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
+            if (!idHolder.IsAuthorized)
             {
                 context.Result = new UnauthorizedResult();
             }
             else
             {
-                if (!_tokenService.ValidateToken(token))
-                {
-                    context.Result = new UnauthorizedResult();
-                }
-                else
-                {
-                    await next();
-                }
+                await next();
             }
+
         }
         catch (Exception ex)
         {

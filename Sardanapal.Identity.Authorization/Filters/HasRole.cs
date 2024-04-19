@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Sardanapal.Identity.Authorization.Data;
 using Sardanapal.Identity.Services.Services;
+using System.Security.Claims;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 
@@ -19,23 +21,13 @@ public class HasRoleAttribute : ActionFilterAttribute
 
         try
         {
-            ITokenService? tokenService = context?.HttpContext?.RequestServices?.GetService(typeof(ITokenService)) as ITokenService;
-
-            string? token = context?.HttpContext.Request.Headers
-                .Where(h => h.Key == "Auth")
-                .Select(h => h.Value)
-                .FirstOrDefault();
-
-            if (string.IsNullOrWhiteSpace(token))
+            IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
+            if (!idHolder.IsAuthorized
+                && !idHolder.Principals.Claims
+                    .Where(c => c.ValueType == ClaimTypes.Role
+                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.Result = new UnauthorizedResult();
-            }
-            else
-            {
-                if (!roleIds.Any(r => tokenService.ValidateTokenRole(token, r)))
-                {
-                    context.Result = new UnauthorizedResult();
-                }
             }
         }
         catch
@@ -48,27 +40,17 @@ public class HasRoleAttribute : ActionFilterAttribute
     {
         try
         {
-            ITokenService? tokenService = context?.HttpContext?.RequestServices?.GetService(typeof(ITokenService)) as ITokenService;
-
-            string? token = context?.HttpContext.Request.Headers
-                .Where(h => h.Key == "Auth")
-                .Select(h => h.Value)
-                .FirstOrDefault();
-
-            if (string.IsNullOrWhiteSpace(token))
+            IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
+            if (!idHolder.IsAuthorized
+                && !idHolder.Principals.Claims
+                    .Where(c => c.ValueType == ClaimTypes.Role
+                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.Result = new UnauthorizedResult();
             }
             else
             {
-                if (!roleIds.Any(r => tokenService.ValidateTokenRole(token, r)))
-                {
-                    context.Result = new UnauthorizedResult();
-                }
-                else
-                {
-                    await next();
-                }
+                await next();
             }
         }
         catch

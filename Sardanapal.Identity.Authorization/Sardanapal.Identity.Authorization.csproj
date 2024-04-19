@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.2" />
+		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.3" />
 		<PackageReference Include="Sardanapal.Identity.Services" Version="0.1.8" />
 	</ItemGroup>
 
