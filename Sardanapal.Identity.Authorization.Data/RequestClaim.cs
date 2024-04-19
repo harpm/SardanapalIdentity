@@ -2,7 +2,9 @@
 
 namespace Sardanapal.Identity.Authorization.Data;
 
-public class RequestClaim
+public interface IRequestClaim<TUserKey>
+    where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
 {
-    public ClaimsPrincipal Claims { get; set; }
+    ClaimsPrincipal Claims { protected get; set; }
+    TUserKey GetCurrentUserId();
 }
