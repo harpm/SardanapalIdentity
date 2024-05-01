@@ -11,7 +11,7 @@ public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
+    where TRole : class, IRoleBase<TRoleKey>, new()
     where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
 {
     DbSet<TUser> Users { get; set; }
@@ -19,13 +19,13 @@ public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR
     DbSet<TUR> UserRoles { get; set; }
 }
 
-public abstract class SdIdentityUnitOfWorkBase<UOW, TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork<UOW>
+public abstract class SdIdentityUnitOfWorkBase<UOW, TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
     , ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>
     where UOW : SdIdentityUnitOfWorkBase<UOW, TUserKey, TRoleKey, TUser, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
+    where TRole : class, IRoleBase<TRoleKey>, new()
     where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
 {
     protected readonly IIdentityHolder _reqClaim;
@@ -34,7 +34,7 @@ public abstract class SdIdentityUnitOfWorkBase<UOW, TUserKey, TRoleKey, TUser, T
     public DbSet<TRole> Roles { get; set; }
     public DbSet<TUR> UserRoles { get; set; }
     
-    public SdIdentityUnitOfWorkBase(DbContextOptions<UOW> opt, IIdentityHolder requestClaim)
+    public SdIdentityUnitOfWorkBase(DbContextOptions opt, IIdentityHolder requestClaim)
         : base(opt)
     {
         _reqClaim = requestClaim;
