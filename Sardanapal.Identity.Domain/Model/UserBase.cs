@@ -15,10 +15,9 @@ public interface IUserBase<TUserKey> : IBaseEntityModel<TUserKey>
     bool VerifiedPhoneNumber { get; set; }
 }
 
-public class UserBase<TUserKey, TRoleKey> : BaseEntityModel<TUserKey>
+public class UserBase<TUserKey> : BaseEntityModel<TUserKey>
     , IUserBase<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
 {
     public virtual string FirstName { get; set; }
     public virtual string LastName { get; set; }
@@ -28,6 +27,12 @@ public class UserBase<TUserKey, TRoleKey> : BaseEntityModel<TUserKey>
     public virtual bool VerifiedEmail { get; set; }
     public virtual long? PhoneNumber { get; set; }
     public virtual bool VerifiedPhoneNumber { get; set; }
+}
+
+public class SardanapalUser<TUserKey, TRoleKey> : UserBase<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+{
     public virtual ICollection<UserRoleBase<TUserKey, TRoleKey>> UserRoles { get; set; }
         = new HashSet<UserRoleBase<TUserKey, TRoleKey>>();
 }

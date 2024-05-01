@@ -18,5 +18,11 @@ public class UserRoleBase<TUserKey, TRoleKey> : BaseEntityModel<long>, IUserRole
     
     public TRoleKey RoleId { get; set; }
 
-    public virtual RoleBase<TRoleKey, TUserKey> Roles { get; set; }
+}
+
+public class SardanapalUserRole<TUserKey, TRoleKey> : UserRoleBase<TUserKey, TRoleKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+{
+    public virtual SardanapalRole<TRoleKey, TUserKey> Roles { get; set; }
 }
