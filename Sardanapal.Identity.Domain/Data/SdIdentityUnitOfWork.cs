@@ -7,23 +7,25 @@ using System.Security.Claims;
 
 namespace Sardanapal.Identity.Domain.Data;
 
-public interface ISdIdentityUnitOfWorkBase<TKey, TUser, TRole, TUR> : ISardanapalUnitOfWork
-    where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TUser : class, IUserBase<TKey>, new()
+public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : ISardanapalUnitOfWork
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+    where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TKey>, new()
+    where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
 {
     DbSet<TUser> Users { get; set; }
     DbSet<TRole> Roles { get; set; }
     DbSet<TUR> UserRoles { get; set; }
 }
 
-public abstract class SdIdentityUnitOfWorkBase<TUserKey, TUser, TRole, TUR> : SardanapalUnitOfWork
-    , ISdIdentityUnitOfWorkBase<TUserKey, TUser, TRole, TUR>
+public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
+    , ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey>, new()
+    where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
 {
     protected readonly RequestClaim _reqClaim;
 

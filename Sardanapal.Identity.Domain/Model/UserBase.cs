@@ -2,8 +2,8 @@
 
 namespace Sardanapal.Identity.Domain.Model;
 
-public interface IUserBase<TKey> : IBaseEntityModel<TKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public interface IUserBase<TUserKey> : IBaseEntityModel<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     string FirstName { get; set; }
     string LastName { get; set; }
@@ -15,9 +15,10 @@ public interface IUserBase<TKey> : IBaseEntityModel<TKey>
     bool VerifiedPhoneNumber { get; set; }
 }
 
-public class UserBase<TKey> : BaseEntityModel<TKey>
-    , IUserBase<TKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public class UserBase<TUserKey, TRoleKey> : BaseEntityModel<TUserKey>
+    , IUserBase<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
 {
     public virtual string FirstName { get; set; }
     public virtual string LastName { get; set; }
@@ -27,6 +28,6 @@ public class UserBase<TKey> : BaseEntityModel<TKey>
     public virtual bool VerifiedEmail { get; set; }
     public virtual long? PhoneNumber { get; set; }
     public virtual bool VerifiedPhoneNumber { get; set; }
-    public virtual ICollection<UserRoleBase<TKey>> UserRoles { get; set; }
-        = new HashSet<UserRoleBase<TKey>>();
+    public virtual ICollection<UserRoleBase<TUserKey, TRoleKey>> UserRoles { get; set; }
+        = new HashSet<UserRoleBase<TUserKey, TRoleKey>>();
 }

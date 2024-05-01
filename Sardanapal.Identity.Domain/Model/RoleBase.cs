@@ -13,6 +13,6 @@ public class RoleBase<TKey, TUserKey> : BaseEntityModel<TKey>, IRoleBase<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual string Title { get; set; }
-    public virtual ICollection<UserRoleBase<TUserKey>> UserRoles { get; set; }
-        = new HashSet<UserRoleBase<TUserKey>>();
+    public virtual ICollection<UserRoleBase<TUserKey, TKey>> UserRoles { get; set; }
+        = new HashSet<UserRoleBase<TUserKey, TKey>>();
 }
