@@ -19,7 +19,7 @@ public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR
     DbSet<TUR> UserRoles { get; set; }
 }
 
-public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
+public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork<SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>>
     , ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
@@ -27,13 +27,14 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole,
     where TRole : class, IRoleBase<byte>, new()
     where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
 {
-    protected readonly RequestClaim _reqClaim;
+    protected readonly IIdentityHolder _reqClaim;
 
     public DbSet<TUser> Users { get; set; }
     public DbSet<TRole> Roles { get; set; }
     public DbSet<TUR> UserRoles { get; set; }
     
-    public SdIdentityUnitOfWorkBase(RequestClaim requestClaim)
+    public SdIdentityUnitOfWorkBase(DbContextOptions<SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>> opt, IIdentityHolder requestClaim)
+        : base(opt)
     {
         _reqClaim = requestClaim;
     }
@@ -53,12 +54,12 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole,
             if (model.State == EntityState.Added)
             {
                 t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Principals?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             }
             else if (model.State == EntityState.Modified)
             {
                 t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Principals?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             }
         }
 
