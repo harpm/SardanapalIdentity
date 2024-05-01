@@ -15,7 +15,7 @@ public interface IUserBase<TUserKey> : IBaseEntityModel<TUserKey>
     bool VerifiedPhoneNumber { get; set; }
 }
 
-public class UserBase<TUserKey> : BaseEntityModel<TUserKey>
+public abstract class UserBase<TUserKey> : BaseEntityModel<TUserKey>
     , IUserBase<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
