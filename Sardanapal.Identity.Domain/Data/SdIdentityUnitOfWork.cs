@@ -19,9 +19,8 @@ public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR
     DbSet<TUR> UserRoles { get; set; }
 }
 
-public abstract class SdIdentityUnitOfWorkBase<UOW, TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
+public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
     , ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>
-    where UOW : SdIdentityUnitOfWorkBase<UOW, TUserKey, TRoleKey, TUser, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TUser : class, IUserBase<TUserKey>, new()
