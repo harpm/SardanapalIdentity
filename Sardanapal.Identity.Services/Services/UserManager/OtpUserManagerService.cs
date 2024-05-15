@@ -26,13 +26,13 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
     , IOtpUserManagerService<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : UserBase<TUserKey>, new()
-    where TRole : RoleBase<byte, TUserKey>, new()
-    where TUR : UserRoleBase<TUserKey>, new()
+    where TRole : RoleBase<byte>, new()
+    where TUR : UserRoleBase<TUserKey, byte>, new()
 {
-    protected IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>> OtpService { get; set; }
+    protected IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> OtpService { get; set; }
 
-    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole
-        , IOtpService<TUserKey, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>> _otpService) : base(context, tokenService, curRole)
+    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole
+        , IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> _otpService) : base(context, tokenService, curRole)
 
     {
         OtpService = _otpService;

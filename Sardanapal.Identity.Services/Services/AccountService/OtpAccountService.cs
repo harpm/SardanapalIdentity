@@ -24,7 +24,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey>, new()
+    where TUR : class, IUserRoleBase<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
 {

@@ -19,7 +19,7 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey>, new()
+    where TUR : class, IUserRoleBase<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
 {

@@ -27,10 +27,10 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey>, new()
+    where TUR : class, IUserRoleBase<TUserKey, byte>, new()
 {
     protected virtual byte _currentRole { get; }
-    protected SdIdentityUnitOfWorkBase<TUserKey, TUser, TRole, TUR> _context;
+    protected SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> _context;
     protected ITokenService _tokenService;
 
     public DbSet<TUser> Users
@@ -49,7 +49,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         }
     }
 
-    public UserManagerService(SdIdentityUnitOfWorkBase<TUserKey, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole)
+    public UserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole)
     {
         _context = context;
         _tokenService = tokenService;

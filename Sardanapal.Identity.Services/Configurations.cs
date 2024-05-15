@@ -18,7 +18,7 @@ public static class Configurations
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TUser : class, IUserBase<TUserKey>, new()
         where TRole : class, IRoleBase<byte>, new()
-        where TUR : class, IUserRoleBase<TUserKey>, new()
+        where TUR : class, IUserRoleBase<TUserKey, byte>, new()
         where TUserManager : class, IUserManagerService<TUserKey, TUser, TRole>, new()
         where TAccountService : class, IAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>, new()
     {
@@ -35,7 +35,7 @@ public static class Configurations
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TUser : class, IUserBase<TUserKey>, new()
         where TRole : class, IRoleBase<byte>, new()
-        where TUR : class, IUserRoleBase<TUserKey>, new()
+        where TUR : class, IUserRoleBase<TUserKey, byte>, new()
         where TUserManager : class, IOtpUserManagerService<TUserKey, TUser, TRole>, new()
         where TAccountService : class, IOtpAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>, new()
     {
