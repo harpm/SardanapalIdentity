@@ -3,7 +3,6 @@ using Sardanapal.Identity.Share.Options;
 using Sardanapal.ViewModel.Response;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace Sardanapal.Identity.Services.Services;
 
@@ -31,14 +30,15 @@ public class TokenService : ITokenService
 
         return result.Fill(() =>
         {
-            var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
-            var Credentials = new SigningCredentials(SymmetricKey, SecurityAlgorithms.HmacSha256);
+            var Credentials = new SigningCredentials(Info.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
             var Claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, uid.ToString()),
                 new Claim(ClaimTypes.Role, roleId.ToString())
             };
-            var token = new JwtSecurityToken(Info.Issuer, Info.Audience, Claims
+            var token = new JwtSecurityToken(Info.TokenParameters.ValidIssuer
+                , Info.TokenParameters.ValidAudience
+                , Claims
                 , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
                 , signingCredentials: Credentials);
             result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
@@ -51,24 +51,11 @@ public class TokenService : ITokenService
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Function);
         claims = new ClaimsPrincipal();
-        
+
         try
         {
-            var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = Info.Issuer,
-                ValidateAudience = true,
-                ValidAudience = Info.Audience,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = SymmetricKey,
-                ValidateLifetime = true
-            };
-
             var tokenHandler = new JwtSecurityTokenHandler();
-            claims = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            claims = tokenHandler.ValidateToken(token, Info.TokenParameters, out SecurityToken validatedToken);
 
             result.Set(StatusCode.Succeeded, true);
             return result;
@@ -85,27 +72,15 @@ public class TokenService : ITokenService
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Function);
 
-        return result.Fill(() => 
+        return result.Fill(() =>
         {
-            var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = Info.Issuer,
-                ValidateAudience = true,
-                ValidAudience = Info.Audience,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = SymmetricKey,
-                ValidateLifetime = true
-            };
-
             var tokenHandler = new JwtSecurityTokenHandler();
-            var claimsPrinc = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            var claimsPrinc = tokenHandler
+                .ValidateToken(token, Info.TokenParameters, out SecurityToken validatedToken);
 
             result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
                 && roleIds.Select(r => r.ToString()).Contains(c.Value)));
-            
+
             return result;
         });
     }
@@ -116,23 +91,12 @@ public class TokenService : ITokenService
 
         return result.Fill(() =>
         {
-            var SymmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Info.SecretKey));
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = Info.Issuer,
-                ValidateAudience = true,
-                ValidAudience = Info.Audience,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = SymmetricKey,
-                ValidateLifetime = true
-            };
-
             var tokenHandler = new JwtSecurityTokenHandler();
-            var claimsPrinc = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            var claimsPrinc = tokenHandler
+                .ValidateToken(token, Info.TokenParameters, out SecurityToken validatedToken);
 
-            result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()));
+            result.Set(StatusCode.Succeeded
+                , claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()));
             return result;
         });
     }
