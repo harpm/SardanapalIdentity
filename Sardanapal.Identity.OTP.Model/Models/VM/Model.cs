@@ -22,8 +22,8 @@ public class NewOtpVM<TUserKey>
     public byte RoleId { get; set; }
 }
 
-public class OtpEditableVM<TKey> : NewOtpVM<TKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
+public class OtpEditableVM<TUserKey> : NewOtpVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
 
 }
