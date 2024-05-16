@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sardanapal.Identity.Domain.Data;
 using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.OTP.Services;
-using Sardanapal.Identity.OTP.Model.Models.VM;
+using Sardanapal.Identity.OTP.VM;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
