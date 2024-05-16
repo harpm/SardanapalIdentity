@@ -1,6 +1,6 @@
 ﻿using Sardanapal.ViewModel.Models;
 
-namespace Sardanapal.Identity.OTP.Model.Models.VM;
+namespace Sardanapal.Identity.OTP.VM;
 
 public class OtpListItemVM<TKey> : BaseListItem<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>

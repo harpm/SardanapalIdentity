@@ -2,7 +2,7 @@
 using Sardanapal.RedisCach.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Sardanapal.Identity.OTP.Models.Domain;
+namespace Sardanapal.Identity.OTP.Domain;
 
 public interface IOTPModel<TUserKey, TKey> : IBaseEntityModel<TKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>

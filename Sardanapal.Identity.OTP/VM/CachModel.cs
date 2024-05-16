@@ -1,7 +1,7 @@
 ﻿using Sardanapal.RedisCach.Models;
 using Sardanapal.ViewModel.Models;
 
-namespace Sardanapal.Identity.OTP.Model.Models.VM;
+namespace Sardanapal.Identity.OTP.VM;
 
 public class CachOtpListItemVM<TUserKey, TKey> : BaseListItem<TKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
