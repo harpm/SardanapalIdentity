@@ -6,17 +6,16 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Shared</Title>
-		<Version>0.1.6</Version>
+		<Version>0.1.7</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.3.0" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.5.2" />
 		<PackageReference Include="Sardanapal.Share" Version="0.1.1" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
 	</ItemGroup>
 
 </Project>
