@@ -117,7 +117,7 @@ jobs:
       - name: Push package OTP
         run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
 
-  update_OTP_Model:
+  update_OTP_Service:
     runs-on: ubuntu-latest
 
     steps:
@@ -130,15 +130,15 @@ jobs:
       - name: Add nuget source
         run: dotnet nuget add source --username harpm --password ${{ secrets.GITHUBTOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
       - name: Clean the build files
-        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Model/Sardanapal.Identity.OTP.Model.csproj
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Service/Sardanapal.Identity.OTP.Service.csproj
       - name: Restore dependencies
-        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Model/Sardanapal.Identity.OTP.Model.csproj
+        run: dotnet restore /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Service/Sardanapal.Identity.OTP.Service.csproj
       - name: Build
-        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Model/Sardanapal.Identity.OTP.Model.csproj --no-restore --configuration release
+        run: dotnet build /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Service/Sardanapal.Identity.OTP.Service.csproj --no-restore --configuration release
       - name: Clean the build files
-        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Model/Sardanapal.Identity.OTP.Model.csproj
+        run: dotnet clean /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Service/Sardanapal.Identity.OTP.Service.csproj
       - name: Push package OTPModel
-        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Model/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
+        run: dotnet nuget push /home/runner/work/SardanapalIdentity/SardanapalIdentity/Sardanapal.Identity.OTP.Service/bin/release/*.nupkg -s https://nuget.pkg.github.com/harpm/index.json --skip-duplicate
 
   update_services:
     runs-on: ubuntu-latest

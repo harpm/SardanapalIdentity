@@ -5,8 +5,6 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity", "Sardanapal.Identity\Sardanapal.Identity.csproj", "{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP", "Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj", "{F63CDDA5-D115-42AA-8A8D-6D95E9EC20F6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Services", "Sardanapal.Identity.Services\Sardanapal.Identity.Services.csproj", "{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Share", "Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj", "{ED689051-EC8E-4D76-AF62-C3173C352747}"
@@ -19,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Domain"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Authorization", "Sardanapal.Identity.Authorization\Sardanapal.Identity.Authorization.csproj", "{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.OTP.Model", "Sardanapal.Identity.OTP.Model\Sardanapal.Identity.OTP.Model.csproj", "{E61B49C6-C1F6-4AB9-AA2F-B438C4CEEAD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Authorization.Data", "Sardanapal.Identity.Authorization.Data\Sardanapal.Identity.Authorization.Data.csproj", "{49E8F317-127E-41DE-95A2-3B17C7C911DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Authorization.Data", "Sardanapal.Identity.Authorization.Data\Sardanapal.Identity.Authorization.Data.csproj", "{49E8F317-127E-41DE-95A2-3B17C7C911DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP", "Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj", "{4905E863-B192-4452-949D-1CB1C92431DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP.Service", "Sardanapal.Identity.OTP.Service\Sardanapal.Identity.OTP.Service.csproj", "{1083B670-E675-4B57-A7AA-E633012B149C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,6 @@ Global
 		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F63CDDA5-D115-42AA-8A8D-6D95E9EC20F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F63CDDA5-D115-42AA-8A8D-6D95E9EC20F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F63CDDA5-D115-42AA-8A8D-6D95E9EC20F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F63CDDA5-D115-42AA-8A8D-6D95E9EC20F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,14 +57,18 @@ Global
 		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E61B49C6-C1F6-4AB9-AA2F-B438C4CEEAD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E61B49C6-C1F6-4AB9-AA2F-B438C4CEEAD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E61B49C6-C1F6-4AB9-AA2F-B438C4CEEAD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E61B49C6-C1F6-4AB9-AA2F-B438C4CEEAD1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{49E8F317-127E-41DE-95A2-3B17C7C911DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{49E8F317-127E-41DE-95A2-3B17C7C911DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49E8F317-127E-41DE-95A2-3B17C7C911DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49E8F317-127E-41DE-95A2-3B17C7C911DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4905E863-B192-4452-949D-1CB1C92431DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4905E863-B192-4452-949D-1CB1C92431DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4905E863-B192-4452-949D-1CB1C92431DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4905E863-B192-4452-949D-1CB1C92431DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1083B670-E675-4B57-A7AA-E633012B149C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1083B670-E675-4B57-A7AA-E633012B149C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1083B670-E675-4B57-A7AA-E633012B149C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1083B670-E675-4B57-A7AA-E633012B149C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
