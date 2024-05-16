@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sardanapal.Identity.Domain.Model;
-using Sardanapal.DomainModel.UnitOfWork;
-using Sardanapal.DomainModel.Domain;
+using Sardanapal.Domain.UnitOfWork;
+using Sardanapal.Domain.Model;
 using Sardanapal.Identity.Authorization.Data;
 using System.Security.Claims;
 

@@ -1,4 +1,4 @@
-﻿using Sardanapal.DomainModel.Domain;
+﻿using Sardanapal.Domain.Model;
 
 namespace Sardanapal.Identity.Domain.Model;
 
