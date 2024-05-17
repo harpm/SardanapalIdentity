@@ -13,6 +13,7 @@ public interface ITokenService
     IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds);
     IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId);
 }
+
 public class TokenService : ITokenService
 {
     public string ServiceName => "TokenService";
@@ -46,7 +47,6 @@ public class TokenService : ITokenService
         });
     }
 
-    // TODO: Needs review
     public IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Function);
