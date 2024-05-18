@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Sardanapal.Identity.Authorization.Data;
-using Sardanapal.Identity.Services.Services;
 using System.Security.Claims;
 
 namespace Sardanapal.Identity.Authorization.Filters;
