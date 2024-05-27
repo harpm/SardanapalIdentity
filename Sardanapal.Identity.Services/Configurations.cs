@@ -14,7 +14,7 @@ namespace Sardanapal.Identity.Services;
 
 public static class Configurations
 {
-    public static IServiceCollection AddDefaultIdentityServices<TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services)
+    public static IServiceCollection AddDefaultIdentityServices<TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, byte roleId)
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TUser : class, IUserBase<TUserKey>, new()
         where TRole : class, IRoleBase<byte>, new()
@@ -30,7 +30,7 @@ public static class Configurations
         return services;
     }
 
-    public static IServiceCollection AddDefaultOtpIdentityServices<TContext, TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, bool useCach)
+    public static IServiceCollection AddDefaultOtpIdentityServices<TContext, TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, byte roleId, bool useCach)
         where TContext : DbContext
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TUser : class, IUserBase<TUserKey>, new()
