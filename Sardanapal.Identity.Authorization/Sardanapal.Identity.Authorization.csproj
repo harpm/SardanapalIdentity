@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Authorization</Title>
-		<Version>0.1.10</Version>
+		<Version>0.1.11</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
@@ -14,7 +14,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
 		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.4" />
-		<PackageReference Include="Sardanapal.Identity.Services" Version="0.1.14" />
+		<PackageReference Include="Sardanapal.Identity.Services" Version="0.1.15" />
 	</ItemGroup>
 
 </Project>
