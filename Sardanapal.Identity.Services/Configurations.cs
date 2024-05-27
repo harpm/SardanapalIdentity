@@ -19,8 +19,8 @@ public static class Configurations
         where TUser : class, IUserBase<TUserKey>, new()
         where TRole : class, IRoleBase<byte>, new()
         where TUR : class, IUserRoleBase<TUserKey, byte>, new()
-        where TUserManager : class, IUserManagerService<TUserKey, TUser, TRole>, new()
-        where TAccountService : class, IAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>, new()
+        where TUserManager : class, IUserManagerService<TUserKey, TUser, TRole>
+        where TAccountService : class, IAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>
     {
         services.ConfigureIdentityOptions();
         services.AddScoped<ITokenService, TokenService>();
