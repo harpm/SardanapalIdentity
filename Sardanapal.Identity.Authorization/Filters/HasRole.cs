@@ -9,7 +9,7 @@ namespace Sardanapal.Identity.Authorization.Filters;
 public class HasRoleAttribute : ActionFilterAttribute
 {
     protected byte[] roleIds;
-    public HasRoleAttribute(byte[] _roleIds)
+    public HasRoleAttribute(params byte[] _roleIds)
     {
         roleIds = _roleIds;
     }
