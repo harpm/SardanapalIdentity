@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Sardanapal.Identity.Authorization.Data;
 using Sardanapal.Identity.Services.Services;
+using System.Net;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 
@@ -23,11 +24,13 @@ public class AuthorizeAttribute : ActionFilterAttribute
             IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
             if (!idHolder.IsAuthorized)
             {
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
             }
         }
         catch (Exception ex)
         {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
     }
@@ -39,6 +42,7 @@ public class AuthorizeAttribute : ActionFilterAttribute
             IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
             if (!idHolder.IsAuthorized)
             {
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
             }
             else
@@ -49,6 +53,7 @@ public class AuthorizeAttribute : ActionFilterAttribute
         }
         catch (Exception ex)
         {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
     }

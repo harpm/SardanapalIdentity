@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Sardanapal.Identity.Authorization.Data;
+using System.Net;
 using System.Security.Claims;
 
 namespace Sardanapal.Identity.Authorization.Filters;
@@ -26,11 +27,13 @@ public class HasRoleAttribute : ActionFilterAttribute
                     .Where(c => c.ValueType == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
             }
         }
         catch
         {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
     }
@@ -45,6 +48,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                     .Where(c => c.ValueType == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
             }
             else
@@ -54,6 +58,7 @@ public class HasRoleAttribute : ActionFilterAttribute
         }
         catch
         {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
     }
