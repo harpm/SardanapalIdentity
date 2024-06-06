@@ -25,7 +25,7 @@ public class TokenService : ITokenService
         this.Info = identityInfo;
     }
 
-    public IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
+    public virtual IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
 
@@ -47,7 +47,7 @@ public class TokenService : ITokenService
         });
     }
 
-    public IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims)
+    public virtual IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Function);
         claims = new ClaimsPrincipal();
@@ -68,7 +68,7 @@ public class TokenService : ITokenService
         return result;
     }
 
-    public IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds)
+    public virtual IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Function);
 
@@ -85,7 +85,7 @@ public class TokenService : ITokenService
         });
     }
 
-    public IResponse<bool> ValidateTokenRole(string token, byte roleId)
+    public virtual IResponse<bool> ValidateTokenRole(string token, byte roleId)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Function);
 

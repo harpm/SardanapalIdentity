@@ -36,7 +36,7 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
         roleId = _roleId;
     }
 
-    public async Task<IResponse<LoginDto>> Login(LoginVM model)
+    public virtual async Task<IResponse<LoginDto>> Login(LoginVM model)
     {
         var result = new Response<LoginDto>();
 
@@ -49,7 +49,7 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
         });
     }
 
-    public async Task<IResponse<TUserKey>> Register(TRegisterVM model)
+    public virtual async Task<IResponse<TUserKey>> Register(TRegisterVM model)
     {
         var result = new Response<TUserKey>();
 

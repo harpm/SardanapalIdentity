@@ -38,7 +38,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         OtpService = _otpService;
     }
 
-    public async Task<TUserKey> RequestLoginUser(long phonenumber)
+    public virtual async Task<TUserKey> RequestLoginUser(long phonenumber)
     {
         var user = await this.Users
             .Where(x => x.PhoneNumber == phonenumber)
@@ -60,7 +60,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         }
     }
 
-    public async Task<TUserKey> RequestLoginUser(string email)
+    public virtual async Task<TUserKey> RequestLoginUser(string email)
     {
         var user = await this.Users
             .Where(x => x.Email == email)
@@ -82,7 +82,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         }
     }
 
-    public async Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName)
+    public virtual async Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName)
     {
         var curUser = await Users
             .Where(x => x.PhoneNumber == phonenumber)
@@ -119,7 +119,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         return curUser.Id;
     }
 
-    public async Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName)
+    public virtual async Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName)
     {
         var curUser = await Users
             .Where(x => x.Email == email)
@@ -156,7 +156,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         return curUser.Id;
     }
 
-    public async Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId)
+    public virtual async Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId)
     {
         var curUser = await Users
             .Where(x => x.Id.Equals(id))
@@ -195,7 +195,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         }
     }
 
-    public async Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId)
+    public virtual async Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId)
     {
         var curUser = await Users
             .Where(x => x.Id.Equals(id))

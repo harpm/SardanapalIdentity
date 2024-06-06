@@ -56,7 +56,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         _currentRole = curRole;
     }
 
-    public async Task<TUser?> GetUser(string? email = null, long? phoneNumber = null)
+    public virtual async Task<TUser?> GetUser(string? email = null, long? phoneNumber = null)
     {
         if (!string.IsNullOrWhiteSpace(email))
         {
@@ -76,7 +76,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         }
     }
 
-    public async void EditUserData(TUserKey id, string? username = null, string? password = null, long? phonenumber = null, string? email = null, string? firstname = null, string? lastname = null)
+    public virtual async void EditUserData(TUserKey id, string? username = null, string? password = null, long? phonenumber = null, string? email = null, string? firstname = null, string? lastname = null)
     {
         var user = await _context.Users.Where(x => x.Id.Equals(id)).FirstAsync();
 
@@ -102,7 +102,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         await _context.SaveChangesAsync();
     }
 
-    public async Task<string> Login(string username, string password)
+    public virtual async Task<string> Login(string username, string password)
     {
         var md5Pass = await Utilities.EncryptToMd5(password);
 
@@ -115,14 +115,14 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
     }
 
-    public Task<bool> HasRole(byte roleId, TUserKey userKey)
+    public virtual Task<bool> HasRole(byte roleId, TUserKey userKey)
     {
         return this._context.UserRoles.AsNoTracking()
             .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
             .AnyAsync();
     }
 
-    public async Task<TUserKey> RegisterUser(string username, string password)
+    public virtual async Task<TUserKey> RegisterUser(string username, string password)
     {
         var hashedPass = await Utilities.EncryptToMd5(password);
 

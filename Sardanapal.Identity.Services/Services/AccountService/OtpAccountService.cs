@@ -38,7 +38,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
         this.userManagerService = _userManagerService;
     }
 
-    public async Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM model)
+    public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM model)
     {
         var result = new Response<TUserKey>(ServiceName, OperationType.Function);
 
@@ -63,7 +63,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
         });
     }
 
-    public async Task<IResponse<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model)
+    public virtual async Task<IResponse<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model)
     {
         var result = new Response<LoginDto>();
 
@@ -88,7 +88,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
         });
     }
 
-    public async Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRegisterRequestVM model)
+    public virtual async Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRegisterRequestVM model)
     {
         var result = new Response<TUserKey>();
         return await result.FillAsync(async () =>
@@ -112,7 +112,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
         });
     }
 
-    public async Task<IResponse<bool>> RegisterWithOtp(ValidateOtpVM<TUserKey> Model)
+    public virtual async Task<IResponse<bool>> RegisterWithOtp(ValidateOtpVM<TUserKey> Model)
     {
         var result = new Response<bool>();
 
