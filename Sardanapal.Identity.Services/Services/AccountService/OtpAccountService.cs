@@ -11,6 +11,7 @@ public interface IOtpAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegister
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
+    where TRegisterVM : RegisterVM
 {
     Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM Model);
     Task<IResponse<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model);
@@ -27,6 +28,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     where TUR : class, IUserRoleBase<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
+    where TRegisterVM : RegisterVM
 {
     protected IOtpUserManagerService<TUserKey, TUser, TRole> userManagerService;
 
