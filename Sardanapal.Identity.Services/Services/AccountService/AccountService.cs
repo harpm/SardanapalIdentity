@@ -10,8 +10,10 @@ public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
+    where TRegisterVM : RegisterVM
 {
-    Task<IResponse<LoginDto>> Login(LoginVM Model);
+    Task<IResponse<LoginDto>> Login(LoginVM model);
+    Task<IResponse<TUserKey>> Register(TRegisterVM model);
 }
 
 public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
@@ -22,6 +24,7 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
     where TUR : class, IUserRoleBase<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
+    where TRegisterVM : RegisterVM
 {
     protected IUserManagerService<TUserKey, TUser, TRole> userManagerService;
     protected virtual string ServiceName { get; set; }
@@ -33,14 +36,27 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
         roleId = _roleId;
     }
 
-    public async Task<IResponse<LoginDto>> Login(LoginVM Model)
+    public async Task<IResponse<LoginDto>> Login(LoginVM model)
     {
         var result = new Response<LoginDto>();
 
         return await result.FillAsync(async () =>
         {
-            string token = await userManagerService.Login(Model.Username, Model.Password);
+            string token = await userManagerService.Login(model.Username, model.Password);
             result.Set(StatusCode.Succeeded, new LoginDto() { Token = token });
+
+            return result;
+        });
+    }
+
+    public async Task<IResponse<TUserKey>> Register(TRegisterVM model)
+    {
+        var result = new Response<TUserKey>();
+
+        return await result.FillAsync(async () =>
+        {
+            TUserKey userId = await userManagerService.RegisterUser(model.Username, model.Password);
+            result.Set(StatusCode.Succeeded, userId);
 
             return result;
         });

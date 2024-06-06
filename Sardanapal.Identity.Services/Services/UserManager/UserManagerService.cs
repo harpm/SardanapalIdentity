@@ -115,17 +115,41 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
     }
 
+    public Task<bool> HasRole(byte roleId, TUserKey userKey)
+    {
+        return this._context.UserRoles.AsNoTracking()
+            .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
+            .AnyAsync();
+    }
+
     public async Task<TUserKey> RegisterUser(string username, string password)
     {
         var hashedPass = await Utilities.EncryptToMd5(password);
-        var newUser = new TUser()
-        {
-            Username = username,
-            HashedPassword = hashedPass
-        };
 
-        await _context.AddAsync(newUser);
-        await _context.SaveChangesAsync();
+        var newUser = await this.GetUser(username);
+        if (newUser == null)
+        {
+            newUser = new TUser()
+            {
+                Username = username,
+                HashedPassword = hashedPass
+            };
+
+            await _context.AddAsync(newUser);
+            await _context.SaveChangesAsync();
+        }
+
+        if (await HasRole(_currentRole, newUser.Id))
+        {
+            var roleUser = new TUR()
+            {
+                RoleId = _currentRole,
+                UserId = newUser.Id
+            };
+
+            await _context.AddAsync(roleUser);
+            await _context.SaveChangesAsync();
+        }
 
         return newUser.Id;
     }
