@@ -5,12 +5,14 @@ namespace Sardanapal.Identity.Authorization.Data;
 
 public interface IIdentityHolder
 {
-    ClaimsPrincipal Principals { get; }
+    ClaimsPrincipal Claims { get; }
     bool IsAuthorized { get; }
     string Token { get; }
     void SetUserId(object userId);
     void SetToken(string token);
     void SetAuthorize();
+    public void SetAuthorize(string token, ClaimsPrincipal claims);
+    public void SetAuthorize(string token, ClaimsPrincipal claims, object userId);
 }
 
 public class IdentityHolder : IIdentityHolder
@@ -24,12 +26,12 @@ public class IdentityHolder : IIdentityHolder
         }
     }
 
-    protected ClaimsPrincipal _principal;
-    public ClaimsPrincipal Principals
+    protected ClaimsPrincipal _claims;
+    public ClaimsPrincipal Claims
     {
         get
         {
-            return _principal;
+            return _claims;
         }
     }
 
@@ -54,6 +56,19 @@ public class IdentityHolder : IIdentityHolder
     public void SetAuthorize()
     {
         _authorized = true;
+    }
+
+    public void SetAuthorize(string token, ClaimsPrincipal claims)
+    {
+        _token = token;
+        _claims = claims;
+    }
+
+    public void SetAuthorize(string token, ClaimsPrincipal claims, object userId)
+    {
+        _token = token;
+        _claims = claims;
+        _userId = Convert.ToInt64(userId.ToString());
     }
 
     public void SetToken(string token)
