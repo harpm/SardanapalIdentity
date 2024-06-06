@@ -23,7 +23,7 @@ public class HasRoleAttribute : ActionFilterAttribute
         {
             IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
             if (!idHolder.IsAuthorized
-                && !idHolder.Principals.Claims
+                && !idHolder.Claims.Claims
                     .Where(c => c.ValueType == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
@@ -44,7 +44,7 @@ public class HasRoleAttribute : ActionFilterAttribute
         {
             IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
             if (!idHolder.IsAuthorized
-                && !idHolder.Principals.Claims
+                && !idHolder.Claims.Claims
                     .Where(c => c.ValueType == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
