@@ -53,30 +53,30 @@ public class IdentityHolder : IIdentityHolder
         }
     }
 
-    public void SetAuthorize()
+    public virtual void SetAuthorize()
     {
         _authorized = true;
     }
 
-    public void SetAuthorize(string token, ClaimsPrincipal claims)
+    public virtual void SetAuthorize(string token, ClaimsPrincipal claims)
     {
-        _token = token;
+        SetAuthorize();
+        SetToken(token);
         _claims = claims;
     }
 
-    public void SetAuthorize(string token, ClaimsPrincipal claims, object userId)
+    public virtual void SetAuthorize(string token, ClaimsPrincipal claims, object userId)
     {
-        _token = token;
-        _claims = claims;
-        _userId = Convert.ToInt64(userId.ToString());
+        SetAuthorize(token, claims);
+        SetUserId(userId);
     }
 
-    public void SetToken(string token)
+    public virtual void SetToken(string token)
     {
         _token = token;
     }
 
-    public void SetUserId(object userId)
+    public virtual void SetUserId(object userId)
     {
         _userId = Convert.ToInt64(userId.ToString());
     }
