@@ -27,7 +27,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                 || idHolder.Claims.Claims == null
                 || idHolder.Claims.Claims.Count() == 0
                 || !idHolder.Claims.Claims
-                    .Where(c => c.ValueType == ClaimTypes.Role
+                    .Where(c => c.Type == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
@@ -51,7 +51,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                 || idHolder.Claims.Claims == null
                 || idHolder.Claims.Claims.Count() == 0
                 || !idHolder.Claims.Claims
-                    .Where(c => c.ValueType == ClaimTypes.Role
+                    .Where(c => c.Type == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
