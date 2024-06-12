@@ -27,7 +27,7 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
     where TRegisterVM : RegisterVM
 {
     protected IUserManagerService<TUserKey, TUser, TRole> userManagerService;
-    protected virtual string ServiceName { get; set; }
+    protected virtual string ServiceName => "AccountService";
     protected readonly byte roleId;
 
     public AccountServiceBase(IUserManagerService<TUserKey, TUser, TRole> _userManagerService, byte _roleId)
@@ -43,7 +43,15 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
         return await result.FillAsync(async () =>
         {
             string token = await userManagerService.Login(model.Username, model.Password);
-            result.Set(StatusCode.Succeeded, new LoginDto() { Token = token });
+
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                result.Set(StatusCode.Succeeded, new LoginDto() { Token = token });
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
 
             return result;
         });

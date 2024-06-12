@@ -37,8 +37,8 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
 
     public override string ServiceName => "OtpService";
 
-    public OtpService(TContext unitOfWork, IMapper _Mapper, IRequestService _Context, int expireTime)
-        : base(unitOfWork, _Mapper, _Context)
+    public OtpService(TContext context, IMapper _Mapper, IRequestService _request, int expireTime)
+        : base(context, _Mapper, _request)
     {
         this.expireTime = expireTime;
     }

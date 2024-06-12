@@ -13,9 +13,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
-		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.5.2" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.6.0" />
 		<PackageReference Include="Sardanapal.Share" Version="0.1.1" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
 	</ItemGroup>
 
 </Project>

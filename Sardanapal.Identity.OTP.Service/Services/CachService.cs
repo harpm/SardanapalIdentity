@@ -40,7 +40,8 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel>
     }
 
     protected IOtpHelper otpHelper { get; set; }
-    public OtpCachService(IConnectionMultiplexer _conn, IMapper _mapper, IOtpHelper _otpHelper, int _expireTime) : base(_conn, _mapper, _expireTime)
+    public OtpCachService(IConnectionMultiplexer _conn, IMapper _mapper, IOtpHelper _otpHelper, int _expireTime)
+        : base(_conn, _mapper, _expireTime)
     {
         otpHelper = _otpHelper;
     }

@@ -54,12 +54,12 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole,
             if (model.State == EntityState.Added)
             {
                 t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Principals?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             }
             else if (model.State == EntityState.Modified)
             {
                 t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Principals?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             }
         }
 
