@@ -110,7 +110,12 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
             && x.HashedPassword == md5Pass)
             .FirstAsync();
 
-        var tokenRes = _tokenService.GenerateToken(user.Id, _currentRole);
+        var roles = await _context.UserRoles.AsNoTracking()
+            .Where(x => x.UserId.Equals(user.Id))
+            .Select(x => x.RoleId)
+            .ToListAsync();
+
+        var tokenRes = _tokenService.GenerateToken(user.Id, roles.ToArray());
 
         return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
     }

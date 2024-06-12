@@ -52,8 +52,6 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
             {
                 result.Set(StatusCode.NotExists);
             }
-
-            return result;
         });
     }
 
@@ -65,8 +63,6 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
         {
             TUserKey userId = await userManagerService.RegisterUser(model.Username, model.Password);
             result.Set(StatusCode.Succeeded, userId);
-
-            return result;
         });
     }
 }

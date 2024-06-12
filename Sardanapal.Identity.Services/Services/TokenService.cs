@@ -12,6 +12,7 @@ public interface ITokenService
     IResponse<bool> ValidateTokenRole(string token, byte roleId);
     IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds);
     IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId);
+    IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte[] roleId);
 }
 
 public class TokenService : ITokenService
@@ -43,7 +44,35 @@ public class TokenService : ITokenService
                 , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
                 , signingCredentials: Credentials);
             result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
-            return result;
+        });
+    }
+
+    public virtual IResponse<string> GenerateToken<TUserKey>(TUserKey uid, params byte[] roleIds)
+    {
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
+
+        return result.Fill(() =>
+        {
+            var roleClaims = new Claim[roleIds.Length];
+            for (int i = 0; i < roleIds.Length; i++)
+            {
+                roleClaims[i] = new Claim(ClaimTypes.Role, roleIds[0].ToString());
+            }
+
+            var Claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, uid.ToString())
+            };
+
+            Claims.AddRange(roleClaims);
+
+            var Credentials = new SigningCredentials(Info.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(Info.TokenParameters.ValidIssuer
+                , Info.TokenParameters.ValidAudience
+                , Claims
+                , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
+                , signingCredentials: Credentials);
+            result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
         });
     }
 
@@ -80,8 +109,6 @@ public class TokenService : ITokenService
 
             result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
                 && roleIds.Select(r => r.ToString()).Contains(c.Value)));
-
-            return result;
         });
     }
 
@@ -97,7 +124,6 @@ public class TokenService : ITokenService
 
             result.Set(StatusCode.Succeeded
                 , claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()));
-            return result;
         });
     }
 }

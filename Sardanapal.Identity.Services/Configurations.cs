@@ -7,7 +7,6 @@ using Sardanapal.Identity.OTP.Services;
 using Sardanapal.Identity.Services.Services;
 using Sardanapal.Identity.Services.Services.AccountService;
 using Sardanapal.Identity.Services.Services.UserManager;
-using Sardanapal.Identity.Share;
 using Sardanapal.Identity.ViewModel.Models.Account;
 
 namespace Sardanapal.Identity.Services;
@@ -22,7 +21,6 @@ public static class Configurations
         where TUserManager : class, IUserManagerService<TUserKey, TUser, TRole>
         where TAccountService : class, IAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>
     {
-        services.ConfigureIdentityOptions();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserManagerService<TUserKey, TUser, TRole>, TUserManager>();
         services.AddScoped<IAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>, TAccountService>();
@@ -39,7 +37,6 @@ public static class Configurations
         where TUserManager : class, IOtpUserManagerService<TUserKey, TUser, TRole>, new()
         where TAccountService : class, IOtpAccountServiceBase<TUserKey, LoginVM, LoginDto, RegisterVM>, new()
     {
-        services.ConfigureIdentityOptions();
         services.AddScoped<ITokenService, TokenService>();
 
         services.AddOtpService<TContext, TUserKey>(useCach);

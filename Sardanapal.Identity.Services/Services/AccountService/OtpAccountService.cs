@@ -58,8 +58,6 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
                 result.Set(StatusCode.Canceled);
                 result.DeveloperMessages = new string[] { "The email or phone number is entered incorrectly" };
             }
-
-            return result;
         });
     }
 
@@ -83,8 +81,6 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
                 result.Set(StatusCode.Failed);
                 result.DeveloperMessages = new string[] { "Failed generating token!" };
             }
-
-            return result;
         });
     }
 
@@ -107,8 +103,6 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
                 result.Set(StatusCode.Canceled);
                 result.DeveloperMessages = new string[] { "The email or phone number is entered incorrectly" };
             }
-
-            return result;
         });
     }
 
@@ -127,8 +121,6 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
             {
                 result.Set(StatusCode.Failed);
             }
-
-            return result;
         });
     }
 }
