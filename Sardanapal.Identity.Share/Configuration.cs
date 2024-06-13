@@ -1,26 +1,24 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Sardanapal.Identity.Share.Options;
+using Sardanapal.Identity.Share.Static;
 
 namespace Sardanapal.Identity.Share;
 
 public static class Configuration
 {
     public static IServiceCollection ConfigureIdentityOptions(this IServiceCollection services
-        , string connectionString
-        , string redisConnection
-        , TokenValidationParameters validationParams
-        , int otpExpTime
-        , int otpLength)
+        , string connString
+        , string redisConnString
+        , TokenValidationParameters tokenParams
+        , int tokenExpireTime
+        , int otpCodeLen)
     {
-        services.AddOptions<IdentityInfo>().Configure(i =>
-        {
-            i.ConnectionString = connectionString;
-            i.RedisConnectionString = redisConnection;
-            i.OTPLength = otpLength;
-            i.TokenParameters = validationParams;
-            i.ExpirationTime = otpExpTime;
-        });
+        StaticConfigs.DbConnectionString = connString;
+        StaticConfigs.RedisConnectionString = redisConnString;
+        StaticConfigs.TokenParameters = tokenParams;
+        StaticConfigs.ExpirationTime = tokenExpireTime;
+        StaticConfigs.OTPLength = otpCodeLen;
+
         return services;
     }
 }
