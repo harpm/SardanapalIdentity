@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Services</Title>
-		<Version>0.1.20</Version>
+		<Version>0.1.21</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>

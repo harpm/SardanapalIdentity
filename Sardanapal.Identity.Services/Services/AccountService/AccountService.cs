@@ -65,4 +65,22 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
             result.Set(StatusCode.Succeeded, userId);
         });
     }
+
+    public virtual async Task<IResponse<string>> RefreshToken(TUserKey userId)
+    {
+        var result = new Response<string>();
+
+        return await result.FillAsync(async () =>
+        {
+            string token = await userManagerService.RefreshToken(userId);
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                result.Set(StatusCode.Succeeded, token);
+            }
+            else
+            {
+                result.Set(StatusCode.Failed);
+            }
+        });
+    }
 }

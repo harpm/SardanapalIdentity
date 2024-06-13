@@ -21,6 +21,7 @@ public interface IUserManagerService<TUserKey, TUser, TRole>
         , string? email = null
         , string? firstname = null
         , string? lastname = null);
+    Task<string> RefreshToken(TUserKey userId);
 }
 
 public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerService<TUserKey, TUser, TRole>
@@ -157,5 +158,25 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         }
 
         return newUser.Id;
+    }
+
+    public async Task<string> RefreshToken(TUserKey userId)
+    {
+        string result = null;
+
+        var roles = await _context.UserRoles.AsNoTracking()
+            .Where(x => x.UserId.Equals(userId))
+            .Select(x => x.RoleId)
+            .ToArrayAsync();
+
+        if (roles != null && roles.Any())
+        {
+            var resultModel = _tokenService.GenerateToken(userId, roles);
+
+            if (resultModel.StatusCode == StatusCode.Succeeded)
+                result = resultModel.Data;
+        }
+
+        return result;
     }
 }
