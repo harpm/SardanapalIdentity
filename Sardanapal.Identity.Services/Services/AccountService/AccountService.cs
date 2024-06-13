@@ -14,6 +14,8 @@ public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
 {
     Task<IResponse<LoginDto>> Login(LoginVM model);
     Task<IResponse<TUserKey>> Register(TRegisterVM model);
+    Task<IResponse<string>> RefreshToken(TUserKey userId);
+
 }
 
 public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>

@@ -116,7 +116,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
             .Select(x => x.RoleId)
             .ToListAsync();
 
-        var tokenRes = _tokenService.GenerateToken(user.Id, roles.ToArray());
+        var tokenRes = _tokenService.GenerateToken(user.Id.ToString(), roles.ToArray());
 
         return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
     }
@@ -171,7 +171,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
 
         if (roles != null && roles.Any())
         {
-            var resultModel = _tokenService.GenerateToken(userId, roles);
+            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles);
 
             if (resultModel.StatusCode == StatusCode.Succeeded)
                 result = resultModel.Data;

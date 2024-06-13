@@ -11,8 +11,8 @@ public interface ITokenService
     IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims);
     IResponse<bool> ValidateTokenRole(string token, byte roleId);
     IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds);
-    IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId);
-    IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte[] roleId);
+    IResponse<string> GenerateToken(string uid, byte roleId);
+    IResponse<string> GenerateToken(string uid, byte[] roleId);
 }
 
 public class TokenService : ITokenService
@@ -24,7 +24,7 @@ public class TokenService : ITokenService
 
     }
 
-    protected virtual string GenerateToken<TUserKey>(TUserKey uid, int expireTime, params byte[] roleIds)
+    protected virtual string GenerateToken(string uid, int expireTime, params byte[] roleIds)
     {
         var roleClaims = new Claim[roleIds.Length];
         for (int i = 0; i < roleIds.Length; i++)
@@ -49,7 +49,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public virtual IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
+    public virtual IResponse<string> GenerateToken(string uid, byte roleId)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
 
@@ -60,7 +60,7 @@ public class TokenService : ITokenService
         });
     }
 
-    public virtual IResponse<string> GenerateToken<TUserKey>(TUserKey uid, params byte[] roleIds)
+    public virtual IResponse<string> GenerateToken(string uid, params byte[] roleIds)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
 
