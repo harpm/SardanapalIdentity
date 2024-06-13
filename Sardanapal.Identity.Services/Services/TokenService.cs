@@ -1,5 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Sardanapal.Identity.Share.Options;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.ViewModel.Response;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,11 +19,9 @@ public class TokenService : ITokenService
 {
     public string ServiceName => "TokenService";
 
-    public readonly IdentityInfo Info;
-
-    public TokenService(IdentityInfo identityInfo)
+    public TokenService()
     {
-        this.Info = identityInfo;
+
     }
 
     public virtual IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
@@ -32,16 +30,16 @@ public class TokenService : ITokenService
 
         return result.Fill(() =>
         {
-            var Credentials = new SigningCredentials(Info.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+            var Credentials = new SigningCredentials(StaticConfigs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
             var Claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, uid.ToString()),
                 new Claim(ClaimTypes.Role, roleId.ToString())
             };
-            var token = new JwtSecurityToken(Info.TokenParameters.ValidIssuer
-                , Info.TokenParameters.ValidAudience
+            var token = new JwtSecurityToken(StaticConfigs.TokenParameters.ValidIssuer
+                , StaticConfigs.TokenParameters.ValidAudience
                 , Claims
-                , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
+                , expires: DateTime.UtcNow.AddMinutes(StaticConfigs.ExpirationTime)
                 , signingCredentials: Credentials);
             result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
         });
@@ -66,11 +64,11 @@ public class TokenService : ITokenService
 
             Claims.AddRange(roleClaims);
 
-            var Credentials = new SigningCredentials(Info.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(Info.TokenParameters.ValidIssuer
-                , Info.TokenParameters.ValidAudience
+            var Credentials = new SigningCredentials(StaticConfigs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(StaticConfigs.TokenParameters.ValidIssuer
+                , StaticConfigs.TokenParameters.ValidAudience
                 , Claims
-                , expires: DateTime.UtcNow.AddMinutes(Info.ExpirationTime)
+                , expires: DateTime.UtcNow.AddMinutes(StaticConfigs.ExpirationTime)
                 , signingCredentials: Credentials);
             result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
         });
@@ -84,7 +82,7 @@ public class TokenService : ITokenService
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            claims = tokenHandler.ValidateToken(token, Info.TokenParameters, out SecurityToken validatedToken);
+            claims = tokenHandler.ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
 
             result.Set(StatusCode.Succeeded, true);
             return result;
@@ -105,7 +103,7 @@ public class TokenService : ITokenService
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var claimsPrinc = tokenHandler
-                .ValidateToken(token, Info.TokenParameters, out SecurityToken validatedToken);
+                .ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
 
             result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
                 && roleIds.Select(r => r.ToString()).Contains(c.Value)));
@@ -120,7 +118,7 @@ public class TokenService : ITokenService
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var claimsPrinc = tokenHandler
-                .ValidateToken(token, Info.TokenParameters, out SecurityToken validatedToken);
+                .ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
 
             result.Set(StatusCode.Succeeded
                 , claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()));

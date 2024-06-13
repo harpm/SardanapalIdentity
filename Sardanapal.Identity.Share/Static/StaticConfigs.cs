@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Sardanapal.Identity.Share.Static;
 
-public class StaticConfigs
+public static class StaticConfigs
 {
     public static string DbConnectionString { get; set; }
     public static string? RedisConnectionString { get; set; }
