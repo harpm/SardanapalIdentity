@@ -1,18 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Sardanapal.Identity.Authorization.Data;
-using Sardanapal.Identity.Services.Services;
-using System.Net;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
 public class AuthorizeAttribute : ActionFilterAttribute
 {
-    protected ITokenService _tokenService;
-    public AuthorizeAttribute(ITokenService tokenService)
+    public AuthorizeAttribute()
     {
-        _tokenService = tokenService;
+
     }
 
     public override void OnActionExecuting(ActionExecutingContext context)
