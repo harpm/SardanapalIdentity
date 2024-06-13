@@ -8,7 +8,7 @@ namespace Sardanapal.Identity.Authorization;
 public static class Configuration
 {
     /// <summary>
-    /// Injecting Auth Filters
+    /// Injecting Auth Filters required services
     /// </summary>
     /// <typeparam name="TTokenService"></typeparam>
     /// <param name="services"></param>
@@ -22,13 +22,20 @@ public static class Configuration
     }
 
     /// <summary>
-    /// Injecting Auth MiddleWares
+    /// Using Auth MiddleWares
     /// </summary>
     /// <param name="app"></param>
     /// <returns></returns>
-    public static IApplicationBuilder UseSardanapalAuthentication(this IApplicationBuilder app)
+    public static IApplicationBuilder UseSardanapalAuthentication(this IApplicationBuilder app, bool withRefreshToken = false)
     {
-        app.UseMiddleware<SdAuthorizationMiddleware>();
+        if (withRefreshToken)
+        {
+            app.UseMiddleware<SdAuthorizationMiddleware>();
+        }
+        else
+        {
+            app.UseMiddleware<SdAuthorizationMiddlewareWihRefreshToken>();
+        }
 
         return app;
     }

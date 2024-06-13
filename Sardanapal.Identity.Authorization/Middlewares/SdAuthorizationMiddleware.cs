@@ -15,7 +15,7 @@ public class SdAuthorizationMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityHolder identityHolder)
+    public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityHolder identityHolder)
     {
         string token = context.Request.Headers
             .Where(x => x.Key.Equals("Auth", StringComparison.InvariantCultureIgnoreCase))
