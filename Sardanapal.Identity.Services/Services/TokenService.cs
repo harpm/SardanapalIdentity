@@ -24,24 +24,39 @@ public class TokenService : ITokenService
 
     }
 
+    protected virtual string GenerateToken<TUserKey>(TUserKey uid, int expireTime, params byte[] roleIds)
+    {
+        var roleClaims = new Claim[roleIds.Length];
+        for (int i = 0; i < roleIds.Length; i++)
+        {
+            roleClaims[i] = new Claim(ClaimTypes.Role, roleIds[0].ToString());
+        }
+
+        var Claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.NameIdentifier, uid.ToString())
+            };
+
+        Claims.AddRange(roleClaims);
+
+        var Credentials = new SigningCredentials(StaticConfigs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(StaticConfigs.TokenParameters.ValidIssuer
+            , StaticConfigs.TokenParameters.ValidAudience
+            , Claims
+            , expires: DateTime.UtcNow.AddMinutes(expireTime)
+            , signingCredentials: Credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
     public virtual IResponse<string> GenerateToken<TUserKey>(TUserKey uid, byte roleId)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
 
         return result.Fill(() =>
         {
-            var Credentials = new SigningCredentials(StaticConfigs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
-            var Claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, uid.ToString()),
-                new Claim(ClaimTypes.Role, roleId.ToString())
-            };
-            var token = new JwtSecurityToken(StaticConfigs.TokenParameters.ValidIssuer
-                , StaticConfigs.TokenParameters.ValidAudience
-                , Claims
-                , expires: DateTime.UtcNow.AddMinutes(StaticConfigs.ExpirationTime)
-                , signingCredentials: Credentials);
-            result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
+            string token = GenerateToken(uid, StaticConfigs.ExpirationTime, roleId);
+            result.Set(StatusCode.Succeeded, token);
         });
     }
 
@@ -51,26 +66,9 @@ public class TokenService : ITokenService
 
         return result.Fill(() =>
         {
-            var roleClaims = new Claim[roleIds.Length];
-            for (int i = 0; i < roleIds.Length; i++)
-            {
-                roleClaims[i] = new Claim(ClaimTypes.Role, roleIds[0].ToString());
-            }
+            string token = GenerateToken(uid, StaticConfigs.ExpirationTime, roleIds);
 
-            var Claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.NameIdentifier, uid.ToString())
-            };
-
-            Claims.AddRange(roleClaims);
-
-            var Credentials = new SigningCredentials(StaticConfigs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(StaticConfigs.TokenParameters.ValidIssuer
-                , StaticConfigs.TokenParameters.ValidAudience
-                , Claims
-                , expires: DateTime.UtcNow.AddMinutes(StaticConfigs.ExpirationTime)
-                , signingCredentials: Credentials);
-            result.Set(StatusCode.Succeeded, new JwtSecurityTokenHandler().WriteToken(token));
+            result.Set(StatusCode.Succeeded, token);
         });
     }
 
