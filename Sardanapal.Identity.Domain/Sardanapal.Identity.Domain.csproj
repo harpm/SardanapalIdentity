@@ -6,13 +6,13 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Domain</Title>
-		<Version>0.1.18</Version>
+		<Version>0.1.20</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Domain" Version="0.1.4" />
+		<PackageReference Include="Sardanapal.Domain" Version="0.1.6" />
 		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.6" />
 	</ItemGroup>
 
