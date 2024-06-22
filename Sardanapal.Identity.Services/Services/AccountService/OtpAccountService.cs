@@ -20,8 +20,9 @@ public interface IOtpAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegister
 
 }
 
-public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
     : AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+    where TOtpUserManager : class, IOtpUserManagerService<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
@@ -30,10 +31,10 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM
 {
-    protected IOtpUserManagerService<TUserKey, TUser, TRole> userManagerService;
+    protected TOtpUserManager userManagerService;
 
-    public OtpAccountServiceBase(IOtpUserManagerService<TUserKey, TUser, TRole> _userManagerService, byte _roleId)
-        : base(_userManagerService, _roleId)
+    public OtpAccountServiceBase(TOtpUserManager _userManagerService)
+        : base(_userManagerService)
     {
         this.userManagerService = _userManagerService;
     }
@@ -50,7 +51,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
             if (identifier != null)
             {
                 var uid = await userManagerService
-                    .RequestLoginUser(identifier);
+                    .RequestLoginUser(identifier, roleId);
                 result.Set(StatusCode.Succeeded, uid);
             }
             else
@@ -95,7 +96,7 @@ public abstract class OtpAccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginV
             if (identifier != null)
             {
                 var uid = await userManagerService
-                    .RequestRegisterUser(identifier, model.FirstName, model.LastName);
+                    .RequestRegisterUser(identifier, model.FirstName, model.LastName, roleId);
                 result.Set(StatusCode.Succeeded, uid);
             }
             else

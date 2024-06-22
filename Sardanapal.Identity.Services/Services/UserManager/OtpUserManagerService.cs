@@ -14,10 +14,10 @@ public interface IOtpUserManagerService<TUserKey, TUser, TRole> : IUserManagerSe
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
 {
-    Task<TUserKey> RequestLoginUser(long phonenumber);
-    Task<TUserKey> RequestLoginUser(string email);
-    Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName);
-    Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName);
+    Task<TUserKey> RequestLoginUser(long phonenumber, byte role);
+    Task<TUserKey> RequestLoginUser(string email, byte role);
+    Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName, byte role);
+    Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName, byte role);
     Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId);
     Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId);
 }
@@ -38,7 +38,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         OtpService = _otpService;
     }
 
-    public virtual async Task<TUserKey> RequestLoginUser(long phonenumber)
+    public virtual async Task<TUserKey> RequestLoginUser(long phonenumber, byte role)
     {
         var user = await this.Users
             .Where(x => x.PhoneNumber == phonenumber)
@@ -49,7 +49,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
             await OtpService.Add(new NewOtpVM<TUserKey>()
             {
                 UserId = user.Id,
-                RoleId = _currentRole
+                RoleId = role
             });
 
             return user.Id;
@@ -60,7 +60,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         }
     }
 
-    public virtual async Task<TUserKey> RequestLoginUser(string email)
+    public virtual async Task<TUserKey> RequestLoginUser(string email, byte role)
     {
         var user = await this.Users
             .Where(x => x.Email == email)
@@ -71,7 +71,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
             await OtpService.Add(new NewOtpVM<TUserKey>()
             {
                 UserId = user.Id,
-                RoleId = _currentRole
+                RoleId = role
             });
 
             return user.Id;
@@ -82,7 +82,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
         }
     }
 
-    public virtual async Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName)
+    public virtual async Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName, byte role)
     {
         var curUser = await Users
             .Where(x => x.PhoneNumber == phonenumber)
@@ -112,14 +112,14 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
             await OtpService.Add(new NewOtpVM<TUserKey>()
             {
                 UserId = curUser.Id,
-                RoleId = _currentRole
+                RoleId = role
             });
         }
 
         return curUser.Id;
     }
 
-    public virtual async Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName)
+    public virtual async Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName, byte role)
     {
         var curUser = await Users
             .Where(x => x.Email == email)
@@ -149,7 +149,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
             await OtpService.Add(new NewOtpVM<TUserKey>()
             {
                 UserId = curUser.Id,
-                RoleId = _currentRole
+                RoleId = role
             });
         }
 
@@ -212,7 +212,7 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {
-                var tokenRes = _tokenService.GenerateToken(curUser.Username, _currentRole);
+                var tokenRes = _tokenService.GenerateToken(curUser.Username, roleId);
                 return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
             }
 

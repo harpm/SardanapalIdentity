@@ -13,7 +13,7 @@ public interface IUserManagerService<TUserKey, TUser, TRole>
 {
     Task<TUser?> GetUser(string? email = null, long? phoneNumber = null);
     Task<string> Login(string username, string password);
-    Task<TUserKey> RegisterUser(string username, string password);
+    Task<TUserKey> RegisterUser(string username, string password, byte role);
 
     void EditUserData(TUserKey id, string? username = null
         , string? password = null
@@ -30,7 +30,6 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
     where TRole : class, IRoleBase<byte>, new()
     where TUR : class, IUserRoleBase<TUserKey, byte>, new()
 {
-    protected virtual byte _currentRole { get; }
     protected SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> _context;
     protected ITokenService _tokenService;
 
@@ -54,7 +53,6 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
     {
         _context = context;
         _tokenService = tokenService;
-        _currentRole = curRole;
     }
 
     public virtual async Task<TUser?> GetUser(string? email = null, long? phoneNumber = null)
@@ -128,7 +126,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
             .AnyAsync();
     }
 
-    public virtual async Task<TUserKey> RegisterUser(string username, string password)
+    public virtual async Task<TUserKey> RegisterUser(string username, string password, byte role)
     {
         var hashedPass = await Utilities.EncryptToMd5(password);
 
@@ -145,11 +143,11 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
             await _context.SaveChangesAsync();
         }
 
-        if (await HasRole(_currentRole, newUser.Id))
+        if (await HasRole(role, newUser.Id))
         {
             var roleUser = new TUR()
             {
-                RoleId = _currentRole,
+                RoleId = role,
                 UserId = newUser.Id
             };
 

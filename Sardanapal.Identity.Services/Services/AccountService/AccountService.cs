@@ -18,7 +18,7 @@ public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
 
 }
 
-public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public abstract class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
     : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
@@ -30,12 +30,11 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
 {
     protected IUserManagerService<TUserKey, TUser, TRole> userManagerService;
     protected virtual string ServiceName => "AccountService";
-    protected readonly byte roleId;
+    protected abstract byte roleId { get; }
 
-    public AccountServiceBase(IUserManagerService<TUserKey, TUser, TRole> _userManagerService, byte _roleId)
+    public AccountServiceBase(IUserManagerService<TUserKey, TUser, TRole> _userManagerService)
     {
         this.userManagerService = _userManagerService;
-        roleId = _roleId;
     }
 
     public virtual async Task<IResponse<LoginDto>> Login(LoginVM model)
@@ -63,7 +62,7 @@ public class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto
 
         return await result.FillAsync(async () =>
         {
-            TUserKey userId = await userManagerService.RegisterUser(model.Username, model.Password);
+            TUserKey userId = await userManagerService.RegisterUser(model.Username, model.Password, this.roleId);
             result.Set(StatusCode.Succeeded, userId);
         });
     }
