@@ -49,7 +49,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         }
     }
 
-    public UserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole)
+    public UserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService)
     {
         _context = context;
         _tokenService = tokenService;

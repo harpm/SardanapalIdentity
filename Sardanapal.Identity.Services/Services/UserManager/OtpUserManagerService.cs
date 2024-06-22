@@ -31,8 +31,8 @@ public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerSer
 {
     protected IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> OtpService { get; set; }
 
-    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService, byte curRole
-        , IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> _otpService) : base(context, tokenService, curRole)
+    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService
+        , IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> _otpService) : base(context, tokenService)
 
     {
         OtpService = _otpService;
