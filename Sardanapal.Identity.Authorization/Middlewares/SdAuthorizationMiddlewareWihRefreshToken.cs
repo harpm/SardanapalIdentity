@@ -14,19 +14,20 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
     }
 
-    public override Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityHolder identityHolder)
+    public override async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityHolder identityHolder)
     {
-        var result = base.InvokeAsync(context, tokenService, identityHolder);
+        await base.InvokeAsync(context, tokenService, identityHolder);
 
-        var token = tokenService.GenerateToken(identityHolder.Claims.FindFirst(ClaimTypes.NameIdentifier).Value
-                    , identityHolder.Claims.FindAll(ClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
-                    .ToArray());
-
-        if (token.StatusCode == StatusCode.Succeeded)
+        if (identityHolder.IsAuthorized)
         {
-            context.Response.Headers["Auth"] = token.StatusCode.ToString();
-        }
+            var token = tokenService.GenerateToken(identityHolder.Claims.FindFirst(ClaimTypes.NameIdentifier).Value
+                        , identityHolder.Claims.FindAll(ClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
+                        .ToArray());
 
-        return result;
+            if (token.StatusCode == StatusCode.Succeeded)
+            {
+                context.Response.Headers["Auth"] = token.StatusCode.ToString();
+            }
+        }
     }
 }

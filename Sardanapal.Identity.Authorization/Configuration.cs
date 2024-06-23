@@ -28,7 +28,7 @@ public static class Configuration
     /// <returns></returns>
     public static IApplicationBuilder UseSardanapalAuthentication(this IApplicationBuilder app, bool withRefreshToken = false)
     {
-        if (withRefreshToken)
+        if (!withRefreshToken)
         {
             app.UseMiddleware<SdAuthorizationMiddleware>();
         }
