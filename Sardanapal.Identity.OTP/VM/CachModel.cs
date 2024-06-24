@@ -11,15 +11,15 @@ public class CachOtpListItemVM<TUserKey, TKey> : BaseListItem<TKey>, ICachModel<
     public DateTime ExpireTime { get; set; }
 }
 
-public class CachNewOtpVM<TUserKey, TKey> : ICachModel<TKey>
+public class CachNewOtpVM<TUserKey, TKey> : NewOtpVM<TUserKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public TKey Id { get; set; }
-    public string Code { get; set; }
-    public TUserKey UserId { get; set; }
-    public DateTime ExpireTime { get; set; }
-    public byte RoleId { get; set; }
+    public override string Code { get; set; }
+    public override TUserKey UserId { get; set; }
+    public override DateTime ExpireTime { get; set; }
+    public override byte RoleId { get; set; }
 }
 
 public class CachOtpEditableVM<TUserKey, TKey> : NewOtpVM<TKey>, ICachModel<TKey>
