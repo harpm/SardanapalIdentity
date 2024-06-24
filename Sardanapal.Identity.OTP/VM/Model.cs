@@ -33,12 +33,10 @@ public class OtpVM
 
 }
 
-public class ValidateOtpVM<TUserKey>
+public class ValidateOtpVM<TUserKey> : OtpEditableVM<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
-    public virtual string Code { get; set; }
-    public virtual TUserKey UserId { get; set; }
-    public virtual byte RoleId { get; set; }
+
 }
 
 public class OtpLoginRequestVM
