@@ -13,7 +13,7 @@ public interface IOtpCachService<TUserKey, TKey, TOtpCachModel>
     , IOtpServiceBase<TUserKey, TKey, CachNewOtpVM<TUserKey, TKey>, ValidateOtpVM<TUserKey>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : OTPModel<TUserKey, TKey>, new()
+    where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
 {
 
 }
@@ -23,7 +23,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel>
     , IOtpCachService<TUserKey, TKey, TOtpCachModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : OTPModel<TUserKey, TKey>, new()
+    where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
 {
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
