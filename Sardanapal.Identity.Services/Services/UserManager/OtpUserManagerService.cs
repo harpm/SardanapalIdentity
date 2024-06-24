@@ -24,7 +24,7 @@ public interface IOtpUserManagerService<TUserKey, TUser, TRole> : IUserManagerSe
 
 public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : UserManagerService<TUserKey, TUser, TRole, TUR>
     , IOtpUserManagerService<TUserKey, TUser, TRole>
-    where TOtpService : class, IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
+    where TOtpService : class, IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : UserBase<TUserKey>, new()
     where TRole : RoleBase<byte>, new()
@@ -165,7 +165,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey> { UserId = id, Code = code, RoleId = roleId });
+            var validationRes = await OtpService.ValidateOtp(new OtpEditableVM<TUserKey> { UserId = id, Code = code, RoleId = roleId });
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {
@@ -204,7 +204,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey>
+            var validationRes = await OtpService.ValidateOtp(new OtpEditableVM<TUserKey>
             {
                 UserId = id,
                 Code = code,
