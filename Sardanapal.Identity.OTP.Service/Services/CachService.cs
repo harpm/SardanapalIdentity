@@ -8,22 +8,26 @@ using Sardanapal.Identity.OTP.Domain;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TUserKey, TKey, TOtpCachModel>
-    : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, CachNewOtpVM<TUserKey, TKey>, CachOtpEditableVM<TUserKey, TKey>>
-    , IOtpServiceBase<TUserKey, TKey, CachNewOtpVM<TUserKey, TKey>, ValidateOtpVM<TUserKey>>
+public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
+    : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM, ValidateOtpVM<TUserKey>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
+    where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
+    where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
 {
 
 }
 
-public class OtpCachService<TUserKey, TKey, TOtpCachModel>
-    : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, CachNewOtpVM<TUserKey, TKey>, CachOtpEditableVM<TUserKey, TKey>>
-    , IOtpCachService<TUserKey, TKey, TOtpCachModel>
+public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
+    : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
+    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
+    where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
+    where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
 {
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
@@ -47,7 +51,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel>
         otpHelper = _otpHelper;
     }
 
-    public override Task<IResponse<TKey>> Add(CachNewOtpVM<TUserKey, TKey> model)
+    public override Task<IResponse<TKey>> Add(TNewVM model)
     {
         model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
         model.Code = otpHelper.GenerateNewOtp();

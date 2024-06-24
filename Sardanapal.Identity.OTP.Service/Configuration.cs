@@ -25,7 +25,7 @@ namespace Sardanapal.Identity.OTP.Services
             if (useCach)
             {
                 services.AddScoped<IOtpServiceBase<TUserKey, Guid, CachNewOtpVM<TUserKey, Guid>, ValidateOtpVM<TUserKey>>
-                    , OtpCachService<TUserKey, Guid, OTPModel<TUserKey, Guid>>>();
+                    , OtpCachService<TUserKey, Guid, OTPModel<TUserKey, Guid>, CachNewOtpVM<TUserKey, Guid>, CachOtpEditableVM<TUserKey, Guid>>>();
             }
             else
             {
