@@ -21,7 +21,7 @@ public interface IOtpAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegister
 }
 
 public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
-    : AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+    : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
     where TOtpUserManager : class, IOtpUserManagerService<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
@@ -31,12 +31,10 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM
 {
-    protected TOtpUserManager userManagerService;
-
     public OtpAccountServiceBase(TOtpUserManager _userManagerService)
         : base(_userManagerService)
     {
-        this.userManagerService = _userManagerService;
+
     }
 
     public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM model)

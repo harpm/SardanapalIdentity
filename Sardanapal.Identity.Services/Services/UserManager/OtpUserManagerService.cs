@@ -22,17 +22,18 @@ public interface IOtpUserManagerService<TUserKey, TUser, TRole> : IUserManagerSe
     Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId);
 }
 
-public class OtpUserManagerService<TUserKey, TUser, TRole, TUR> : UserManagerService<TUserKey, TUser, TRole, TUR>
+public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : UserManagerService<TUserKey, TUser, TRole, TUR>
     , IOtpUserManagerService<TUserKey, TUser, TRole>
+    where TOtpService : class, IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : UserBase<TUserKey>, new()
     where TRole : RoleBase<byte>, new()
     where TUR : UserRoleBase<TUserKey, byte>, new()
 {
-    protected IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> OtpService { get; set; }
+    protected TOtpService OtpService { get; set; }
 
     public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService
-        , IOtpService<TUserKey, Guid, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> _otpService) : base(context, tokenService)
+        , TOtpService _otpService) : base(context, tokenService)
 
     {
         OtpService = _otpService;

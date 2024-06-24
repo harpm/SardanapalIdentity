@@ -18,8 +18,9 @@ public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
 
 }
 
-public abstract class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
     : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+    where TUserManager : class, IUserManagerService<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUserBase<TUserKey>, new()
     where TRole : class, IRoleBase<byte>, new()
@@ -28,11 +29,11 @@ public abstract class AccountServiceBase<TUserKey, TUser, TRole, TUR, TLoginVM, 
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM
 {
-    protected IUserManagerService<TUserKey, TUser, TRole> userManagerService;
+    protected TUserManager userManagerService;
     protected virtual string ServiceName => "AccountService";
     protected abstract byte roleId { get; }
 
-    public AccountServiceBase(IUserManagerService<TUserKey, TUser, TRole> _userManagerService)
+    public AccountServiceBase(TUserManager _userManagerService)
     {
         this.userManagerService = _userManagerService;
     }
