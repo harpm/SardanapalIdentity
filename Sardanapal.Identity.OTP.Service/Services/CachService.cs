@@ -64,7 +64,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel>
             if (items != null)
             {
                 result.Set(StatusCode.Succeeded
-                    , items.Where(i => i.UserId.Equals(model.UserId) && i.Code == model.Code && i.Role == model.RoleId)
+                    , items.Where(i => i.UserId.Equals(model.UserId) && i.Code == model.Code && i.RoleId == model.RoleId)
                     .Any());
             }
             else
