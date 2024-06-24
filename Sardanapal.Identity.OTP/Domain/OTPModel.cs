@@ -14,7 +14,7 @@ public interface IOTPModel<TUserKey, TKey> : IBaseEntityModel<TKey>, ICachModel<
 
     DateTime ExpireTime { get; set; }
 
-    byte? Role { get; set; }
+    byte? RoleId { get; set; }
 }
 
 public class OTPModel<TUserKey, TKey> : BaseEntityModel<TKey>, IOTPModel<TUserKey, TKey>
@@ -30,5 +30,5 @@ public class OTPModel<TUserKey, TKey> : BaseEntityModel<TKey>, IOTPModel<TUserKe
     [Required]
     public virtual DateTime ExpireTime { get; set; }
 
-    public virtual byte? Role { get; set; }
+    public virtual byte? RoleId { get; set; }
 }
