@@ -1,9 +1,8 @@
 ﻿using Sardanapal.RedisCach.Models;
-using Sardanapal.ViewModel.Models;
 
 namespace Sardanapal.Identity.OTP.VM;
 
-public class CachOtpListItemVM<TUserKey, TKey> : BaseListItem<TKey>, ICachModel<TKey>
+public class CachOtpListItemVM<TUserKey, TKey> : OtpListItemVM<TKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
@@ -25,7 +24,7 @@ public class CachOtpEditableVM<TUserKey, TKey> : OtpEditableVM<TUserKey>, ICachM
     public TKey Id { get; set; }
 }
 
-public class CachOtpVM<TUserKey, TKey> : ICachModel<TKey>
+public class CachOtpVM<TUserKey, TKey> : OtpVM, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {

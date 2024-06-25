@@ -8,26 +8,28 @@ using Sardanapal.Identity.OTP.Domain;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
+public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
     : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, ValidateOtpVM<TUserKey>>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
+    where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
 
 }
 
-public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
+public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
     : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
+    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
+    where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
@@ -59,7 +61,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
         return base.Add(model);
     }
 
-    public async Task<IResponse<bool>> ValidateOtp(ValidateOtpVM<TUserKey> model)
+    public async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
         return await result.FillAsync(async () =>
