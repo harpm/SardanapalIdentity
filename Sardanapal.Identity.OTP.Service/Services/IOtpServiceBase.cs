@@ -1,9 +1,10 @@
 ﻿using Sardanapal.Identity.OTP.VM;
+using Sardanapal.Interface.IService.ICrud;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
+public interface IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM> : ICreateService<TKey, TNewVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TNewVM : class, new()
