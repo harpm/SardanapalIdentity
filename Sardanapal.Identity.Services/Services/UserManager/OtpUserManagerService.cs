@@ -22,13 +22,17 @@ public interface IOtpUserManagerService<TUserKey, TUser, TRole> : IUserManagerSe
     Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId);
 }
 
-public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : UserManagerService<TUserKey, TUser, TRole, TUR>
+public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNewVM, TEditableVM, TValidateVM>
+    : UserManagerService<TUserKey, TUser, TRole, TUR>
     , IOtpUserManagerService<TUserKey, TUser, TRole>
-    where TOtpService : class, IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
+    where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : UserBase<TUserKey>, new()
     where TRole : RoleBase<byte>, new()
     where TUR : UserRoleBase<TUserKey, byte>, new()
+    where TNewVM : NewOtpVM<TUserKey>, new()
+    where TEditableVM : OtpEditableVM<TUserKey>, new()
+    where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
     protected TOtpService OtpService { get; set; }
 
@@ -47,7 +51,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (user != null)
         {
-            await OtpService.Add(new NewOtpVM<TUserKey>()
+            await OtpService.Add(new TNewVM()
             {
                 UserId = user.Id,
                 RoleId = role
@@ -69,7 +73,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (user != null)
         {
-            await OtpService.Add(new NewOtpVM<TUserKey>()
+            await OtpService.Add(new TNewVM()
             {
                 UserId = user.Id,
                 RoleId = role
@@ -110,7 +114,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (curUser != null && !curUser.VerifiedPhoneNumber)
         {
-            await OtpService.Add(new NewOtpVM<TUserKey>()
+            await OtpService.Add(new TNewVM()
             {
                 UserId = curUser.Id,
                 RoleId = role
@@ -147,7 +151,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (curUser != null && !curUser.VerifiedEmail)
         {
-            await OtpService.Add(new NewOtpVM<TUserKey>()
+            await OtpService.Add(new TNewVM()
             {
                 UserId = curUser.Id,
                 RoleId = role
@@ -165,7 +169,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey> { UserId = id, Code = code, RoleId = roleId });
+            var validationRes = await OtpService.ValidateOtp(new TValidateVM { UserId = id, Code = code, RoleId = roleId });
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {
@@ -204,7 +208,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR> : U
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new ValidateOtpVM<TUserKey>
+            var validationRes = await OtpService.ValidateOtp(new TValidateVM
             {
                 UserId = id,
                 Code = code,
