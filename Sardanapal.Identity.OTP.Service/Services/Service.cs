@@ -8,22 +8,23 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM>
-    : ICrudService<TUserKey, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TUserKey, TNewVM, ValidateOtpVM<TUserKey>>
+public interface IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
+    : ICrudService<TKey, TSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TSearchVM : OtpSearchVM, new()
     where TVM : OtpVM, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
+    where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
 
 }
 
-public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
     : EfCrudService<TContext, TKey, OTPModel<TUserKey, TKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, ValidateOtpVM<TUserKey>>
+    , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
     where TContext : DbContext
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
@@ -32,6 +33,7 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
     where TVM : OtpVM, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
+    where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
     public int expireTime { get; set; }
 
@@ -49,7 +51,7 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
         await this.UnitOfWork.SaveChangesAsync();
     }
 
-    public Task<IResponse<bool>> ValidateOtp(ValidateOtpVM<TUserKey> model)
+    public Task<IResponse<bool>> ValidateOtp(TValidateVM model)
     {
         throw new NotImplementedException();
     }

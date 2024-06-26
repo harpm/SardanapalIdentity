@@ -30,7 +30,7 @@ namespace Sardanapal.Identity.OTP.Services
             else
             {
                 services.AddScoped<IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
-                    , OtpService<TContext, TUserKey, Guid, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>>>();
+                    , OtpService<TContext, TUserKey, Guid, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, ValidateOtpVM<TUserKey>>>();
             }
             return services;
         }
