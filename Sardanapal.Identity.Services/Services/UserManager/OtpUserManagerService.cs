@@ -97,6 +97,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         {
             curUser = new TUser()
             {
+                Username = phonenumber.ToString(),
                 PhoneNumber = phonenumber,
                 FirstName = firstname,
                 LastName = lastName
@@ -134,6 +135,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         {
             curUser = new TUser()
             {
+                Username = email,
                 Email = email,
                 FirstName = firstname,
                 LastName = lastName
