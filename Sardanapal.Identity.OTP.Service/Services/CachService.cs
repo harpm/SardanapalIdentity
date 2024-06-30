@@ -5,6 +5,7 @@ using AutoMapper;
 using System.Text.Json;
 using Sardanapal.Identity.OTP.VM;
 using Sardanapal.Identity.OTP.Domain;
+using Sardanapal.RedisCach.Models;
 
 namespace Sardanapal.Identity.OTP.Services;
 
@@ -26,7 +27,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
     , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
+    where TOtpCachModel : class, ICachModel<TKey>, IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
     where TValidateVM : ValidateOtpVM<TUserKey>, new()
