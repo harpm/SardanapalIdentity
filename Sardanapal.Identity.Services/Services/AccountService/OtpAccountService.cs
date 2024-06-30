@@ -31,6 +31,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM
 {
+    protected override string ServiceName => "OTP AccountService";
     public OtpAccountServiceBase(TOtpUserManager _userManagerService)
         : base(_userManagerService)
     {
