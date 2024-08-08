@@ -54,12 +54,39 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         otpHelper = _otpHelper;
     }
 
-    public override Task<IResponse<TKey>> Add(TNewVM model)
+    public override async Task<IResponse<TKey>> Add(TNewVM model)
     {
         model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
         model.Code = otpHelper.GenerateNewOtp();
 
-        return base.Add(model);
+        Response<TKey> result = new Response<TKey>(GetType().Name, OperationType.Add);
+        return await result.FillAsync(async () =>
+        {
+            TKey newId = model.Id;
+            TOtpCachModel value = mapper.Map<TNewVM, TOtpCachModel>(model);
+            var items = await InternalGetAll();
+
+            if (items.Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId).Any())
+            {
+                bool added = await GetCurrentDatabase()
+                    .HashSetAsync(rKey
+                        , new RedisValue(newId.ToString())
+                        , new RedisValue(JsonSerializer.Serialize(value)));
+
+                bool hasExpireTime = true;
+                if (expireTime > 0)
+                {
+                    hasExpireTime = await GetCurrentDatabase().KeyExpireAsync(rKey, DateTime.UtcNow.AddMinutes(expireTime));
+                }
+                result.Set(StatusCode.Succeeded, newId);
+            }
+            else
+            {
+                result.Set(StatusCode.Canceled);
+                result.UserMessage = "برای ارسال کد جدید تا پ";
+            }
+
+        });
     }
 
     public async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
