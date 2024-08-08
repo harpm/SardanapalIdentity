@@ -9,12 +9,12 @@ public static class ValidationExtensions
         return builder.Matches("^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$");
     }
 
-    public static IRuleBuilder<T, string> Pssword<T>(this IRuleBuilder<T, string> builder)
+    public static IRuleBuilder<T, string> Password<T>(this IRuleBuilder<T, string> builder)
     {
         return builder.Matches("^(?=.*[A-Za-z])(?=.*)[A-Za-z]{8,}$");
     }
 
-    public static IRuleBuilder<T, string> PsswordPlusCapitalLetter<T>(this IRuleBuilder<T, string> builder)
+    public static IRuleBuilder<T, string> PasswordPlusCapitalLetter<T>(this IRuleBuilder<T, string> builder)
     {
         return builder.Matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*)[a-zA-Z]{8,}$");
     }
