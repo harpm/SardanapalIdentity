@@ -1,16 +1,11 @@
 ﻿using Sardanapal.Domain.Model;
+using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Model;
 
-public interface IUserRoleBase<TUserKey, TRoleKey> : IBaseEntityModel<long>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
-{
-    TUserKey UserId { get; set; }
-    TRoleKey RoleId { get; set; }
-}
 
-public abstract class UserRoleBase<TUserKey, TRoleKey> : BaseEntityModel<long>, IUserRoleBase<TUserKey, TRoleKey>
+
+public abstract class UserRoleBase<TUserKey, TRoleKey> : BaseEntityModel<long>, IUserRole<TUserKey, TRoleKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
 {

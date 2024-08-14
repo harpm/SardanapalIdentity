@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Domain.UnitOfWork;
 using Sardanapal.Domain.Model;
 using Sardanapal.Identity.Authorization.Data;
 using System.Security.Claims;
+using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Data;
 
 public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : ISardanapalUnitOfWork
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<TRoleKey>, new()
-    where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
+    where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRole<TRoleKey>, new()
+    where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
 {
     DbSet<TUser> Users { get; set; }
     DbSet<TRole> Roles { get; set; }
@@ -23,9 +23,9 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole,
     , ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<TRoleKey>, new()
-    where TUR : class, IUserRoleBase<TUserKey, TRoleKey>, new()
+    where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRole<TRoleKey>, new()
+    where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
 {
     protected readonly IIdentityHolder _reqClaim;
 

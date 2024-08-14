@@ -1,22 +1,10 @@
 ﻿using Sardanapal.Domain.Model;
+using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Model;
 
-public interface IUserBase<TUserKey> : IBaseEntityModel<TUserKey>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-{
-    string FirstName { get; set; }
-    string LastName { get; set; }
-    string Username { get; set; }
-    string HashedPassword { get; set; }
-    string? Email { get; set; }
-    bool VerifiedEmail { get; set; }
-    long? PhoneNumber { get; set; }
-    bool VerifiedPhoneNumber { get; set; }
-}
-
 public abstract class UserBase<TUserKey> : BaseEntityModel<TUserKey>
-    , IUserBase<TUserKey>
+    , IUser<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual string FirstName { get; set; }

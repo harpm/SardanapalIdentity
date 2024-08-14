@@ -1,14 +1,9 @@
 ﻿using Sardanapal.Domain.Model;
+using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Model;
 
-public interface IRoleBase<TKey> : IBaseEntityModel<TKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
-{
-    string Title { get; set; }
-}
-
-public abstract class RoleBase<TKey> : BaseEntityModel<TKey>, IRoleBase<TKey>
+public abstract class RoleBase<TKey> : BaseEntityModel<TKey>, IRole<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public virtual string Title { get; set; }

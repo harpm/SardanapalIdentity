@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Sardanapal.Identity.Domain.Model;
+using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain;
 
@@ -9,7 +9,7 @@ public static class IdentitySeeds
 {
     public static IServiceProvider AddRoles<TRoleEnum, TRole, TRoleKey>(this IServiceProvider provider)
         where TRoleEnum : Enum
-        where TRole : class, IRoleBase<TRoleKey>, new()
+        where TRole : class, IRole<TRoleKey>, new()
         where TRoleKey : IEquatable<TRoleKey>, IComparable<TRoleKey>
     {
         var scope = provider.CreateScope();
@@ -36,8 +36,8 @@ public static class IdentitySeeds
 
     public static IServiceProvider AddAdminUser<TRoleEnum, TUser, TUserRole, TUserKey, TRoleKey>(this IServiceProvider provider)
         where TRoleEnum : Enum
-        where TUser : class, IUserBase<TUserKey>, new()
-        where TUserRole : class, IUserRoleBase<TUserKey, TRoleKey>, new()
+        where TUser : class, IUser<TUserKey>, new()
+        where TUserRole : class, IUserRole<TUserKey, TRoleKey>, new()
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TRoleKey : IEquatable<TRoleKey>, IComparable<TRoleKey>
     {
