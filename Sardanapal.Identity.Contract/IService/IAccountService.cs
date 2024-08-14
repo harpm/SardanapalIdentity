@@ -4,7 +4,7 @@ using Sardanapal.Identity.Dto;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+public interface IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
