@@ -7,7 +7,7 @@ public class CachOtpListItemVM<TUserKey, TKey> : OtpListItemVM<TKey>, ICachModel
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public TUserKey UserId { get; set; }
-    public DateTime ExpireTime { get; set; }
+    public override DateTime ExpireTime { get; set; }
 }
 
 public class CachNewOtpVM<TUserKey, TKey> : NewOtpVM<TUserKey>, ICachModel<TKey>
