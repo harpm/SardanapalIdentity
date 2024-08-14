@@ -6,7 +6,7 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM> : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM> : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
