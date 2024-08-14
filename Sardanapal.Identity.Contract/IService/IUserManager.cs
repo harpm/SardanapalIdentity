@@ -3,7 +3,7 @@ using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IUserManagerService<TUserKey, TUser, TRole>
+public interface IUserManager<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<byte>, new()
