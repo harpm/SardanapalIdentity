@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Authorization</Title>
-		<Version>0.1.25</Version>
+		<Version>0.1.26</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.6" />
-		<PackageReference Include="Sardanapal.Identity.Services" Version="0.1.22" />
+		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.7" />
+		<PackageReference Include="Sardanapal.Identity.Services" Version="0.1.39" />
 	</ItemGroup>
 
 </Project>
