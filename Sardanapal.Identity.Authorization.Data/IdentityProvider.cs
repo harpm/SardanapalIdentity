@@ -1,9 +1,10 @@
 ﻿
+using Sardanapal.Identity.Contract.IService;
 using System.Security.Claims;
 
 namespace Sardanapal.Identity.Authorization.Data;
 
-public class IdentityHolder : IIdentityProvider
+public class IdentityProvider : IIdentityProvider
 {
     protected long _userId;
     public long UserId
