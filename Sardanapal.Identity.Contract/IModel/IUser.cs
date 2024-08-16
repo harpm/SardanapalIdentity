@@ -1,5 +1,5 @@
 ﻿
-using Sardanapal.Domain.Model;
+using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.Contract.IModel;
 public interface IUser<TUserKey> : IBaseEntityModel<TUserKey>

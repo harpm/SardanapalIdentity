@@ -1,7 +1,7 @@
 ﻿
 using Sardanapal.Identity.Dto;
-using Sardanapal.Identity.OTP.VM;
 using Sardanapal.Identity.ViewModel.Models.Account;
+using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Contract.IService;
