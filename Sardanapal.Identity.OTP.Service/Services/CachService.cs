@@ -11,7 +11,7 @@ namespace Sardanapal.Identity.OTP.Services;
 
 public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
     : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
+    , IOtpService<TUserKey, TKey, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()

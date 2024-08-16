@@ -8,20 +8,6 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
-    : ICrudService<TKey, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TSearchVM : OtpSearchVM, new()
-    where TVM : OtpVM, new()
-    where TNewVM : NewOtpVM<TUserKey>, new()
-    where TEditableVM : OtpEditableVM<TUserKey>, new()
-    where TValidateVM : ValidateOtpVM<TUserKey>, new()
-{
-
-}
-
 public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
     : EfCrudService<TContext, TKey, OTPModel<TUserKey, TKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
