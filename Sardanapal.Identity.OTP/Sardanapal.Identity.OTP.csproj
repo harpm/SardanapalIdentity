@@ -5,14 +5,17 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>0.1.10</Version>
+		<Version>0.1.11</Version>
 		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Identity.ViewModel" Version="0.1.15" />
-		<PackageReference Include="Sardanapal.RedisCach" Version="0.1.5" />
+		<PackageReference Include="Sardanapal.Identity.Contract" Version="0.1.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="VM\" />
 	</ItemGroup>
 
 </Project>

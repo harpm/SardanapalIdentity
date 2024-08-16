@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sardanapal.Domain.UnitOfWork;
-using Sardanapal.Domain.Model;
 using Sardanapal.Identity.Authorization.Data;
 using System.Security.Claims;
 using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Contract.Data;
+using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Data;
 
-public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : ISardanapalUnitOfWork
+public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TUser, TRole, TUR> : ISdUnitOfWork
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TUser : class, IUser<TUserKey>, new()
@@ -20,7 +21,7 @@ public interface ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR
 }
 
 public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
-    , ISdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR>
+    , ISdIdentityUnitOfWork<TUserKey, TRoleKey, TUser, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TUser : class, IUser<TUserKey>, new()
