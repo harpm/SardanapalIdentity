@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Domain.Data;
 using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.Services.Statics;
@@ -6,29 +8,11 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public interface IUserManagerService<TUserKey, TUser, TRole>
+public class UserManager<TUserKey, TUser, TRole, TUR> : IUserManager<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
-{
-    Task<TUser?> GetUser(string? email = null, long? phoneNumber = null);
-    Task<string> Login(string username, string password);
-    Task<TUserKey> RegisterUser(string username, string password, byte role);
-
-    void EditUserData(TUserKey id, string? username = null
-        , string? password = null
-        , long? phonenumber = null
-        , string? email = null
-        , string? firstname = null
-        , string? lastname = null);
-    Task<string> RefreshToken(TUserKey userId);
-}
-
-public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerService<TUserKey, TUser, TRole>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey, byte>, new()
+    where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRole<byte>, new()
+    where TUR : class, IUserRole<TUserKey, byte>, new()
 {
     protected SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> _context;
     protected ITokenService _tokenService;
@@ -49,7 +33,7 @@ public class UserManagerService<TUserKey, TUser, TRole, TUR> : IUserManagerServi
         }
     }
 
-    public UserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService)
+    public UserManager(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService)
     {
         _context = context;
         _tokenService = tokenService;

@@ -1,35 +1,21 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Domain.Data;
-using Sardanapal.Identity.Domain.Model;
-using Sardanapal.Identity.OTP.Services;
-using Sardanapal.Identity.OTP.VM;
+using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-
-public interface IOtpUserManagerService<TUserKey, TUser, TRole> : IUserManagerService<TUserKey, TUser, TRole>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
-{
-    Task<TUserKey> RequestLoginUser(long phonenumber, byte role);
-    Task<TUserKey> RequestLoginUser(string email, byte role);
-    Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName, byte role);
-    Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName, byte role);
-    Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId);
-    Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId);
-}
-
 public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNewVM, TEditableVM, TValidateVM>
-    : UserManagerService<TUserKey, TUser, TRole, TUR>
-    , IOtpUserManagerService<TUserKey, TUser, TRole>
+    : UserManager<TUserKey, TUser, TRole, TUR>
+    , IOtpUserManager<TUserKey, TUser, TRole>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : UserBase<TUserKey>, new()
-    where TRole : RoleBase<byte>, new()
-    where TUR : UserRoleBase<TUserKey, byte>, new()
+    where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRole<byte>, new()
+    where TUR : class, IUserRole<TUserKey, byte>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
     where TValidateVM : ValidateOtpVM<TUserKey>, new()

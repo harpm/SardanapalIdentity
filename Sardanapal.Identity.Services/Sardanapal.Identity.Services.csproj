@@ -6,17 +6,16 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Services</Title>
-		<Version>0.1.39</Version>
+		<Version>0.1.40</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Identity.Domain" Version="0.1.21" />
+		<PackageReference Include="Sardanapal.Identity.Domain" Version="0.1.23" />
 		<PackageReference Include="Sardanapal.Identity.Dto" Version="0.1.1" />
-		<PackageReference Include="Sardanapal.Identity.OTP.Service" Version="0.1.18" />
+		<PackageReference Include="Sardanapal.Identity.OTP.Service" Version="0.1.20" />
 		<PackageReference Include="Sardanapal.Identity.Share" Version="0.1.10" />
-		<PackageReference Include="Sardanapal.Identity.ViewModel" Version="0.1.15" />
 	</ItemGroup>
 
 </Project>

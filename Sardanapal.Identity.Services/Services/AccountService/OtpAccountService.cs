@@ -1,32 +1,21 @@
 ﻿
-using Sardanapal.Identity.Domain.Model;
+using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Dto;
-using Sardanapal.Identity.OTP.VM;
-using Sardanapal.Identity.Services.Services.UserManager;
 using Sardanapal.Identity.ViewModel.Models.Account;
+using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
-public interface IOtpAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM> : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TLoginVM : LoginVM
-    where TLoginDto : LoginDto
-    where TRegisterVM : RegisterVM
-{
-    Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM Model);
-    Task<IResponse<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model);
-    Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRegisterRequestVM model);
-    Task<IResponse<bool>> RegisterWithOtp(ValidateOtpVM<TUserKey> Model);
-
-}
 
 public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
     : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
-    where TOtpUserManager : class, IOtpUserManagerService<TUserKey, TUser, TRole>
+    , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey, byte>, new()
+    where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRole<byte>, new()
+    where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM

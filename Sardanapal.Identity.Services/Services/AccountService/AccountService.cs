@@ -1,30 +1,18 @@
-﻿using Sardanapal.Identity.Domain.Model;
+﻿using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Dto;
-using Sardanapal.Identity.Services.Services.UserManager;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public interface IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TLoginVM : LoginVM
-    where TLoginDto : LoginDto
-    where TRegisterVM : RegisterVM
-{
-    Task<IResponse<LoginDto>> Login(LoginVM model);
-    Task<IResponse<TUserKey>> Register(TRegisterVM model);
-    Task<IResponse<string>> RefreshToken(TUserKey userId);
-
-}
-
 public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
-    : IAccountServiceBase<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TUserManager : class, IUserManagerService<TUserKey, TUser, TRole>
+    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+    where TUserManager : class, IUserManager<TUserKey, TUser, TRole>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TUser : class, IUserBase<TUserKey>, new()
-    where TRole : class, IRoleBase<byte>, new()
-    where TUR : class, IUserRoleBase<TUserKey, byte>, new()
+    where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRole<byte>, new()
+    where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM
