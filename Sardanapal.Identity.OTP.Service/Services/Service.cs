@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Service.Services;
-using Sardanapal.Identity.OTP.VM;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.OTP.Domain;
-using Sardanapal.InterfacePanel.Service;
+using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;

@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Sardanapal.Identity.OTP.VM;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.OTP.Domain;
+using Sardanapal.Identity.ViewModel.Otp;
 
 namespace Sardanapal.Identity.OTP.Services
 {

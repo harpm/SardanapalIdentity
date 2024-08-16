@@ -3,15 +3,18 @@ using Sardanapal.RedisCache.Services;
 using Sardanapal.ViewModel.Response;
 using AutoMapper;
 using System.Text.Json;
-using Sardanapal.Identity.OTP.VM;
 using Sardanapal.Identity.OTP.Domain;
-using Sardanapal.RedisCach.Models;
+using Sardanapal.Contract.IService;
+using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.ViewModel.Otp;
+using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.OTP.Services;
 
 public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
     : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpService<TUserKey, TKey, TNewVM, TValidateVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
