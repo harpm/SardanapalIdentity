@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Sardanapal.Identity.Authorization.Data;
-using Sardanapal.Identity.Services.Services;
+using Sardanapal.Identity.Contract.IService;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Authorization.Middlewares;

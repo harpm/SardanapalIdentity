@@ -3,19 +3,7 @@ using System.Security.Claims;
 
 namespace Sardanapal.Identity.Authorization.Data;
 
-public interface IIdentityHolder
-{
-    ClaimsPrincipal Claims { get; }
-    bool IsAuthorized { get; }
-    string Token { get; }
-    void SetUserId(object userId);
-    void SetToken(string token);
-    void SetAuthorize();
-    public void SetAuthorize(string token, ClaimsPrincipal claims);
-    public void SetAuthorize(string token, ClaimsPrincipal claims, object userId);
-}
-
-public class IdentityHolder : IIdentityHolder
+public class IdentityHolder : IIdentityProvider
 {
     protected long _userId;
     public long UserId

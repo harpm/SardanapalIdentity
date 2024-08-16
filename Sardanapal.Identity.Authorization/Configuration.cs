@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Sardanapal.Identity.Services.Services;
 using Microsoft.AspNetCore.Builder;
 using Sardanapal.Identity.Authorization.Middlewares;
+using Sardanapal.Identity.Contract.IService;
 
 namespace Sardanapal.Identity.Authorization;
 
