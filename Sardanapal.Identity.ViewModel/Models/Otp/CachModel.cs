@@ -1,4 +1,4 @@
-﻿using Sardanapal.RedisCach.Models;
+﻿using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.ViewModel.Otp;
 
