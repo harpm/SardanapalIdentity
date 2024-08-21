@@ -22,8 +22,10 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
 {
     protected TOtpService OtpService { get; set; }
 
-    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService
-        , TOtpService _otpService) : base(context, tokenService)
+    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context
+        , ITokenService tokenService
+        , TOtpService _otpService)
+        : base(context, tokenService)
 
     {
         OtpService = _otpService;
