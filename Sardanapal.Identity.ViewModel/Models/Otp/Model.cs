@@ -1,4 +1,5 @@
 ﻿using Sardanapal.ViewModel.Models;
+using System.ComponentModel.Design;
 
 namespace Sardanapal.Identity.ViewModel.Otp;
 
@@ -20,6 +21,7 @@ public class NewOtpVM<TUserKey>
     public virtual TUserKey UserId { get; set; }
     public virtual DateTime ExpireTime { get; set; }
     public virtual byte RoleId { get; set; }
+    public virtual string Recipient { get; set; }
 }
 
 public class OtpEditableVM<TUserKey> : NewOtpVM<TUserKey>
