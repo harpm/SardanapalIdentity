@@ -38,23 +38,22 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
 
-    public int expireTime
-    {
-        get
-        {
-            return base.expireTime;
-        }
-        set
-        {
-            base.expireTime = value;
-        }
-    }
-
     protected IOtpHelper otpHelper { get; set; }
-    public OtpCachService(IConnectionMultiplexer _conn, IMapper _mapper, IOtpHelper _otpHelper, int _expireTime)
-        : base(_conn, _mapper, _expireTime)
+
+    protected override int expireTime { get => base.expireTime; set => base.expireTime = value; }
+    protected IEmailService emailService { get; set; }
+    protected ISmsService smsService { get; set; }
+
+    public OtpCachService(IConnectionMultiplexer _conn
+        , IMapper _mapper
+        , IOtpHelper _otpHelper
+        , IEmailService _emailService
+        , ISmsService _smsService)
+        : base(_conn, _mapper)
     {
         otpHelper = _otpHelper;
+        emailService = _emailService;
+        smsService = _smsService;
     }
 
     public override async Task<IResponse<TKey>> Add(TNewVM model)
@@ -81,6 +80,13 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
                 {
                     hasExpireTime = await GetCurrentDatabase().KeyExpireAsync(rKey, DateTime.UtcNow.AddMinutes(expireTime));
                 }
+
+                if (long.TryParse(model.Recipient, out long _))
+                    smsService.Send(model.Recipient, model.Code);
+                else
+                    emailService.Send(model.Recipient, model.Code);
+
+
                 result.Set(StatusCode.Succeeded, newId);
             }
             else

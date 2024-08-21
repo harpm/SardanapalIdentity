@@ -26,10 +26,42 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
 
     public override string ServiceName => "OtpService";
 
-    public OtpService(TContext context, IMapper _Mapper, IRequestService _request, int expireTime)
+    protected IOtpHelper otpHelper;
+    protected IEmailService emailService { get; set; }
+    protected ISmsService smsService { get; set; }
+
+    public OtpService(TContext context
+        , IMapper _Mapper
+        , IRequestService _request
+        , IEmailService _emailService
+        , ISmsService _smsService
+        , IOtpHelper _otpHelper)
         : base(context, _Mapper, _request)
     {
-        this.expireTime = expireTime;
+        emailService = _emailService;
+        smsService = _smsService;
+        otpHelper = _otpHelper;
+    }
+
+    public override async Task<IResponse<TKey>> Add(TNewVM Model)
+    {
+        Model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
+        Model.Code = otpHelper.GenerateNewOtp();
+        Response<TKey> Result = new Response<TKey>(ServiceName, OperationType.Add);
+        return await Result.FillAsync(async delegate
+        {
+            OTPModel<TUserKey, TKey> Item = Mapper.Map<OTPModel<TUserKey, TKey>>(Model);
+            await UnitOfWork.AddAsync(Item);
+            await UnitOfWork.SaveChangesAsync();
+
+            if (long.TryParse(Model.Recipient, out long _))
+                smsService.Send(Model.Recipient, Item.Code);
+            else
+                emailService.Send(Model.Recipient, Item.Code);
+            
+
+            Result.Set(StatusCode.Succeeded, Item.Id);
+        });
     }
 
     public async Task RemoveExpireds()
