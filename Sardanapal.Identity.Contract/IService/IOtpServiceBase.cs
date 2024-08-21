@@ -13,7 +13,6 @@ public interface IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
     where TNewVM : class, new()
     where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
-    int expireTime { get; set; }
     Task<IResponse<bool>> ValidateOtp(TValidateVM model);
     Task RemoveExpireds();
 }
