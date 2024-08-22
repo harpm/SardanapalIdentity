@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Sardanapal.Identity.Authorization.Data;
+using Sardanapal.Identity.Contract.IService;
 using System.Net;
 using System.Security.Claims;
 
@@ -21,7 +21,7 @@ public class HasRoleAttribute : ActionFilterAttribute
 
         try
         {
-            IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
+            IIdentityProvider idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityProvider)) as IIdentityProvider;
             if (!idHolder.IsAuthorized
                 || idHolder.Claims == null
                 || idHolder.Claims.Claims == null
@@ -45,7 +45,7 @@ public class HasRoleAttribute : ActionFilterAttribute
     {
         try
         {
-            IIdentityHolder idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityHolder)) as IIdentityHolder;
+            IIdentityProvider idHolder = context.HttpContext.RequestServices.GetService(typeof(IIdentityProvider)) as IIdentityProvider;
             if (!idHolder.IsAuthorized
                 || idHolder.Claims == null
                 || idHolder.Claims.Claims == null

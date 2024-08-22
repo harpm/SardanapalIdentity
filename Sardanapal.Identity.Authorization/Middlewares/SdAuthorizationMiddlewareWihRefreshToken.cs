@@ -14,14 +14,14 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
     }
 
-    public override async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityHolder identityHolder)
+    public override async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
-        await base.InvokeAsync(context, tokenService, identityHolder);
+        await base.InvokeAsync(context, tokenService, identityProvider);
 
-        if (identityHolder.IsAuthorized)
+        if (identityProvider.IsAuthorized)
         {
-            var token = tokenService.GenerateToken(identityHolder.Claims.FindFirst(ClaimTypes.NameIdentifier).Value
-                        , identityHolder.Claims.FindAll(ClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
+            var token = tokenService.GenerateToken(identityProvider.Claims.FindFirst(ClaimTypes.NameIdentifier).Value
+                        , identityProvider.Claims.FindAll(ClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
                         .ToArray());
 
             if (token.StatusCode == StatusCode.Succeeded)

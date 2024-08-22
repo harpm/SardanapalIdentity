@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using Sardanapal.Identity.Authorization.Data;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.ViewModel.Response;
 
@@ -15,7 +14,7 @@ public class SdAuthorizationMiddleware
         _next = next;
     }
 
-    public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityHolder identityHolder)
+    public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
         string token = context.Request.Headers
             .Where(x => x.Key.Equals("Auth", StringComparison.InvariantCultureIgnoreCase))
@@ -25,7 +24,7 @@ public class SdAuthorizationMiddleware
         var res = tokenService.ValidateToken(token, out ClaimsPrincipal cp);
         if (res.StatusCode == StatusCode.Succeeded && res.Data)
         {
-            identityHolder.SetAuthorize(token, cp, cp.FindFirst(ClaimTypes.NameIdentifier).Value);
+            identityProvider.SetAuthorize(token, cp, cp.FindFirst(ClaimTypes.NameIdentifier).Value);
         }
 
         // Call the next delegate/middleware in the pipeline.
