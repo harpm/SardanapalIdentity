@@ -68,7 +68,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
             TOtpCachModel value = mapper.Map<TNewVM, TOtpCachModel>(model);
             var items = await InternalGetAll();
 
-            if (items.Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId).Any())
+            if (!items.Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId).Any())
             {
                 bool added = await GetCurrentDatabase()
                     .HashSetAsync(rKey
