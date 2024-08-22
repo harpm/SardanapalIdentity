@@ -39,11 +39,17 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
 
         if (user != null)
         {
-            await OtpService.Add(new TNewVM()
+            var otpRes = await OtpService.Add(new TNewVM()
             {
                 UserId = user.Id,
-                RoleId = role
+                RoleId = role,
+                Recipient = phonenumber.ToString()
             });
+
+            if (otpRes.StatusCode != StatusCode.Succeeded)
+            {
+                throw new Exception(string.Join(", ", otpRes.DeveloperMessages));
+            }
 
             return user.Id;
         }
@@ -64,7 +70,8 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
             await OtpService.Add(new TNewVM()
             {
                 UserId = user.Id,
-                RoleId = role
+                RoleId = role,
+                Recipient = email
             });
 
             return user.Id;
