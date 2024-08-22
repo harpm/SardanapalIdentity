@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sardanapal.Domain.UnitOfWork;
-using Sardanapal.Identity.Authorization.Data;
 using System.Security.Claims;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
+using Sardanapal.Identity.Contract.IService;
 
 namespace Sardanapal.Identity.Domain.Data;
 
@@ -28,13 +28,13 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole,
     where TRole : class, IRole<TRoleKey>, new()
     where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
 {
-    protected readonly IIdentityHolder _reqClaim;
+    protected readonly IIdentityProvider _reqClaim;
 
     public DbSet<TUser> Users { get; set; }
     public DbSet<TRole> Roles { get; set; }
     public DbSet<TUR> UserRoles { get; set; }
     
-    public SdIdentityUnitOfWorkBase(DbContextOptions opt, IIdentityHolder requestClaim)
+    public SdIdentityUnitOfWorkBase(DbContextOptions opt, IIdentityProvider requestClaim)
         : base(opt)
     {
         _reqClaim = requestClaim;

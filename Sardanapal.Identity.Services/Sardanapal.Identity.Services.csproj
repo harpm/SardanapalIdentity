@@ -12,10 +12,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Identity.Domain" Version="0.1.23" />
-		<PackageReference Include="Sardanapal.Identity.Dto" Version="0.1.1" />
-		<PackageReference Include="Sardanapal.Identity.OTP.Service" Version="0.1.22" />
-		<PackageReference Include="Sardanapal.Identity.Share" Version="0.1.10" />
+	  <ProjectReference Include="..\Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj" />
+	  <ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
+	  <ProjectReference Include="..\Sardanapal.Identity.OTP.Service\Sardanapal.Identity.OTP.Service.csproj" />
+	  <ProjectReference Include="..\Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj" />
 	</ItemGroup>
 
 </Project>

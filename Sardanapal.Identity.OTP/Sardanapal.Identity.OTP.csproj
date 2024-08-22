@@ -9,13 +9,13 @@
 		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Sardanapal.Identity.Contract" Version="0.1.4" />
-	</ItemGroup>
-
+	
 	<ItemGroup>
 	  <Folder Include="VM\" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
 	</ItemGroup>
 
 </Project>

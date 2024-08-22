@@ -13,9 +13,13 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Contract" Version="0.1.3" />
-		<PackageReference Include="Sardanapal.Identity.Dto" Version="0.1.1" />
-		<PackageReference Include="Sardanapal.Identity.ViewModel" Version="0.1.17" />
+		<PackageReference Include="Sardanapal.Contract" Version="0.1.4" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
+	  <ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
 	</ItemGroup>
 
 </Project>

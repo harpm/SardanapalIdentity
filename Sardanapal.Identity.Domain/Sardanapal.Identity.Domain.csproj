@@ -12,9 +12,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Domain" Version="0.1.9" />
-		<PackageReference Include="Sardanapal.Identity.Authorization.Data" Version="0.1.7" />
-		<PackageReference Include="Sardanapal.Identity.Contract" Version="0.1.4" />
+		<PackageReference Include="Sardanapal.Domain" Version="0.1.10" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Sardanapal.Identity.Authorization.Data\Sardanapal.Identity.Authorization.Data.csproj" />
+	  <ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
 	</ItemGroup>
 
 </Project>
