@@ -43,22 +43,32 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
         otpHelper = _otpHelper;
     }
 
-    public override async Task<IResponse<TKey>> Add(TNewVM Model)
+    protected virtual string CreateSMSOtpMessage(TNewVM model)
     {
-        Model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
-        Model.Code = otpHelper.GenerateNewOtp();
+        return model.Code;
+    }
+
+    protected virtual string CreateEmailOtpMessage(TNewVM model)
+    {
+        return model.Code;
+    }
+
+    public override async Task<IResponse<TKey>> Add(TNewVM model)
+    {
+        model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
+        model.Code = otpHelper.GenerateNewOtp();
         Response<TKey> Result = new Response<TKey>(ServiceName, OperationType.Add);
         return await Result.FillAsync(async delegate
         {
-            OTPModel<TUserKey, TKey> Item = Mapper.Map<OTPModel<TUserKey, TKey>>(Model);
+            OTPModel<TUserKey, TKey> Item = Mapper.Map<OTPModel<TUserKey, TKey>>(model);
             await UnitOfWork.AddAsync(Item);
             await UnitOfWork.SaveChangesAsync();
 
-            if (long.TryParse(Model.Recipient, out long _))
-                smsService.Send(Model.Recipient, Item.Code);
+            if (long.TryParse(model.Recipient, out long _))
+                smsService.Send(model.Recipient, CreateSMSOtpMessage(model));
             else
-                emailService.Send(Model.Recipient, Item.Code);
-            
+                emailService.Send(model.Recipient, CreateEmailOtpMessage(model));
+
 
             Result.Set(StatusCode.Succeeded, Item.Id);
         });

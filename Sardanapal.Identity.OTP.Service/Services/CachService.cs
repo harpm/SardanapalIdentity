@@ -56,6 +56,16 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         smsService = _smsService;
     }
 
+    protected virtual string CreateSMSOtpMessage(TNewVM model)
+    {
+        return model.Code;
+    }
+
+    protected virtual string CreateEmailOtpMessage(TNewVM model)
+    {
+        return model.Code;
+    }
+
     public override async Task<IResponse<TKey>> Add(TNewVM model)
     {
         model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
@@ -82,9 +92,9 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
                 }
 
                 if (long.TryParse(model.Recipient, out long _))
-                    smsService.Send(model.Recipient, model.Code);
+                    smsService.Send(model.Recipient, CreateSMSOtpMessage(model));
                 else
-                    emailService.Send(model.Recipient, model.Code);
+                    emailService.Send(model.Recipient, CreateEmailOtpMessage(model));
 
 
                 result.Set(StatusCode.Succeeded, newId);
