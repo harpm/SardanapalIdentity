@@ -12,9 +12,9 @@ public abstract class UserBase<TUserKey> : BaseEntityModel<TUserKey>
     public virtual string Username { get; set; }
     public virtual string HashedPassword { get; set; }
     public virtual string? Email { get; set; }
-    public virtual bool VerifiedEmail { get; set; }
+    public virtual bool VerifiedEmail { get; set; } = false;
     public virtual long? PhoneNumber { get; set; }
-    public virtual bool VerifiedPhoneNumber { get; set; }
+    public virtual bool VerifiedPhoneNumber { get; set; } = false;
 }
 
 public class SardanapalUser<TUserKey, TRoleKey> : UserBase<TUserKey>

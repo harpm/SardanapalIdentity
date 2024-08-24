@@ -217,8 +217,12 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
                 var tokenRes = _tokenService.GenerateToken(curUser.Username, roleId);
                 return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
             }
-
-            return string.Empty;
+            else
+            {
+                throw new Exception(string.Join(", "
+                    , validationRes.DeveloperMessages
+                    , "StatusCode: " + validationRes.StatusCode.ToString()));
+            }
         }
         else
         {
