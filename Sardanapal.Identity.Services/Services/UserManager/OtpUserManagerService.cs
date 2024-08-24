@@ -112,6 +112,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         {
             await OtpService.Add(new TNewVM()
             {
+                Recipient = phonenumber.ToString(),
                 UserId = curUser.Id,
                 RoleId = role
             });
@@ -150,6 +151,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         {
             await OtpService.Add(new TNewVM()
             {
+                Recipient = email,
                 UserId = curUser.Id,
                 RoleId = role
             });
