@@ -9,6 +9,7 @@ using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Contract.IModel;
+using Sardanapal.Identity.Share.Resources;
 
 namespace Sardanapal.Identity.OTP.Services;
 
@@ -102,7 +103,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.UserMessage = "برای ارسال کد جدید تا پ";
+                result.UserMessage = string.Format(Service_Messages.OtpCooldown, expireTime);
             }
 
         });
@@ -123,6 +124,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
             else
             {
                 result.Set(StatusCode.NotExists);
+                result.UserMessage = string.Format(Service_Messages.InvalidOtpCode, model.Code);
             }
         });
     }

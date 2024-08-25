@@ -4,7 +4,7 @@ using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Service.Services;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.OTP.Domain;
+using Sardanapal.Identity.Share.Resources;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
 
@@ -59,20 +59,30 @@ public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearc
     {
         model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
         model.Code = otpHelper.GenerateNewOtp();
-        Response<TKey> Result = new Response<TKey>(ServiceName, OperationType.Add);
-        return await Result.FillAsync(async delegate
+
+        Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add);
+        return await result.FillAsync(async delegate
         {
-            TOTPModel Item = Mapper.Map<TOTPModel>(model);
-            await UnitOfWork.AddAsync(Item);
-            await UnitOfWork.SaveChangesAsync();
+            if (!await UnitOfWork.Set<TOTPModel>().AsNoTracking()
+                .Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId)
+                .AnyAsync())
+            {
+                TOTPModel Item = Mapper.Map<TOTPModel>(model);
+                await UnitOfWork.AddAsync(Item);
+                await UnitOfWork.SaveChangesAsync();
 
-            if (long.TryParse(model.Recipient, out long _))
-                smsService.Send(model.Recipient, CreateSMSOtpMessage(model));
+                if (long.TryParse(model.Recipient, out long _))
+                    smsService.Send(model.Recipient, CreateSMSOtpMessage(model));
+                else
+                    emailService.Send(model.Recipient, CreateEmailOtpMessage(model));
+
+                result.Set(StatusCode.Succeeded, Item.Id);
+            }
             else
-                emailService.Send(model.Recipient, CreateEmailOtpMessage(model));
-
-
-            Result.Set(StatusCode.Succeeded, Item.Id);
+            {
+                result.Set(StatusCode.Canceled);
+                result.UserMessage = string.Format(Service_Messages.OtpCooldown, expireTime);
+            }
         });
     }
 

@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Authorization Data</Title>
-		<Version>0.2.4</Version>
+		<Version>0.2.5</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>

@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Shared</Title>
-		<Version>0.2.4</Version>
+		<Version>0.2.5</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
@@ -17,6 +17,30 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.2" />
 		<PackageReference Include="Sardanapal.Share" Version="0.2.2" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Resources\Service.Messages.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Service.Messages.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Resources\Validation.Messages.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Validation.Messages.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Service.Messages.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Service.Messages.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Resources\Validation.Messages.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Validation.Messages.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 </Project>

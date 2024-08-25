@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Domain.Data;
+using Sardanapal.Identity.Share.Resources;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
+using System.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
@@ -55,7 +57,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         }
         else
         {
-            throw new Exception("User phone number not found!");
+            throw new KeyNotFoundException(Service_Messages.PhonenumberNotFound);
         }
     }
 
@@ -78,7 +80,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         }
         else
         {
-            throw new Exception("User email not found!");
+            throw new KeyNotFoundException(Service_Messages.EmailNotFound);
         }
     }
 
@@ -105,7 +107,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         }
         else if (curUser.VerifiedPhoneNumber)
         {
-            throw new Exception("A User with this phone number already exists!");
+            throw new DuplicateNameException(Service_Messages.DuplicatePhoneNumber);
         }
 
         if (curUser != null && !curUser.VerifiedPhoneNumber)
@@ -144,7 +146,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         }
         else if (curUser.VerifiedEmail)
         {
-            throw new Exception("A User with this email already exists!");
+            throw new DuplicateNameException(Service_Messages.DuplicateEmail);
         }
 
         if (curUser != null && !curUser.VerifiedEmail)
@@ -195,7 +197,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         }
         else
         {
-            throw new Exception("Invalid user id!");
+            throw new KeyNotFoundException(Service_Messages.InvalidUserId);
         }
     }
 
@@ -228,7 +230,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNe
         }
         else
         {
-            throw new Exception("Invalid user id!");
+            throw new Exception(Service_Messages.InvalidUserId);
         }
     }
 }

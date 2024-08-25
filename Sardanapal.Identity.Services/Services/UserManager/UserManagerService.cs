@@ -114,7 +114,7 @@ public class UserManager<TUserKey, TUser, TRole, TUR> : IUserManager<TUserKey, T
     {
         var hashedPass = await Utilities.EncryptToMd5(password);
 
-        var newUser = await this.GetUser(username);
+        var newUser = await GetUser(username);
         if (newUser == null)
         {
             newUser = new TUser()

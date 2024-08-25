@@ -2,6 +2,7 @@
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Dto;
+using Sardanapal.Identity.Share.Resources;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
@@ -45,7 +46,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.DeveloperMessages = new string[] { "The email or phone number is entered incorrectly" };
+                result.DeveloperMessages = [Service_Messages.InvalidEmailOrNumber];
             }
         });
     }
@@ -68,7 +69,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
             else
             {
                 result.Set(StatusCode.Failed);
-                result.DeveloperMessages = new string[] { "Failed generating token!" };
+                result.DeveloperMessages = [Service_Messages.FailedGeneratingToken];
             }
         });
     }
@@ -90,7 +91,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.DeveloperMessages = new string[] { "The email or phone number is entered incorrectly" };
+                result.DeveloperMessages = [Service_Messages.InvalidEmailOrNumber];
             }
         });
     }
