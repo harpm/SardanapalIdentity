@@ -108,7 +108,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         });
     }
 
-    public async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
+    public virtual async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
         return await result.FillAsync(async () =>
@@ -132,7 +132,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
     /// So don't use it, unless in special cases
     /// </summary>
     /// <returns></returns>
-    public async Task RemoveExpireds()
+    public virtual async Task RemoveExpireds()
     {
         var allOtps = await GetCurrentDatabase().HashGetAllAsync(new RedisKey(key));
 

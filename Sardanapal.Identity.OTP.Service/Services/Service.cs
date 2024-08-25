@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Service.Services;
+using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.OTP.Domain;
 using Sardanapal.Identity.ViewModel.Otp;
@@ -9,12 +10,13 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
-    : EfCrudService<TContext, TKey, OTPModel<TUserKey, TKey>, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
+    : EfCrudService<TContext, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
     where TContext : DbContext
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
+    where TOTPModel : class, IOTPModel<TUserKey, TKey>, new()
     where TListItemVM : OtpListItemVM<TKey>
     where TSearchVM : OtpSearchVM, new()
     where TVM : OtpVM, new()
@@ -60,7 +62,7 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
         Response<TKey> Result = new Response<TKey>(ServiceName, OperationType.Add);
         return await Result.FillAsync(async delegate
         {
-            OTPModel<TUserKey, TKey> Item = Mapper.Map<OTPModel<TUserKey, TKey>>(model);
+            TOTPModel Item = Mapper.Map<TOTPModel>(model);
             await UnitOfWork.AddAsync(Item);
             await UnitOfWork.SaveChangesAsync();
 
@@ -74,14 +76,23 @@ public class OtpService<TContext, TUserKey, TKey, TListItemVM, TSearchVM, TVM, T
         });
     }
 
-    public async Task RemoveExpireds()
+    public virtual async Task RemoveExpireds()
     {
         this.UnitOfWork.RemoveRange(GetCurrentService().Where(x => x.ExpireTime <= DateTime.UtcNow));
         await this.UnitOfWork.SaveChangesAsync();
     }
 
-    public Task<IResponse<bool>> ValidateOtp(TValidateVM model)
+    public virtual async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
     {
-        throw new NotImplementedException();
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+
+        return await result.FillAsync(async () =>
+        {
+            var isValid = await UnitOfWork.Set<TOTPModel>()
+                .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
+                .AnyAsync();
+
+            result.Set(StatusCode.Succeeded, isValid);
+        });
     }
 }

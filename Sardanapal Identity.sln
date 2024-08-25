@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity", "Sardanapal.Identity\Sardanapal.Identity.csproj", "{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Services", "Sardanapal.Identity.Services\Sardanapal.Identity.Services.csproj", "{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Share", "Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj", "{ED689051-EC8E-4D76-AF62-C3173C352747}"
@@ -28,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{B9F427
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Contract", "Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj", "{0D735DB1-8255-464E-A953-94E1A6C7091D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Contract", "Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj", "{0D735DB1-8255-464E-A953-94E1A6C7091D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +34,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6D51EB0-266A-4B85-8B32-88CE9DDD6468}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}.Release|Any CPU.ActiveCfg = Release|Any CPU

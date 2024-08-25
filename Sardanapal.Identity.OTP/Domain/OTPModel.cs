@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sardanapal.Identity.OTP.Domain;
 
-public class OTPModel<TUserKey, TKey> : BaseEntityModel<TKey>
+public abstract class OTPModel<TUserKey, TKey> : BaseEntityModel<TKey>
     , IOTPModel<TUserKey, TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>

@@ -12,7 +12,7 @@ namespace Sardanapal.Identity.Services;
 
 public static class Configurations
 {
-    public static IServiceCollection AddDefaultIdentityServices<TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, byte roleId)
+    public static IServiceCollection AddDefaultIdentityServices<TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services)
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TUser : class, IUser<TUserKey>, new()
         where TRole : class, IRole<byte>, new()
@@ -27,9 +27,10 @@ public static class Configurations
         return services;
     }
 
-    public static IServiceCollection AddDefaultOtpIdentityServices<TContext, TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, byte roleId, bool useCach)
+    public static IServiceCollection AddDefaultOtpIdentityServices<TContext, TUserKey, TOTPModel, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, bool useCach)
         where TContext : DbContext
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
+        where TOTPModel : class, IOTPModel<TUserKey, Guid>, new()
         where TUser : class, IUser<TUserKey>, new()
         where TRole : class, IRole<byte>, new()
         where TUR : class, IUserRole<TUserKey, byte>, new()
@@ -38,7 +39,7 @@ public static class Configurations
     {
         services.AddScoped<ITokenService, TokenService>();
 
-        services.AddOtpService<TContext, TUserKey>(useCach);
+        services.AddOtpService<TContext, TOTPModel, TUserKey>(useCach);
 
         services.AddScoped<IOtpUserManager<TUserKey, TUser, TRole>, TUserManager>();
         services.AddScoped<IOtpAccountService<TUserKey, LoginVM, LoginDto, RegisterVM>, TAccountService>();

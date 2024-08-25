@@ -6,12 +6,12 @@ namespace Sardanapal.Identity.Services.Services.RoleManager;
 public abstract class RoleManagerBase<TUserKey, TRoleKey, TRole, TUR>
     : IRoleManager<TUserKey, TRoleKey, TRole, TUR>
 {
-    public TRole GetRole(TRoleKey roleId)
+    public virtual TRole GetRole(TRoleKey roleId)
     {
         throw new NotImplementedException();
     }
 
-    public bool HasRole(TRoleKey roleId, TUserKey userId)
+    public virtual bool HasRole(TRoleKey roleId, TUserKey userId)
     {
         throw new NotImplementedException();
     }

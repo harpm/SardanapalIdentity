@@ -16,7 +16,7 @@ public class OtpHelper : IOtpHelper
         _otpLength = otpLength;
     }
 
-    public string GenerateNewOtp()
+    public virtual string GenerateNewOtp()
     {
         char[] nines = new char[OtpLength];
         Array.Fill(nines, '9');
