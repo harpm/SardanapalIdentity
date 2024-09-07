@@ -29,7 +29,16 @@ public class IdentityProvider : IIdentityProvider
     {
         get
         {
-            return _authorized;
+            return _authorized || _isAnanymous;
+        }
+    }
+
+    protected bool _isAnanymous;
+    public bool IsAnanymous
+    {
+        get
+        {
+            return _isAnanymous;
         }
     }
 
@@ -40,6 +49,11 @@ public class IdentityProvider : IIdentityProvider
         {
             return _token;
         }
+    }
+
+    public virtual void SetAnanymous()
+    {
+        _isAnanymous = true;
     }
 
     public virtual void SetAuthorize()
