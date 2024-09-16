@@ -86,10 +86,9 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
                         , new RedisValue(newId.ToString())
                         , new RedisValue(JsonSerializer.Serialize(value)));
 
-                bool hasExpireTime = true;
                 if (expireTime > 0)
                 {
-                    hasExpireTime = await GetCurrentDatabase().KeyExpireAsync(rKey, DateTime.UtcNow.AddMinutes(expireTime));
+                    await GetCurrentDatabase().ExecuteAsync($"HEXPIRE {key} {expireTime * 60} FIELDS 1 {newId.ToString()}");
                 }
 
                 if (long.TryParse(model.Recipient, out long _))

@@ -6,15 +6,15 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity OTP</Title>
-		<Version>0.2.6</Version>
+		<Version>0.2.7</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Sardanapal.Ef.Service" Version="0.2.2" />
-	  <PackageReference Include="Sardanapal.Http.Service" Version="0.2.2" />
-	  <PackageReference Include="Sardanapal.RedisCach.Service" Version="0.2.2" />
+	  <PackageReference Include="Sardanapal.Ef.Service" Version="0.2.3" />
+	  <PackageReference Include="Sardanapal.Http.Service" Version="0.2.3" />
+	  <PackageReference Include="Sardanapal.RedisCach.Service" Version="0.2.3" />
 	</ItemGroup>
 
 	<ItemGroup>
