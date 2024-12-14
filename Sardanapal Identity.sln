@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP.Service", "Sardanapal.Identity.OTP.Service\Sardanapal.Identity.OTP.Service.csproj", "{1083B670-E675-4B57-A7AA-E633012B149C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{B9F427EC-BCAC-46A9-92FE-A9F4E3D36E60}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9F427EC-BCAC-46A9-92FE-A9F4E3D36E60}"
 	ProjectSection(SolutionItems) = preProject
+		Build.json = Build.json
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		SDBuild.go = SDBuild.go
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Contract", "Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj", "{0D735DB1-8255-464E-A953-94E1A6C7091D}"
