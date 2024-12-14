@@ -11,6 +11,6 @@
 		"Sardanapal.Identity.OTP.Service",
 		"Sardanapal.Identity.Services",
 		"Sardanapal.Identity.Share",
-		"Sardanapal.Identity.ViewModel",
+		"Sardanapal.Identity.ViewModel"
 	]
 }
