@@ -19,6 +19,11 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21.x
 
       - name: Add nuget source
         run: dotnet nuget add source --username harpm --password ${{ secrets.GITHUBTOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
