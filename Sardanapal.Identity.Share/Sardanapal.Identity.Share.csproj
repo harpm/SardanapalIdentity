@@ -6,7 +6,6 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Shared</Title>
-		<Version>0.2.7</Version>
 		<Authors>Harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
@@ -15,7 +14,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.2" />
-		<PackageReference Include="Sardanapal.Share" Version="0.2.3" />
+		<PackageReference Include="Sardanapal.Share" Version="0.4.2" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
 	</ItemGroup>
 

@@ -5,7 +5,6 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>0.2.7</Version>
 		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
