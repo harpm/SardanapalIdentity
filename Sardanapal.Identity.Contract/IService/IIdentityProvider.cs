@@ -12,6 +12,6 @@ public interface IIdentityProvider
     void SetUserId(object userId);
     void SetToken(string token);
     void SetAuthorize();
-    public void SetAuthorize(string token, ClaimsPrincipal claims);
-    public void SetAuthorize(string token, ClaimsPrincipal claims, object userId);
+    void SetAuthorize(string token, ClaimsPrincipal claims);
+    void SetAuthorize(string token, ClaimsPrincipal claims, object userId);
 }
