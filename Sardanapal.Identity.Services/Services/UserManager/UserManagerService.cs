@@ -2,7 +2,6 @@
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Domain.Data;
-using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.Services.Statics;
 using Sardanapal.ViewModel.Response;
 

@@ -36,7 +36,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                result.Set(StatusCode.Succeeded, new LoginDto() { Token = token });
+                result.Set(StatusCode.Succeeded, new LoginDto(token));
             }
             else
             {

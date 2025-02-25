@@ -1,14 +1,6 @@
 ﻿
 namespace Sardanapal.Identity.ViewModel.Models.Account;
 
-public class LoginVM
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
-}
+public record LoginVM(string Username, string Password);
 
-public class RegisterVM
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
-}
+public record RegisterVM(string Username, string Password);

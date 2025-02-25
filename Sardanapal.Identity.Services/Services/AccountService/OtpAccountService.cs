@@ -61,10 +61,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                result.Set(StatusCode.Succeeded, new LoginDto()
-                {
-                    Token = token
-                });
+                result.Set(StatusCode.Succeeded, new LoginDto(token));
             }
             else
             {

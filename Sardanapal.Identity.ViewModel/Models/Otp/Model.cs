@@ -1,20 +1,16 @@
 ﻿using Sardanapal.ViewModel.Models;
-using System.ComponentModel.Design;
 
 namespace Sardanapal.Identity.ViewModel.Otp;
 
-public class OtpListItemVM<TKey> : BaseListItem<TKey>
+public record OtpListItemVM<TKey> : BaseListItem<TKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public virtual DateTime ExpireTime { get; set; }
 }
 
-public class OtpSearchVM
-{
+public record OtpSearchVM();
 
-}
-
-public class NewOtpVM<TUserKey>
+public record NewOtpVM<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual string Code { get; set; }
@@ -24,30 +20,21 @@ public class NewOtpVM<TUserKey>
     public virtual string Recipient { get; set; }
 }
 
-public class OtpEditableVM<TUserKey> : NewOtpVM<TUserKey>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-{
+public record OtpEditableVM<TUserKey> : NewOtpVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>;
 
-}
+public record OtpVM();
 
-public class OtpVM
-{
+public record ValidateOtpVM<TUserKey> : OtpEditableVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>;
 
-}
-
-public class ValidateOtpVM<TUserKey> : OtpEditableVM<TUserKey>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-{
-
-}
-
-public class OtpLoginRequestVM
+public record OtpLoginRequestVM
 {
     public virtual string? Email { get; set; }
     public virtual long? PhoneNumber { get; set; }
 }
 
-public class OtpRegisterRequestVM : OtpLoginRequestVM
+public record OtpRegisterRequestVM : OtpLoginRequestVM
 {
     public virtual string FirstName { get; set; }
     public virtual string LastName { get; set; }
