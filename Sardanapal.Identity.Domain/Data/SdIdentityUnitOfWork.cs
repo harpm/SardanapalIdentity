@@ -8,32 +8,41 @@ using Sardanapal.Identity.Contract.IService;
 
 namespace Sardanapal.Identity.Domain.Data;
 
-public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TUser, TRole, TUR> : ISdUnitOfWork
+public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC> : ISdUnitOfWork
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+    where TClaimKey : IComparable<TClaimKey>, IEquatable<TClaimKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<TRoleKey>, new()
+    where TClaim : class, IClaim<TClaimKey>, new()
     where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
+    where TUC : class, IUserClaim<TUserKey, TClaimKey>, new()
 {
     DbSet<TUser> Users { get; set; }
     DbSet<TRole> Roles { get; set; }
     DbSet<TUR> UserRoles { get; set; }
+    DbSet<TUC> UserClaims { get; set; }
 }
 
-public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TUser, TRole, TUR> : SardanapalUnitOfWork
-    , ISdIdentityUnitOfWork<TUserKey, TRoleKey, TUser, TRole, TUR>
+public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC> : SardanapalUnitOfWork
+    , ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+    where TClaimKey : IComparable<TClaimKey>, IEquatable<TClaimKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<TRoleKey>, new()
+    where TClaim : class, IClaim<TClaimKey>, new()
     where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
+    where TUC : class, IUserClaim<TUserKey, TClaimKey>, new()
 {
     protected readonly IIdentityProvider _reqClaim;
 
     public DbSet<TUser> Users { get; set; }
     public DbSet<TRole> Roles { get; set; }
     public DbSet<TUR> UserRoles { get; set; }
-    
+    public DbSet<TUC> UserClaims { get; set; }
+
+
     public SdIdentityUnitOfWorkBase(DbContextOptions opt, IIdentityProvider requestClaim)
         : base(opt)
     {

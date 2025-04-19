@@ -6,12 +6,13 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, TClaim, TUR, TLoginVM, TLoginDto, TRegisterVM>
     : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TUserManager : class, IUserManager<TUserKey, TUser, TRole>
+    where TUserManager : class, IUserManager<TUserKey, TUser, TRole, TClaim>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<byte>, new()
+    where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto

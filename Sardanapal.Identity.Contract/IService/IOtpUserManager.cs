@@ -3,10 +3,11 @@ using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IOtpUserManager<TUserKey, TUser, TRole> : IUserManager<TUserKey, TUser, TRole>
+public interface IOtpUserManager<TUserKey, TUser, TRole, TClaim> : IUserManager<TUserKey, TUser, TRole, TClaim>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<byte>, new()
+    where TClaim : class, IClaim<byte>, new()
 {
     Task<TUserKey> RequestLoginUser(long phonenumber, byte role);
     Task<TUserKey> RequestLoginUser(string email, byte role);

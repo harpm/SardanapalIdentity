@@ -10,21 +10,23 @@ using System.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TUR, TNewVM, TEditableVM, TValidateVM>
-    : UserManager<TUserKey, TUser, TRole, TUR>
-    , IOtpUserManager<TUserKey, TUser, TRole>
+public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, TUR, TUC, TNewVM, TEditableVM, TValidateVM>
+    : UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC>
+    , IOtpUserManager<TUserKey, TUser, TRole, TClaim>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<byte>, new()
+    where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
+    where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
     where TValidateVM : ValidateOtpVM<TUserKey>, new()
 {
     protected TOtpService OtpService { get; set; }
 
-    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context
+    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, byte, TUser, TRole, TClaim, TUR, TUC> context
         , ITokenService tokenService
         , TOtpService _otpService)
         : base(context, tokenService)

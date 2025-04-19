@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Http;
-using Sardanapal.Identity.Authorization.Data;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.ViewModel.Response;
 using System.Security.Claims;
 
@@ -26,7 +26,7 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
             if (token.StatusCode == StatusCode.Succeeded)
             {
-                context.Response.Headers["Auth"] = token.StatusCode.ToString();
+                context.Response.Headers[ConstantKeys.AUTH_HEADER_KEY] = token.StatusCode.ToString();
             }
         }
     }

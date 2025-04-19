@@ -12,36 +12,38 @@ namespace Sardanapal.Identity.Services;
 
 public static class Configurations
 {
-    public static IServiceCollection AddDefaultIdentityServices<TUserKey, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services)
+    public static IServiceCollection AddDefaultIdentityServices<TUserKey, TUser, TRole, TClaim, TUR, TUserManager, TAccountService>(this IServiceCollection services)
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TUser : class, IUser<TUserKey>, new()
         where TRole : class, IRole<byte>, new()
+        where TClaim : class, IClaim<byte>, new()
         where TUR : class, IUserRole<TUserKey, byte>, new()
-        where TUserManager : class, IUserManager<TUserKey, TUser, TRole>
+        where TUserManager : class, IUserManager<TUserKey, TUser, TRole, TClaim>
         where TAccountService : class, IAccountService<TUserKey, LoginVM, LoginDto, RegisterVM>
     {
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IUserManager<TUserKey, TUser, TRole>, TUserManager>();
+        services.AddScoped<IUserManager<TUserKey, TUser, TRole, TClaim>, TUserManager>();
         services.AddScoped<IAccountService<TUserKey, LoginVM, LoginDto, RegisterVM>, TAccountService>();
 
         return services;
     }
 
-    public static IServiceCollection AddDefaultOtpIdentityServices<TContext, TUserKey, TOTPModel, TUser, TRole, TUR, TUserManager, TAccountService>(this IServiceCollection services, bool useCach)
+    public static IServiceCollection AddDefaultOtpIdentityServices<TContext, TUserKey, TOTPModel, TUser, TRole, TClaim, TUR, TUserManager, TAccountService>(this IServiceCollection services, bool useCach)
         where TContext : DbContext
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         where TOTPModel : class, IOTPModel<TUserKey, Guid>, new()
         where TUser : class, IUser<TUserKey>, new()
         where TRole : class, IRole<byte>, new()
+        where TClaim : class, IClaim<byte>, new()
         where TUR : class, IUserRole<TUserKey, byte>, new()
-        where TUserManager : class, IOtpUserManager<TUserKey, TUser, TRole>, new()
+        where TUserManager : class, IOtpUserManager<TUserKey, TUser, TRole, TClaim>, new()
         where TAccountService : class, IOtpAccountService<TUserKey, LoginVM, LoginDto, RegisterVM>, new()
     {
         services.AddScoped<ITokenService, TokenService>();
 
         services.AddOtpService<TContext, TOTPModel, TUserKey>(useCach);
 
-        services.AddScoped<IOtpUserManager<TUserKey, TUser, TRole>, TUserManager>();
+        services.AddScoped<IOtpUserManager<TUserKey, TUser, TRole, TClaim>, TUserManager>();
         services.AddScoped<IOtpAccountService<TUserKey, LoginVM, LoginDto, RegisterVM>, TAccountService>();
 
 

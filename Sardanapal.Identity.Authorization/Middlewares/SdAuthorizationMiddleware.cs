@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Authorization.Middlewares;
@@ -17,7 +18,7 @@ public class SdAuthorizationMiddleware
     public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
         string token = context.Request.Headers
-            .Where(x => x.Key.Equals("Auth", StringComparison.InvariantCultureIgnoreCase))
+            .Where(x => x.Key.Equals(ConstantKeys.AUTH_HEADER_KEY, StringComparison.InvariantCultureIgnoreCase))
             .Select(x => x.Value)
             .FirstOrDefault();
 

@@ -17,10 +17,15 @@ public abstract class UserBase<TUserKey> : BaseEntityModel<TUserKey>
     public virtual bool VerifiedPhoneNumber { get; set; } = false;
 }
 
-public class SardanapalUser<TUserKey, TRoleKey> : UserBase<TUserKey>
+public class SardanapalUser<TUserKey, TRoleKey, TClaimKey> : UserBase<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+    where TClaimKey : IComparable<TClaimKey>, IEquatable<TClaimKey>
 {
     public virtual ICollection<UserRoleBase<TUserKey, TRoleKey>> UserRoles { get; set; }
         = new HashSet<UserRoleBase<TUserKey, TRoleKey>>();
+
+
+    public virtual ICollection<UserClaimBase<TUserKey, TClaimKey>> UserClaims { get; set; }
+        = new HashSet<UserClaimBase<TUserKey, TClaimKey>>();
 }

@@ -7,13 +7,15 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class UserManager<TUserKey, TUser, TRole, TUR> : IUserManager<TUserKey, TUser, TRole>
+public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManager<TUserKey, TUser, TRole, TClaim>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRole : class, IRole<byte>, new()
+    where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
+    where TUC : class, IUserClaim<TUserKey, byte>, new()
 {
-    protected SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> _context;
+    protected SdIdentityUnitOfWorkBase<TUserKey, byte, byte, TUser, TRole, TClaim, TUR, TUC> _context;
     protected ITokenService _tokenService;
 
     public DbSet<TUser> Users
@@ -32,7 +34,7 @@ public class UserManager<TUserKey, TUser, TRole, TUR> : IUserManager<TUserKey, T
         }
     }
 
-    public UserManager(SdIdentityUnitOfWorkBase<TUserKey, byte, TUser, TRole, TUR> context, ITokenService tokenService)
+    public UserManager(SdIdentityUnitOfWorkBase<TUserKey, byte, byte, TUser, TRole, TClaim, TUR, TUC> context, ITokenService tokenService)
     {
         _context = context;
         _tokenService = tokenService;
