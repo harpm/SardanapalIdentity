@@ -25,7 +25,7 @@ public class SdAuthorizationMiddleware
         var res = tokenService.ValidateToken(token, out ClaimsPrincipal cp);
         if (res.StatusCode == StatusCode.Succeeded && res.Data)
         {
-            identityProvider.SetAuthorize(token, cp, cp.FindFirst(ClaimTypes.NameIdentifier).Value);
+            identityProvider.SetAuthorize(token, cp, cp.FindFirst(SdClaimTypes.NameIdentifier).Value);
         }
 
         // Call the next delegate/middleware in the pipeline.

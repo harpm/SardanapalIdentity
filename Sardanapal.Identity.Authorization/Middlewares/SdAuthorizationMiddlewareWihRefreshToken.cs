@@ -1,5 +1,4 @@
 ﻿
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
@@ -20,8 +19,8 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
         if (identityProvider.IsAuthorized)
         {
-            var token = tokenService.GenerateToken(identityProvider.Claims.FindFirst(ClaimTypes.NameIdentifier).Value
-                        , identityProvider.Claims.FindAll(ClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
+            var token = tokenService.GenerateToken(identityProvider.Claims.FindFirst(SdClaimTypes.NameIdentifier).Value
+                        , identityProvider.Claims.FindAll(SdClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
                         .ToArray(), []);
 
             if (token.StatusCode == StatusCode.Succeeded)

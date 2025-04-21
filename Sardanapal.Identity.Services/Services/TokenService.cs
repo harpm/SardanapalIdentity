@@ -21,12 +21,12 @@ public class TokenService : ITokenService
         var roleClaims = new Claim[roleIds.Length];
         for (int i = 0; i < roleIds.Length; i++)
         {
-            roleClaims[i] = new Claim(ClaimTypes.Role, roleIds[0].ToString());
+            roleClaims[i] = new Claim(SdClaimTypes.Role, roleIds[0].ToString());
         }
 
         var Claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.NameIdentifier, uid.ToString())
+                new Claim(SdClaimTypes.NameIdentifier, uid.ToString())
             };
 
         Claims.AddRange(roleClaims);
@@ -84,7 +84,7 @@ public class TokenService : ITokenService
             var claimsPrinc = tokenHandler
                 .ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
 
-            result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
+            result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == SdClaimTypes.Role
                 && roleIds.Select(r => r.ToString()).Contains(c.Value)));
         });
     }

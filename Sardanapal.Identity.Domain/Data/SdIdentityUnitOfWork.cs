@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sardanapal.Domain.UnitOfWork;
-using System.Security.Claims;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
@@ -64,12 +64,12 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
             if (model.State == EntityState.Added)
             {
                 t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
             }
             else if (model.State == EntityState.Modified)
             {
                 t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
             }
         }
 
