@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Sardanapal.Identity.Authorization.Filters;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.ViewModel.Response;
@@ -17,6 +19,15 @@ public class SdAuthorizationMiddleware
 
     public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
+        var descriptor = context.GetEndpoint().Metadata.GetMetadata<ActionDescriptor>();
+
+        if (descriptor != null && descriptor.FilterDescriptors
+            .Where(f => f.GetType() == typeof(AnanymousAttribute))
+            .Any())
+        {
+            identityProvider.SetAnanymous();
+        }
+
         string token = context.Request.Headers
             .Where(x => x.Key.Equals(ConstantKeys.AUTH_HEADER_KEY, StringComparison.InvariantCultureIgnoreCase))
             .Select(x => x.Value)
