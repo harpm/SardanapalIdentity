@@ -1,9 +1,9 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.ViewModel.Response;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Sardanapal.Identity.Services.Services;
 
@@ -16,7 +16,7 @@ public class TokenService : ITokenService
 
     }
 
-    protected virtual string GenerateToken(string uid, int expireTime, params byte[] roleIds)
+    protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, byte[] claimIds)
     {
         var roleClaims = new Claim[roleIds.Length];
         for (int i = 0; i < roleIds.Length; i++)
@@ -41,24 +41,13 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public virtual IResponse<string> GenerateToken(string uid, byte roleId)
+    public virtual IResponse<string> GenerateToken(string uid, byte[] roleIds, byte[] claimIds)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
 
         return result.Fill(() =>
         {
-            string token = GenerateToken(uid, StaticConfigs.ExpirationTime, roleId);
-            result.Set(StatusCode.Succeeded, token);
-        });
-    }
-
-    public virtual IResponse<string> GenerateToken(string uid, params byte[] roleIds)
-    {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
-
-        return result.Fill(() =>
-        {
-            string token = GenerateToken(uid, StaticConfigs.ExpirationTime, roleIds);
+            string token = GenerateToken(uid, StaticConfigs.ExpirationTime, roleIds, []);
 
             result.Set(StatusCode.Succeeded, token);
         });
@@ -85,7 +74,7 @@ public class TokenService : ITokenService
         return result;
     }
 
-    public virtual IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds)
+    public virtual IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds, byte[] claimIds)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Function);
 
@@ -97,21 +86,6 @@ public class TokenService : ITokenService
 
             result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role
                 && roleIds.Select(r => r.ToString()).Contains(c.Value)));
-        });
-    }
-
-    public virtual IResponse<bool> ValidateTokenRole(string token, byte roleId)
-    {
-        IResponse<bool> result = new Response(ServiceName, OperationType.Function);
-
-        return result.Fill(() =>
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var claimsPrinc = tokenHandler
-                .ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
-
-            result.Set(StatusCode.Succeeded
-                , claimsPrinc.HasClaim(c => c.Type == ClaimTypes.Role && c.Value == roleId.ToString()));
         });
     }
 }

@@ -24,11 +24,6 @@ public class HasRoleAttribute : ActionFilterAttribute
         {
             IIdentityProvider idProvider = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
 
-            if (context.ActionDescriptor.FilterDescriptors.Where(f => f.Filter.GetType().IsAssignableTo(typeof(AnanymousAttribute))).Any())
-            {
-                idProvider.SetAnanymous();
-            }
-
             if (!idProvider.IsAuthorized
                 || idProvider.Claims == null
                 || idProvider.Claims.Claims == null

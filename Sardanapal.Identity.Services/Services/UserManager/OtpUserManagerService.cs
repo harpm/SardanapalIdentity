@@ -220,7 +220,7 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, 
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {
-                var tokenRes = _tokenService.GenerateToken(curUser.Username, roleId);
+                var tokenRes = _tokenService.GenerateToken(curUser.Username, [roleId], []);
                 return tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty;
             }
             else

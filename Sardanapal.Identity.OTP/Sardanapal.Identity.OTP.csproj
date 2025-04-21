@@ -10,10 +10,6 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-	  <Folder Include="VM\" />
-	</ItemGroup>
-	
-	<ItemGroup>
 	  <ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
 	</ItemGroup>
 
