@@ -1,19 +1,23 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Contract.IService;
-using Sardanapal.Ef.Service.Services;
+using Sardanapal.Service;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Resources;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
+using Sardanapal.Identity.Contract.IRepository;
+using Sardanapal.ViewModel.Models;
+using Sardanapal.Ef.Helper;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
-    : EfCrudService<TContext, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM>
+public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
+    : CrudServiceBase<TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
-    where TContext : DbContext
+    where TRepository : class, IOTPRepository<TKey, TOTPModel>, new()
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOTPModel : class, IOTPModel<TUserKey, TKey>, new()
@@ -26,23 +30,26 @@ public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearc
 {
     public int expireTime { get; set; }
 
-    public override string ServiceName => "OtpService";
+    protected override string ServiceName => "OtpService";
 
     protected IOtpHelper otpHelper;
     protected IEmailService emailService { get; set; }
     protected ISmsService smsService { get; set; }
 
-    public OtpService(TContext context
-        , IMapper _Mapper
-        , IRequestService _request
+    public OtpService(TRepository repository
+        , IMapper mapper
         , IEmailService _emailService
         , ISmsService _smsService
-        , IOtpHelper _otpHelper)
-        : base(context, _Mapper, _request)
+        , IOtpHelper _otpHelper) : base(repository, mapper)
     {
         emailService = _emailService;
         smsService = _smsService;
         otpHelper = _otpHelper;
+    }
+
+    protected virtual IQueryable<TOTPModel> Search(IQueryable<TOTPModel> query, TSearchVM searchModel)
+    {
+        return query;
     }
 
     protected virtual string CreateSMSOtpMessage(TNewVM model)
@@ -63,13 +70,13 @@ public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearc
         Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add);
         return await result.FillAsync(async delegate
         {
-            if (!await UnitOfWork.Set<TOTPModel>().AsNoTracking()
+            if (!await _repository.FetchAll().AsQueryable().AsNoTracking()
                 .Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId)
                 .AnyAsync())
             {
-                TOTPModel Item = Mapper.Map<TOTPModel>(model);
-                await UnitOfWork.AddAsync(Item);
-                await UnitOfWork.SaveChangesAsync();
+                TOTPModel Item = _mapper.Map<TOTPModel>(model);
+                await _repository.AddAsync(Item);
+                await _repository.SaveChangesAsync();
 
                 if (long.TryParse(model.Recipient, out long _))
                     smsService.Send(model.Recipient, CreateSMSOtpMessage(model));
@@ -88,8 +95,9 @@ public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearc
 
     public virtual async Task RemoveExpireds()
     {
-        this.UnitOfWork.RemoveRange(GetCurrentService().Where(x => x.ExpireTime <= DateTime.UtcNow));
-        await this.UnitOfWork.SaveChangesAsync();
+        this._repository.RemoveRange(_repository.FetchAll().AsQueryable()
+            .Where(x => x.ExpireTime <= DateTime.UtcNow));
+        await this._repository.SaveChangesAsync();
     }
 
     public virtual async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
@@ -98,11 +106,37 @@ public class OtpService<TContext, TUserKey, TKey, TOTPModel, TListItemVM, TSearc
 
         return await result.FillAsync(async () =>
         {
-            var isValid = await UnitOfWork.Set<TOTPModel>()
+            var isValid = await _repository.FetchAll().AsQueryable()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
                 .AnyAsync();
 
             result.Set(StatusCode.Succeeded, isValid);
         });
+    }
+
+    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null)
+    {
+        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch);
+
+        await result.FillAsync(async () =>
+        {
+            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, TSearchVM>();
+            SearchModel.Fields = SearchModel.Fields ?? new TSearchVM();
+
+            var data = new GridVM<TKey, T>(SearchModel);
+
+            var query = _repository.FetchAll().AsQueryable().AsNoTracking();
+
+            query = Search(query, SearchModel.Fields);
+
+            query = QueryHelper.Search(query, SearchModel);
+
+            data.List = await query.ProjectTo<T>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            result.Set(StatusCode.Succeeded, data);
+        });
+
+        return result;
     }
 }
