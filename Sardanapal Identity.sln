@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9F427EC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Contract", "Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj", "{0D735DB1-8255-464E-A953-94E1A6C7091D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Repository", "Sardanapal.Identity.Repository\Sardanapal.Identity.Repository.csproj", "{572139A6-D809-4F6E-9063-C97CBF320C95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{0D735DB1-8255-464E-A953-94E1A6C7091D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D735DB1-8255-464E-A953-94E1A6C7091D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D735DB1-8255-464E-A953-94E1A6C7091D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{572139A6-D809-4F6E-9063-C97CBF320C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{572139A6-D809-4F6E-9063-C97CBF320C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{572139A6-D809-4F6E-9063-C97CBF320C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{572139A6-D809-4F6E-9063-C97CBF320C95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
