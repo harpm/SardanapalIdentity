@@ -8,9 +8,13 @@
 		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
-	  <ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Sardanapal.Domain" Version="0.6.5" />
 	</ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Sardanapal.Ef.Repository;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.ViewModel.Otp;
@@ -19,8 +20,8 @@ namespace Sardanapal.Identity.OTP.Services
         /// otherwise otp codes will be saved in main database
         /// </param>
         /// <returns></returns>
-        public static IServiceCollection AddOtpService<TContext, TOTPModel, TUserKey>(this IServiceCollection services, bool useCach)
-            where TContext : DbContext
+        public static IServiceCollection AddOtpService<TRepository, TOTPModel, TUserKey>(this IServiceCollection services, bool useCach)
+            where TRepository : IEFRepository<Guid, TOTPModel>
             where TOTPModel : class, IOTPModel<TUserKey, Guid>, new()
             where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         {
@@ -32,7 +33,7 @@ namespace Sardanapal.Identity.OTP.Services
             else
             {
                 services.AddScoped<IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
-                    , OtpService<TContext, TUserKey, Guid, TOTPModel, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, ValidateOtpVM<TUserKey>>>();
+                    , OtpService<TRepository, TUserKey, Guid, TOTPModel, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, ValidateOtpVM<TUserKey>>>();
             }
             return services;
         }

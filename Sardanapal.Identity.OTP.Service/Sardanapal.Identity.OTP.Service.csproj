@@ -11,15 +11,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Sardanapal.Ef.Service" Version="0.5.0" />
-	  <PackageReference Include="Sardanapal.Http.Service" Version="0.5.0" />
-	  <PackageReference Include="Sardanapal.RedisCach.Service" Version="0.5.0" />
+		<PackageReference Include="Sardanapal.Http.Service" Version="0.6.5" />
+		<PackageReference Include="Sardanapal.RedisCache" Version="0.6.5" />
+		<PackageReference Include="Sardanapal.Service" Version="0.6.5" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
-	  <ProjectReference Include="..\Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj" />
-	  <ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj" />
+		<ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
 	</ItemGroup>
 
 
