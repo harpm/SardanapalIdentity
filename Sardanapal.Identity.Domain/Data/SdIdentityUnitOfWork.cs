@@ -20,6 +20,7 @@ public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRo
 {
     DbSet<TUser> Users { get; set; }
     DbSet<TRole> Roles { get; set; }
+    DbSet<TClaim> Claims { get; set; }
     DbSet<TUR> UserRoles { get; set; }
     DbSet<TUC> UserClaims { get; set; }
 }
@@ -39,6 +40,7 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
 
     public DbSet<TUser> Users { get; set; }
     public DbSet<TRole> Roles { get; set; }
+    public DbSet<TClaim> Claims { get; set; }
     public DbSet<TUR> UserRoles { get; set; }
     public DbSet<TUC> UserClaims { get; set; }
 
