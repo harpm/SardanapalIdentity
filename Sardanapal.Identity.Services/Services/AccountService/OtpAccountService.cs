@@ -19,7 +19,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
     where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM
-    where TLoginDto : LoginDto
+    where TLoginDto : LoginDto, new()
     where TRegisterVM : RegisterVM
 {
     protected override string ServiceName => "OTP AccountService";
@@ -52,9 +52,9 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
         });
     }
 
-    public virtual async Task<IResponse<LoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model)
+    public virtual async Task<IResponse<TLoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model)
     {
-        var result = new Response<LoginDto>();
+        var result = new Response<TLoginDto>();
 
         return await result.FillAsync(async () =>
         {
@@ -62,7 +62,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TR
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                result.Set(StatusCode.Succeeded, new LoginDto(token));
+                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = token });
             }
             else
             {

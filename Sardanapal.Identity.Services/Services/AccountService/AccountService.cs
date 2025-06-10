@@ -15,7 +15,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
     where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM
-    where TLoginDto : LoginDto
+    where TLoginDto : LoginDto, new()
     where TRegisterVM : RegisterVM
 {
     protected TUserManager userManagerService;
@@ -27,9 +27,9 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
         this.userManagerService = _userManagerService;
     }
 
-    public virtual async Task<IResponse<LoginDto>> Login(LoginVM model)
+    public virtual async Task<IResponse<TLoginDto>> Login(LoginVM model)
     {
-        var result = new Response<LoginDto>();
+        var result = new Response<TLoginDto>();
 
         return await result.FillAsync(async () =>
         {
@@ -37,7 +37,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                result.Set(StatusCode.Succeeded, new LoginDto(token));
+                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = token });
             }
             else
             {
