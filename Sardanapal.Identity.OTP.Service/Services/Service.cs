@@ -7,9 +7,9 @@ using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Resources;
 using Sardanapal.Identity.ViewModel.Otp;
+using Sardanapal.ViewModel.Models;
 using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.Contract.IRepository;
-using Sardanapal.ViewModel.Models;
 using Sardanapal.Ef.Helper;
 
 namespace Sardanapal.Identity.OTP.Services;
@@ -17,7 +17,7 @@ namespace Sardanapal.Identity.OTP.Services;
 public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
     : CrudServiceBase<TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
-    where TRepository : class, IOTPRepository<TKey, TOTPModel>, new()
+    where TRepository : class, IOTPRepository<TKey, TOTPModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOTPModel : class, IOTPModel<TUserKey, TKey>, new()
@@ -38,6 +38,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
 
     public OtpService(TRepository repository
         , IMapper mapper
+        , IRequestService _request
         , IEmailService _emailService
         , ISmsService _smsService
         , IOtpHelper _otpHelper) : base(repository, mapper)
@@ -45,11 +46,38 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         emailService = _emailService;
         smsService = _smsService;
         otpHelper = _otpHelper;
+        
     }
 
     protected virtual IQueryable<TOTPModel> Search(IQueryable<TOTPModel> query, TSearchVM searchModel)
     {
         return query;
+    }
+
+    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null)
+    {
+        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch);
+
+        await result.FillAsync(async () =>
+        {
+            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, TSearchVM>();
+            SearchModel.Fields = SearchModel.Fields ?? new TSearchVM();
+
+            var data = new GridVM<TKey, T>(SearchModel);
+
+            var query = _repository.FetchAll().AsQueryable().AsNoTracking();
+
+            query = Search(query, SearchModel.Fields);
+
+            query = QueryHelper.Search(query, SearchModel);
+
+            data.List = await query.ProjectTo<T>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            result.Set(StatusCode.Succeeded, data);
+        });
+
+        return result;
     }
 
     protected virtual string CreateSMSOtpMessage(TNewVM model)
@@ -95,8 +123,11 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
 
     public virtual async Task RemoveExpireds()
     {
-        this._repository.RemoveRange(_repository.FetchAll().AsQueryable()
-            .Where(x => x.ExpireTime <= DateTime.UtcNow));
+        await this._repository.DeleteRangeAsync(_repository
+            .FetchAll().AsQueryable()
+            .Where(x => x.ExpireTime <= DateTime.UtcNow)
+            .Select(x => x.Id)
+            .ToList());
         await this._repository.SaveChangesAsync();
     }
 
@@ -112,31 +143,5 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
 
             result.Set(StatusCode.Succeeded, isValid);
         });
-    }
-
-    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null)
-    {
-        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch);
-
-        await result.FillAsync(async () =>
-        {
-            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, TSearchVM>();
-            SearchModel.Fields = SearchModel.Fields ?? new TSearchVM();
-
-            var data = new GridVM<TKey, T>(SearchModel);
-
-            var query = _repository.FetchAll().AsQueryable().AsNoTracking();
-
-            query = Search(query, SearchModel.Fields);
-
-            query = QueryHelper.Search(query, SearchModel);
-
-            data.List = await query.ProjectTo<T>(_mapper.ConfigurationProvider)
-                .ToListAsync();
-
-            result.Set(StatusCode.Succeeded, data);
-        });
-
-        return result;
     }
 }

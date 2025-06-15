@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Sardanapal.Ef.Repository;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
@@ -20,7 +21,7 @@ namespace Sardanapal.Identity.OTP.Services
         /// </param>
         /// <returns></returns>
         public static IServiceCollection AddOtpService<TRepository, TOTPModel, TUserKey>(this IServiceCollection services, bool useCach)
-            where TRepository : class, IOTPRepository<Guid, TOTPModel>, new()
+            where TRepository : class, IOTPRepository<Guid, TOTPModel>
             where TOTPModel : class, IOTPModel<TUserKey, Guid>, new()
             where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         {

@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Sardanapal.Domain.UnitOfWork;
-using Sardanapal.Identity.Share.Static;
-using Sardanapal.Identity.Contract.IModel;
+﻿using Sardanapal.Domain.UnitOfWork;
 using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
+using Sardanapal.Identity.Share.Static;
+using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sardanapal.Identity.Domain.Data;
 
@@ -21,6 +21,7 @@ public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRo
 {
     DbSet<TUser> Users { get; set; }
     DbSet<TRole> Roles { get; set; }
+    DbSet<TClaim> Claims { get; set; }
     DbSet<TUR> UserRoles { get; set; }
     DbSet<TUC> UserClaims { get; set; }
 }
@@ -41,6 +42,7 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
 
     public DbSet<TUser> Users { get; set; }
     public DbSet<TRole> Roles { get; set; }
+    public DbSet<TClaim> Claims { get; set; }
     public DbSet<TUR> UserRoles { get; set; }
     public DbSet<TUC> UserClaims { get; set; }
 
