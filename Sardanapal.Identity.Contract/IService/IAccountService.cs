@@ -10,7 +10,7 @@ public interface IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
     where TLoginDto : LoginDto
     where TRegisterVM : RegisterVM
 {
-    Task<IResponse<TLoginDto>> Login(LoginVM model);
+    Task<IResponse<TLoginDto>> Login(TLoginVM model);
     Task<IResponse<TUserKey>> Register(TRegisterVM model);
     Task<IResponse<string>> RefreshToken(TUserKey userId);
 

@@ -19,24 +19,28 @@ public class SdAuthorizationMiddleware
 
     public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
-        var descriptor = context.GetEndpoint().Metadata.GetMetadata<ActionDescriptor>();
+        if (context == null) return;
 
-        if (descriptor != null && descriptor.FilterDescriptors
-            .Where(f => f.GetType() == typeof(AnanymousAttribute))
-            .Any())
-        {
-            identityProvider.SetAnanymous();
-        }
-
-        string token = context.Request.Headers
+        string token = context?.Request?.Headers?
             .Where(x => x.Key.Equals(ConstantKeys.AUTH_HEADER_KEY, StringComparison.InvariantCultureIgnoreCase))
             .Select(x => x.Value)
             .FirstOrDefault();
 
+        if (string.IsNullOrWhiteSpace(token)) return;
+
         var res = tokenService.ValidateToken(token, out ClaimsPrincipal cp);
         if (res.StatusCode == StatusCode.Succeeded && res.Data)
         {
-            identityProvider.SetAuthorize(token, cp, cp.FindFirst(SdClaimTypes.NameIdentifier).Value);
+            identityProvider.SetAuthorize(token, cp, cp?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
+        }
+
+        var descriptor = context.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>();
+
+        if (descriptor?.FilterDescriptors
+            .Where(f => f.GetType() == typeof(AnanymousAttribute))
+            .Any() ?? false)
+        {
+            identityProvider.SetAnanymous();
         }
 
         // Call the next delegate/middleware in the pipeline.

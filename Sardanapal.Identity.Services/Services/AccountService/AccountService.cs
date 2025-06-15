@@ -27,7 +27,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
         this.userManagerService = _userManagerService;
     }
 
-    public virtual async Task<IResponse<TLoginDto>> Login(LoginVM model)
+    public virtual async Task<IResponse<TLoginDto>> Login(TLoginVM model)
     {
         var result = new Response<TLoginDto>();
 
