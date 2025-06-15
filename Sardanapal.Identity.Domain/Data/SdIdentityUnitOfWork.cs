@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sardanapal.Identity.Domain.Data;
 
-public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC> : ISdUnitOfWork
+public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC>
+    : ISdUnitOfWork
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TClaimKey : IComparable<TClaimKey>, IEquatable<TClaimKey>
@@ -25,7 +26,8 @@ public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRo
     DbSet<TUC> UserClaims { get; set; }
 }
 
-public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC> : SardanapalUnitOfWork
+public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC>
+    : SardanapalUnitOfWork
     , ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRole, TClaim, TUR, TUC>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
