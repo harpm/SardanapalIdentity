@@ -11,7 +11,7 @@ namespace Sardanapal.Identity.Authorization.Middlewares;
 public class SdAuthorizationMiddleware
 {
     private readonly RequestDelegate _next;
-    
+
     public SdAuthorizationMiddleware(RequestDelegate next)
     {
         _next = next;
@@ -26,21 +26,22 @@ public class SdAuthorizationMiddleware
             .Select(x => x.Value)
             .FirstOrDefault();
 
-        if (string.IsNullOrWhiteSpace(token)) return;
-
-        var res = tokenService.ValidateToken(token, out ClaimsPrincipal cp);
-        if (res.StatusCode == StatusCode.Succeeded && res.Data)
+        if (!string.IsNullOrWhiteSpace(token))
         {
-            identityProvider.SetAuthorize(token, cp, cp?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
-        }
+            var res = tokenService.ValidateToken(token, out ClaimsPrincipal cp);
+            if (res.StatusCode == StatusCode.Succeeded && res.Data)
+            {
+                identityProvider.SetAuthorize(token, cp, cp?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
+            }
 
-        var descriptor = context.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>();
+            var descriptor = context.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>();
 
-        if (descriptor?.FilterDescriptors
-            .Where(f => f.GetType() == typeof(AnanymousAttribute))
-            .Any() ?? false)
-        {
-            identityProvider.SetAnanymous();
+            if (descriptor?.FilterDescriptors
+                .Where(f => f.GetType() == typeof(AnanymousAttribute))
+                .Any() ?? false)
+            {
+                identityProvider.SetAnanymous();
+            }
         }
 
         // Call the next delegate/middleware in the pipeline.

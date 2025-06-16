@@ -1,10 +1,11 @@
 {
 	"nuget_provider": "https://nuget.pkg.github.com/harpm/index.json",
-	"version": "0.6.6",
+	"version": "0.6.9",
 	"projects_path": [
 		"Sardanapal.Identity.Authorization",
 		"Sardanapal.Identity.Authorization.Data",
 		"Sardanapal.Identity.Contract",
+		"Sardanapal.Identity.Repository",
 		"Sardanapal.Identity.Domain",
 		"Sardanapal.Identity.Dto",
 		"Sardanapal.Identity.OTP",
