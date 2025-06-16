@@ -13,10 +13,10 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
     }
 
-    public override async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    protected override async Task ProcessIdentity(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
-        await base.InvokeAsync(context, tokenService, identityProvider);
-
+        await base.ProcessIdentity(context, tokenService, identityProvider);
+        
         if (identityProvider.IsAuthorized)
         {
             var token = tokenService.GenerateToken(identityProvider.Claims.FindFirst(SdClaimTypes.NameIdentifier).Value

@@ -17,7 +17,7 @@ public class SdAuthorizationMiddleware
         _next = next;
     }
 
-    public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    protected virtual async Task ProcessIdentity(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
         if (context == null) return;
 
@@ -43,6 +43,11 @@ public class SdAuthorizationMiddleware
                 identityProvider.SetAnanymous();
             }
         }
+    }
+
+    public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    {
+        await ProcessIdentity(context, tokenService, identityProvider);
 
         // Call the next delegate/middleware in the pipeline.
         await _next(context);
