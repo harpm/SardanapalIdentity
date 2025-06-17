@@ -125,9 +125,14 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                 .ToListAsync();
 
             var tokenRes = _tokenService.GenerateToken(user.Id.ToString(), roles.ToArray(), []);
-            if (!tokenRes.IsSuccess) result = tokenRes.ConvertTo<string>();
-
-            result.Set(StatusCode.Succeeded, tokenRes.Data);
+            if (!tokenRes.IsSuccess)
+            {
+                result = tokenRes.ConvertTo<string>();
+            }
+            else
+            {
+                result.Set(StatusCode.Succeeded, tokenRes.Data);
+            }
         });
 
         return result;

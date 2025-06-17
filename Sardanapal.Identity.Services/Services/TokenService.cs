@@ -18,6 +18,8 @@ public class TokenService : ITokenService
 
     protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, byte[] claimIds)
     {
+        if (StaticConfigs.TokenParameters == null) throw new NullReferenceException(nameof(StaticConfigs.TokenParameters));
+
         var roleClaims = new Claim[roleIds.Length];
         for (int i = 0; i < roleIds.Length; i++)
         {
