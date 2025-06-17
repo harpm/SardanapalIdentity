@@ -29,15 +29,19 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
 
     public virtual async Task<IResponse<TLoginDto>> Login(TLoginVM model)
     {
-        var result = new Response<TLoginDto>();
+        IResponse<TLoginDto> result = new Response<TLoginDto>(ServiceName, OperationType.Fetch);
 
         return await result.FillAsync(async () =>
         {
-            string token = await userManagerService.Login(model.Username, model.Password);
+            var tokenRes = await userManagerService.Login(model.Username, model.Password);
 
-            if (!string.IsNullOrWhiteSpace(token))
+            if (tokenRes.IsSuccess)
             {
-                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = token });
+                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = tokenRes.Data });
+            }
+            else if (tokenRes.StatusCode == StatusCode.Exception)
+            {
+                result = tokenRes.ConvertTo<TLoginDto>();
             }
             else
             {
@@ -48,25 +52,41 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
 
     public virtual async Task<IResponse<TUserKey>> Register(TRegisterVM model)
     {
-        var result = new Response<TUserKey>();
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add);
 
         return await result.FillAsync(async () =>
         {
-            TUserKey userId = await userManagerService.RegisterUser(model.Username, model.Password, this.roleId);
-            result.Set(StatusCode.Succeeded, userId);
+            IResponse<TUserKey> userIdRes = await userManagerService.RegisterUser(model.Username, model.Password, this.roleId);
+
+            if (userIdRes.IsSuccess)
+            {
+                result.Set(StatusCode.Succeeded, userIdRes.Data);
+            }
+            else if (userIdRes.StatusCode == StatusCode.Exception)
+            {
+                result = userIdRes.ConvertTo<TUserKey>();
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
         });
     }
 
     public virtual async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
-        var result = new Response<string>();
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch);
 
         return await result.FillAsync(async () =>
         {
-            string token = await userManagerService.RefreshToken(userId);
-            if (!string.IsNullOrWhiteSpace(token))
+            var tokenRes = await userManagerService.RefreshToken(userId);
+            if (tokenRes.IsSuccess)
             {
-                result.Set(StatusCode.Succeeded, token);
+                result.Set(StatusCode.Succeeded, tokenRes.Data);
+            }
+            else if (tokenRes.StatusCode == StatusCode.Exception)
+            {
+                result = tokenRes.ConvertTo<string>();
             }
             else
             {

@@ -67,7 +67,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         return model.Code;
     }
 
-    public override async Task<IResponse<TKey>> Add(TNewVM model)
+    public override async Task<IResponse<TKey>> Add(TNewVM model, CancellationToken ct = default)
     {
         model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
         model.Code = otpHelper.GenerateNewOtp();

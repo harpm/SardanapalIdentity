@@ -11,10 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Http.Service" Version="0.6.5" />
-		<PackageReference Include="Sardanapal.RedisCache" Version="0.6.5" />
-		<PackageReference Include="Sardanapal.Service" Version="0.6.5" />
-		<PackageReference Include="Sardanapal.Ef" Version="0.6.5" />
+		<PackageReference Include="Sardanapal.Http.Service" Version="0.6.6" />
+		<PackageReference Include="Sardanapal.RedisCache" Version="0.6.6" />
+		<PackageReference Include="Sardanapal.Service" Version="0.6.6" />
+		<PackageReference Include="Sardanapal.Ef" Version="0.6.6" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -1,10 +1,10 @@
-﻿using Sardanapal.Domain.UnitOfWork;
-using Sardanapal.Contract.Data;
+﻿using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Microsoft.EntityFrameworkCore;
+using Sardanapal.Ef.UnitOfWork;
 
 namespace Sardanapal.Identity.Domain.Data;
 

@@ -54,7 +54,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         return query;
     }
 
-    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null)
+    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null, CancellationToken ct = default)
     {
         IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch);
 
@@ -90,7 +90,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         return model.Code;
     }
 
-    public override async Task<IResponse<TKey>> Add(TNewVM model)
+    public override async Task<IResponse<TKey>> Add(TNewVM model, CancellationToken ct = default)
     {
         model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
         model.Code = otpHelper.GenerateNewOtp();
