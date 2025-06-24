@@ -22,7 +22,7 @@ public class AuthorizeAttribute : ActionFilterAttribute
         {
             IIdentityProvider idHolder = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
 
-            if (!idHolder.IsAuthorized)
+            if (!idHolder.IsAuthorized && !idHolder.IsAnanymous)
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();

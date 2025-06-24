@@ -24,13 +24,13 @@ public class HasRoleAttribute : ActionFilterAttribute
         {
             IIdentityProvider idProvider = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
 
-            if (!idProvider.IsAuthorized
+            if (!idProvider.IsAnanymous && (!idProvider.IsAuthorized
                 || idProvider.Claims == null
                 || idProvider.Claims.Claims == null
                 || idProvider.Claims.Claims.Count() == 0
                 || !idProvider.Claims.Claims
                     .Where(c => c.Type == SdClaimTypes.Role
-                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
+                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any()))
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
