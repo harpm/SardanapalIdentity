@@ -14,10 +14,8 @@ public class AuthorizeAttribute : ActionFilterAttribute
 
     }
 
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        base.OnActionExecuting(context);
-
         try
         {
             IIdentityProvider idHolder = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
@@ -33,5 +31,7 @@ public class AuthorizeAttribute : ActionFilterAttribute
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
+
+        return base.OnActionExecutionAsync(context, next);
     }
 }

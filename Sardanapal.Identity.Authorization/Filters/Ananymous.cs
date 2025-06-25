@@ -15,10 +15,8 @@ public class AnanymousAttribute : ActionFilterAttribute
 
     }
 
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        base.OnActionExecuting(context);
-
         try
         {
             IIdentityProvider idProvider = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
@@ -29,5 +27,7 @@ public class AnanymousAttribute : ActionFilterAttribute
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
+        
+        return base.OnActionExecutionAsync(context, next);
     }
 }

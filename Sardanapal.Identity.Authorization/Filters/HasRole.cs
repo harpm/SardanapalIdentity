@@ -16,21 +16,22 @@ public class HasRoleAttribute : ActionFilterAttribute
         roleIds = _roleIds;
     }
 
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        base.OnActionExecuting(context);
-
         try
         {
-            IIdentityProvider idProvider = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
+            IIdentityProvider idProvider = context?.HttpContext?.RequestServices?.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
 
-            if (!idProvider.IsAnanymous && (!idProvider.IsAuthorized
+            if (idProvider?.IsAnanymous ?? false)
+                return base.OnActionExecutionAsync(context, next);
+
+            if (!idProvider.IsAuthorized
                 || idProvider.Claims == null
                 || idProvider.Claims.Claims == null
                 || idProvider.Claims.Claims.Count() == 0
                 || !idProvider.Claims.Claims
                     .Where(c => c.Type == SdClaimTypes.Role
-                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any()))
+                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
@@ -41,5 +42,7 @@ public class HasRoleAttribute : ActionFilterAttribute
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
         }
+
+        return base.OnActionExecutionAsync(context, next);
     }
 }
