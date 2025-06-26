@@ -41,7 +41,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
             }
             else if (tokenRes.StatusCode == StatusCode.Exception)
             {
-                result = tokenRes.ConvertTo<TLoginDto>();
+                tokenRes.ConvertTo<TLoginDto>(result);
             }
             else
             {
@@ -64,7 +64,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
             }
             else if (userIdRes.StatusCode == StatusCode.Exception)
             {
-                result = userIdRes.ConvertTo<TUserKey>();
+                userIdRes.ConvertTo<TUserKey>(result);
             }
             else
             {
@@ -86,7 +86,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
             }
             else if (tokenRes.StatusCode == StatusCode.Exception)
             {
-                result = tokenRes.ConvertTo<string>();
+                tokenRes.ConvertTo<string>(result);
             }
             else
             {

@@ -127,7 +127,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
             var tokenRes = _tokenService.GenerateToken(user.Id.ToString(), roles.ToArray(), []);
             if (!tokenRes.IsSuccess)
             {
-                result = tokenRes.ConvertTo<string>();
+                tokenRes.ConvertTo<string>(result);
             }
             else
             {
@@ -164,7 +164,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
             var newUserRes = await GetUser(username);
             if (newUserRes.StatusCode == StatusCode.Exception)
             {
-                result = newUserRes.ConvertTo<TUserKey>();
+                newUserRes.ConvertTo<TUserKey>(result);
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
