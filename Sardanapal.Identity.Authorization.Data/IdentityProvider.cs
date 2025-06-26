@@ -6,8 +6,8 @@ namespace Sardanapal.Identity.Authorization.Data;
 
 public class IdentityProvider : IIdentityProvider
 {
-    protected long _userId;
-    public long UserId
+    protected string _userId;
+    public string UserId
     {
         get
         {
@@ -81,6 +81,6 @@ public class IdentityProvider : IIdentityProvider
 
     public virtual void SetUserId(object userId)
     {
-        _userId = Convert.ToInt64(userId.ToString());
+        _userId = userId.ToString();
     }
 }
