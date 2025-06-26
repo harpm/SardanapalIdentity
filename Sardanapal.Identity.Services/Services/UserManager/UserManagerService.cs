@@ -52,7 +52,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
             if (!string.IsNullOrWhiteSpace(email))
             {
                 user = await Users.AsNoTracking()
-                   .Where(x => x.Email == email)
+                   .Where(x => x.Email == email || x.Username == email)
                    .FirstOrDefaultAsync();
 
                 if (user != null)
@@ -208,7 +208,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                 await _context.SaveChangesAsync();
 
                 var hasRoleRes = await HasRole(role, newUser.Id);
-                if (hasRoleRes.IsSuccess && hasRoleRes.Data)
+                if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
                 {
                     var roleUser = new TUR()
                     {
