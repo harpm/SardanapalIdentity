@@ -153,6 +153,15 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
         return result;
     }
 
+    protected virtual TUser CreateNewUser(string username, string hashedPassword)
+    {
+        return new TUser()
+        {
+            Username = username,
+            HashedPassword = hashedPassword
+        };
+    }
+
     public virtual async Task<IResponse<TUserKey>> RegisterUser(string username, string password, byte role)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add);
@@ -167,27 +176,26 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                 newUserRes.ConvertTo<TUserKey>(result);
             }
 
+            var newUser = newUserRes.Data;
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                if (newUserRes.Data == null)
+                if (newUser == null)
                 {
-                    var newUser = new TUser()
-                    {
-                        Username = username,
-                        HashedPassword = hashedPass
-                    };
+                    newUser = CreateNewUser(username, hashedPass);
 
                     await _context.AddAsync(newUser);
                     await _context.SaveChangesAsync();
                 }
-                var hasRoleRes = await HasRole(role, newUserRes.Data.Id);
+                
+                var hasRoleRes = await HasRole(role, newUser.Id);
                 if (hasRoleRes.IsSuccess && hasRoleRes.Data)
                 {
                     var roleUser = new TUR()
                     {
                         RoleId = role,
-                        UserId = newUserRes.Data.Id
+                        UserId = newUser.Id
                     };
 
                     await _context.AddAsync(roleUser);
@@ -196,7 +204,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
 
                 await transaction.CommitAsync();
 
-                result.Set(StatusCode.Succeeded, newUserRes.Data.Id);
+                result.Set(StatusCode.Succeeded, newUser.Id);
 
             }
             catch (Exception ex)
