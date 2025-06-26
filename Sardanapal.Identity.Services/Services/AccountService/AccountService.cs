@@ -62,13 +62,9 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TRole, T
             {
                 result.Set(StatusCode.Succeeded, userIdRes.Data);
             }
-            else if (userIdRes.StatusCode == StatusCode.Exception)
-            {
-                userIdRes.ConvertTo<TUserKey>(result);
-            }
             else
             {
-                result.Set(StatusCode.NotExists);
+                userIdRes.ConvertTo<TUserKey>(result);
             }
         });
     }

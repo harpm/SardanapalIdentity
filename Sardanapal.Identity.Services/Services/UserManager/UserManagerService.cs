@@ -82,7 +82,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
             }
             else
             {
-                throw new NullReferenceException($"Parameter {nameof(email)} | {nameof(phoneNumber)} is null");
+                throw new ArgumentNullException($"Parameter {nameof(email)} | {nameof(phoneNumber)} is null");
             }
         });
 
@@ -130,18 +130,30 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
 
         await result.FillAsync(async () =>
         {
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException(nameof(username));
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentNullException(nameof(password));
+
             var md5Pass = await Utilities.EncryptToMd5(password);
 
             var user = await _context.Users.Where(x => x.Username == username
                 && x.HashedPassword == md5Pass)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                result.Set(StatusCode.NotExists);
+                return;
+            }
 
             var roles = await _context.UserRoles.AsNoTracking()
                 .Where(x => x.UserId.Equals(user.Id))
                 .Select(x => x.RoleId)
                 .ToListAsync();
 
-            var tokenRes = _tokenService.GenerateToken(user.Id.ToString(), roles.ToArray(), []);
+            var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
+                , roles?.ToArray() ?? []
+                , []);
+
             if (!tokenRes.IsSuccess)
             {
                 tokenRes.ConvertTo<string>(result);
