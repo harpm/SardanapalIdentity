@@ -175,20 +175,21 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
             {
                 newUserRes.ConvertTo<TUserKey>(result);
             }
-
-            var newUser = newUserRes.Data;
+            else if (newUserRes.IsSuccess)
+            {
+                result.Set(StatusCode.Duplicate, newUserRes.Data.Id);
+                return;
+            }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                if (newUser == null)
-                {
-                    newUser = CreateNewUser(username, hashedPass);
+                var newUser = CreateNewUser(username, hashedPass);
 
-                    await _context.AddAsync(newUser);
-                    await _context.SaveChangesAsync();
-                }
-                
+                await _context.AddAsync(newUser);
+                await _context.SaveChangesAsync();
+
                 var hasRoleRes = await HasRole(role, newUser.Id);
                 if (hasRoleRes.IsSuccess && hasRoleRes.Data)
                 {
