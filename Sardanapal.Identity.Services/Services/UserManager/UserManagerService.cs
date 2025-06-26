@@ -54,18 +54,35 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                 user = await Users.AsNoTracking()
                    .Where(x => x.Email == email)
                    .FirstOrDefaultAsync();
-                result.Set(StatusCode.Succeeded, user);
+
+                if (user != null)
+                {
+                    result.Set(StatusCode.Succeeded, user);
+                }
+                else
+                {
+                    result.Set(StatusCode.NotExists);
+                }
+
             }
             else if (phoneNumber.HasValue)
             {
                 user = await Users.AsNoTracking()
                     .Where(x => x.PhoneNumber == phoneNumber)
                     .FirstOrDefaultAsync();
-                result.Set(StatusCode.Succeeded, user);
+
+                if (user != null)
+                {
+                    result.Set(StatusCode.Succeeded, user);
+                }
+                else
+                {
+                    result.Set(StatusCode.NotExists);
+                }
             }
             else
             {
-                result.Set(StatusCode.NotExists, null);
+                throw new NullReferenceException($"Parameter {nameof(email)} | {nameof(phoneNumber)} is null");
             }
         });
 
