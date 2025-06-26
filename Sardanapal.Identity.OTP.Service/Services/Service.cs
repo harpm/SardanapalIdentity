@@ -69,7 +69,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
 
             query = Search(query, SearchModel.Fields);
 
-            query = QueryHelper.Search(query, SearchModel);
+            query = QueryHelper.Search(query, SearchModel).AsQueryable();
 
             data.List = await query.ProjectTo<T>(_mapper.ConfigurationProvider)
                 .ToListAsync();

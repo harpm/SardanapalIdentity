@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Domain" Version="0.6.11" />
+		<PackageReference Include="Sardanapal.Domain" Version="0.6.12" />
 	</ItemGroup>
 
 </Project>

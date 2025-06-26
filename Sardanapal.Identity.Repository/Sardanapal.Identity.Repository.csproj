@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Ef.Repository" Version="0.6.11" />
+		<PackageReference Include="Sardanapal.Ef.Repository" Version="0.6.12" />
 	</ItemGroup>
 
 	<ItemGroup>
