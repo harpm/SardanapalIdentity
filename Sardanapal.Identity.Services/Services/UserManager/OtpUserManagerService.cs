@@ -1,23 +1,23 @@
 ﻿
+using System.Data;
 using Microsoft.EntityFrameworkCore;
+using Sardanapal.Contract.IRepository;
 using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Domain.Data;
 using Sardanapal.Identity.Share.Resources;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
-using System.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, TUR, TUC, TNewVM, TEditableVM, TValidateVM>
-    : UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC>
-    , IOtpUserManager<TUserKey, TUser, TRole, TClaim>
+public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TNewVM, TEditableVM, TValidateVM>
+    : UserManager<TRepository, TUserKey, TUser, TUR, TUC>
+    , IOtpUserManager<TUserKey, TUser>
+    where TRepository : class, IUserRepository<TUserKey, byte, TUser, TUR>, IEFRepository<TUserKey, TUser>, new()
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TValidateVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRole : class, IRole<byte>, new()
-    where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
@@ -26,10 +26,10 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, 
 {
     protected TOtpService OtpService { get; set; }
 
-    public OtpUserManagerService(SdIdentityUnitOfWorkBase<TUserKey, byte, byte, TUser, TRole, TClaim, TUR, TUC> context
+    public OtpUserManagerService(TRepository repository
         , ITokenService tokenService
         , TOtpService _otpService)
-        : base(context, tokenService)
+        : base(repository, tokenService)
 
     {
         OtpService = _otpService;
@@ -102,8 +102,8 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, 
                 LastName = lastName
             };
 
-            await _context.AddAsync(curUser);
-            await _context.SaveChangesAsync();
+            await _repository.AddAsync(curUser);
+            await _repository.SaveChangesAsync();
 
             return curUser.Id;
         }
@@ -141,8 +141,8 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, 
                 LastName = lastName
             };
 
-            await _context.AddAsync(curUser);
-            await _context.SaveChangesAsync();
+            await _repository.AddAsync(curUser);
+            await _repository.SaveChangesAsync();
 
             return curUser.Id;
         }
@@ -189,8 +189,8 @@ public class OtpUserManagerService<TOtpService, TUserKey, TUser, TRole, TClaim, 
                     return false;
                 }
 
-                _context.Set<TUser>().Update(curUser);
-                await _context.SaveChangesAsync();
+                await _repository.UpdateAsync(id, curUser);
+                await _repository.SaveChangesAsync();
 
                 return true;
             }

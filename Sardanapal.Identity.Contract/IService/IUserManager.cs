@@ -4,11 +4,9 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IUserManager<TUserKey, TUser, TRole, TClaim>
+public interface IUserManager<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRole : class, IRole<byte>, new()
-    where TClaim : class, IClaim<byte>, new()
 {
     Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null);
     Task<IResponse<string>> Login(string username, string password);

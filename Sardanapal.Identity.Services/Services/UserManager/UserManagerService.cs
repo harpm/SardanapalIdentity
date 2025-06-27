@@ -1,44 +1,38 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sardanapal.Contract.IRepository;
 using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Domain.Data;
 using Sardanapal.Identity.Services.Statics;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManager<TUserKey, TUser, TRole, TClaim>
+public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
+    : IUserManager<TUserKey, TUser>
+    where TRepository : class, IUserRepository<TUserKey, byte, TUser, TUR>
+        , IEFRepository<TUserKey, TUser>, new()
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRole : class, IRole<byte>, new()
-    where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
 {
     protected virtual string ServiceName => "UserManager";
 
-    protected SdIdentityUnitOfWorkBase<TUserKey, byte, byte, TUser, TRole, TClaim, TUR, TUC> _context;
-    protected ITokenService _tokenService;
+    protected readonly TRepository _repository;
+    protected readonly ITokenService _tokenService;
 
-    public DbSet<TUser> Users
+    public IQueryable<TUser> Users
     {
         get
         {
-            return _context.Set<TUser>();
+            return _repository.FetchAll().AsQueryable();
         }
     }
 
-    public DbSet<TRole> Roles
+    public UserManager(TRepository repository, ITokenService tokenService)
     {
-        get
-        {
-            return _context.Set<TRole>();
-        }
-    }
-
-    public UserManager(SdIdentityUnitOfWorkBase<TUserKey, byte, byte, TUser, TRole, TClaim, TUR, TUC> context, ITokenService tokenService)
-    {
-        _context = context;
+        _repository = repository;
         _tokenService = tokenService;
     }
 
@@ -95,7 +89,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
 
         await result.FillAsync(async () =>
         {
-            var user = await _context.Users.Where(x => x.Id.Equals(id)).FirstAsync();
+            var user = await this.Users.Where(x => x.Id.Equals(id)).FirstAsync();
 
             if (!string.IsNullOrWhiteSpace(username))
                 user.Username = username;
@@ -115,8 +109,8 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
             if (!string.IsNullOrWhiteSpace(lastname))
                 user.LastName = lastname;
 
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            await _repository.UpdateAsync(id, user);
+            await _repository.SaveChangesAsync();
 
             result.Set(StatusCode.Succeeded, true);
         });
@@ -135,7 +129,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
 
             var md5Pass = await Utilities.EncryptToMd5(password);
 
-            var user = await _context.Users.Where(x => x.Username == username
+            var user = await Users.Where(x => x.Username == username
                 && x.HashedPassword == md5Pass)
                 .FirstOrDefaultAsync();
 
@@ -145,7 +139,9 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                 return;
             }
 
-            var roles = await _context.UserRoles.AsNoTracking()
+            var roles = await _repository.FetchAllUserRoles()
+                .AsQueryable()
+                .AsNoTracking()
                 .Where(x => x.UserId.Equals(user.Id))
                 .Select(x => x.RoleId)
                 .ToListAsync();
@@ -172,7 +168,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
         await result.FillAsync(async () =>
         {
-            var data = await this._context.UserRoles.AsNoTracking()
+            var data = await this._repository.FetchAllUserRoles().AsQueryable().AsNoTracking()
                 .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
                 .AnyAsync();
 
@@ -210,14 +206,14 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                 return;
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _repository.BeginTransactionAsync();
 
             try
             {
                 var newUser = CreateNewUser(username, hashedPass);
 
-                await _context.AddAsync(newUser);
-                await _context.SaveChangesAsync();
+                await _repository.AddAsync(newUser);
+                await _repository.SaveChangesAsync();
 
                 var hasRoleRes = await HasRole(role, newUser.Id);
                 if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
@@ -228,8 +224,8 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
                         UserId = newUser.Id
                     };
 
-                    await _context.AddAsync(roleUser);
-                    await _context.SaveChangesAsync();
+                    await _repository.AddUserRoleAsync(roleUser);
+                    await _repository.SaveChangesAsync();
                 }
 
                 await transaction.CommitAsync();
@@ -253,7 +249,7 @@ public class UserManager<TUserKey, TUser, TRole, TClaim, TUR, TUC> : IUserManage
 
         await result.FillAsync(async () =>
         {
-            var roles = await _context.UserRoles.AsNoTracking()
+            var roles = await _repository.FetchAllUserRoles().AsQueryable().AsNoTracking()
                 .Where(x => x.UserId.Equals(userId))
                 .Select(x => x.RoleId)
                 .ToArrayAsync();

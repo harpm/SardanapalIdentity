@@ -9,14 +9,12 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TClaim, TUR, TLoginVM, TLoginDto, TRegisterVM>
-    : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TRole, TClaim, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM>
+    : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM>
     , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser, TRole, TClaim>
+    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRole : class, IRole<byte>, new()
-    where TClaim : class, IClaim<byte>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto, new()
