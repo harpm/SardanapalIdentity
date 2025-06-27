@@ -11,7 +11,7 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
     : IUserManager<TUserKey, TUser>
     where TRepository : class, IUserRepository<TUserKey, byte, TUser, TUR>
-        , IEFRepository<TUserKey, TUser>, new()
+        , IEFRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
