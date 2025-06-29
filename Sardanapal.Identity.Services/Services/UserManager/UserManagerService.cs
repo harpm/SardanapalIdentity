@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sardanapal.ViewModel.Response;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Services.Statics;
-using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
@@ -22,14 +22,6 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
     protected readonly TRepository _repository;
     protected readonly ITokenService _tokenService;
 
-    public IQueryable<TUser> Users
-    {
-        get
-        {
-            return _repository.FetchAll().AsQueryable();
-        }
-    }
-
     public UserManager(TRepository repository, ITokenService tokenService)
     {
         _repository = repository;
@@ -45,9 +37,11 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
             TUser? user;
             if (!string.IsNullOrWhiteSpace(email))
             {
-                user = await Users.AsNoTracking()
-                   .Where(x => x.Email == email || x.Username == email)
-                   .FirstOrDefaultAsync();
+                user = await _repository.FetchAll()
+                    .AsQueryable()
+                    .AsNoTracking()
+                    .Where(x => x.Email == email || x.Username == email)
+                    .FirstOrDefaultAsync();
 
                 if (user != null)
                 {
@@ -61,7 +55,8 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
             }
             else if (phoneNumber.HasValue)
             {
-                user = await Users.AsNoTracking()
+                user = await _repository.FetchAll()
+                    .AsQueryable().AsNoTracking()
                     .Where(x => x.PhoneNumber == phoneNumber)
                     .FirstOrDefaultAsync();
 
@@ -89,7 +84,9 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
         await result.FillAsync(async () =>
         {
-            var user = await this.Users.Where(x => x.Id.Equals(id)).FirstAsync();
+            var user = await this._repository.FetchAll()
+                .AsQueryable().AsNoTracking()
+                .Where(x => x.Id.Equals(id)).FirstAsync();
 
             if (!string.IsNullOrWhiteSpace(username))
                 user.Username = username;
@@ -129,8 +126,11 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
             var md5Pass = await Utilities.EncryptToMd5(password);
 
-            var user = await Users.Where(x => x.Username == username
-                && x.HashedPassword == md5Pass)
+            var user = await _repository.FetchAll()
+                .AsQueryable()
+                .AsNoTracking()
+                .Where(x => x.Username == username
+                    && x.HashedPassword == md5Pass)
                 .FirstOrDefaultAsync();
 
             if (user == null)
@@ -168,7 +168,8 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
         await result.FillAsync(async () =>
         {
-            var data = await this._repository.FetchAllUserRoles().AsQueryable().AsNoTracking()
+            var data = await this._repository.FetchAllUserRoles()
+                .AsQueryable().AsNoTracking()
                 .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
                 .AnyAsync();
 
