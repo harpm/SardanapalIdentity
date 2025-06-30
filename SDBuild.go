@@ -60,7 +60,7 @@ func main() {
 
 		if err != nil {
 			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
-			continue
+			panic();
 		}
 
 		fmt.Printf("Output: \t%s", string(output[:]))
@@ -75,7 +75,7 @@ func main() {
 
 		if err != nil {
 			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
-			continue
+			panic();
 		}
 
 		fmt.Printf("Output: \t%s", string(output[:]))
@@ -94,7 +94,7 @@ func main() {
 
 		if err != nil {
 			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
-			continue
+			panic();
 		}
 
 		// log output message
@@ -118,7 +118,7 @@ func main() {
 
 		if err != nil {
 			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
-			continue
+			panic()
 		}
 
 		fmt.Printf("Output: \t%s", string(output[:]))

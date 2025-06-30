@@ -37,7 +37,10 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
     public virtual async Task<TUserKey> RequestLoginUser(long phonenumber, byte role)
     {
-        var user = await this.Users
+        var user = await _repository
+            .FetchAll()
+            .AsQueryable()
+            .AsNoTracking()
             .Where(x => x.PhoneNumber == phonenumber)
             .FirstOrDefaultAsync();
 
@@ -65,7 +68,10 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
     public virtual async Task<TUserKey> RequestLoginUser(string email, byte role)
     {
-        var user = await this.Users
+        var user = await _repository
+            .FetchAll()
+            .AsQueryable()
+            .AsNoTracking()
             .Where(x => x.Email == email)
             .FirstOrDefaultAsync();
 
@@ -88,7 +94,10 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
     public virtual async Task<TUserKey> RequestRegisterUser(long phonenumber, string firstname, string lastName, byte role)
     {
-        var curUser = await Users
+        var curUser = await _repository
+            .FetchAll()
+            .AsQueryable()
+            .AsNoTracking()
             .Where(x => x.PhoneNumber == phonenumber)
             .FirstOrDefaultAsync();
 
@@ -127,7 +136,10 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
     public virtual async Task<TUserKey> RequestRegisterUser(string email, string firstname, string lastName, byte role)
     {
-        var curUser = await Users
+        var curUser = await _repository
+            .FetchAll()
+            .AsQueryable()
+            .AsNoTracking()
             .Where(x => x.Email == email)
             .FirstOrDefaultAsync();
 
@@ -166,7 +178,10 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
     public virtual async Task<bool> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId)
     {
-        var curUser = await Users
+        var curUser = await _repository
+            .FetchAll()
+            .AsQueryable()
+            .AsNoTracking()
             .Where(x => x.Id.Equals(id))
             .FirstOrDefaultAsync();
 
@@ -205,7 +220,10 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
     public virtual async Task<string> VerifyLoginOtpCode(string code, TUserKey id, byte roleId)
     {
-        var curUser = await Users
+        var curUser = await _repository
+            .FetchAll()
+            .AsQueryable()
+            .AsNoTracking()
             .Where(x => x.Id.Equals(id))
             .FirstOrDefaultAsync();
 
