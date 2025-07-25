@@ -20,7 +20,7 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
         if (identityProvider.IsAuthorized)
         {
             var token = tokenService.GenerateToken(identityProvider.Claims.FindFirst(SdClaimTypes.NameIdentifier).Value
-                        , identityProvider.Claims.FindAll(SdClaimTypes.Role).Select(c => Convert.ToByte(c.Value))
+                        , identityProvider.Claims.FindAll(SdClaimTypes.Roles).Select(c => Convert.ToByte(c.Value))
                         .ToArray(), []);
 
             if (token.StatusCode == StatusCode.Succeeded)
