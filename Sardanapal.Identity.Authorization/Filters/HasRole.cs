@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +31,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                 || idProvider.Claims.Claims == null
                 || idProvider.Claims.Claims.Count() == 0
                 || !idProvider.Claims.Claims
-                    .Where(c => c.Type == SdClaimTypes.Roles
+                    .Where(c => c.Type == ClaimTypes.Role
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
