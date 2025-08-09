@@ -1,13 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
+<Project>
+   <PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Title>Sardanapal Identity Dto</Title>
-		<Authors>Harpm</Authors>
+		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
-	</PropertyGroup>
-
+   </PropertyGroup>
 </Project>

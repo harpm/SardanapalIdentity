@@ -1,28 +1,29 @@
 ﻿
-using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Share.Resources;
+using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
+using System.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TNewVM, TEditableVM, TValidateVM>
+public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     : UserManager<TRepository, TUserKey, TUser, TUR, TUC>
     , IOtpUserManager<TUserKey, TUser>
     where TRepository : class, IUserRepository<TUserKey, byte, TUser, TUR>, IEFRepository<TUserKey, TUser>, new()
-    where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TValidateVM>
+    where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
-    where TValidateVM : ValidateOtpVM<TUserKey>, new()
+    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
+    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     protected TOtpService OtpService { get; set; }
 
@@ -62,7 +63,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         }
         else
         {
-            throw new KeyNotFoundException(Service_Messages.PhonenumberNotFound);
+            throw new KeyNotFoundException(Identity_Messages.PhonenumberNotFound);
         }
     }
 
@@ -88,7 +89,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         }
         else
         {
-            throw new KeyNotFoundException(Service_Messages.EmailNotFound);
+            throw new KeyNotFoundException(Identity_Messages.EmailNotFound);
         }
     }
 
@@ -118,7 +119,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         }
         else if (curUser.VerifiedPhoneNumber)
         {
-            throw new DuplicateNameException(Service_Messages.DuplicatePhoneNumber);
+            throw new DuplicateNameException(Identity_Messages.DuplicatePhoneNumber);
         }
 
         if (curUser != null && !curUser.VerifiedPhoneNumber)
@@ -160,7 +161,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         }
         else if (curUser.VerifiedEmail)
         {
-            throw new DuplicateNameException(Service_Messages.DuplicateEmail);
+            throw new DuplicateNameException(Identity_Messages.DuplicateEmail);
         }
 
         if (curUser != null && !curUser.VerifiedEmail)
@@ -187,7 +188,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new TValidateVM { UserId = id, Code = code, RoleId = roleId });
+            var validationRes = await OtpService.ValidateOtpRegister(new TOTPRegisterVM { UserId = id, Code = code, RoleId = roleId });
 
             if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
             {
@@ -214,7 +215,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         }
         else
         {
-            throw new KeyNotFoundException(Service_Messages.InvalidUserId);
+            throw new KeyNotFoundException(Identity_Messages.InvalidUserId);
         }
     }
 
@@ -229,7 +230,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
         if (curUser != null)
         {
-            var validationRes = await OtpService.ValidateOtp(new TValidateVM
+            var validationRes = await OtpService.ValidateOtpLogin(new TOTPLoginVM
             {
                 UserId = id,
                 Code = code,
@@ -250,7 +251,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         }
         else
         {
-            throw new Exception(Service_Messages.InvalidUserId);
+            throw new Exception(Identity_Messages.InvalidUserId);
         }
     }
 }

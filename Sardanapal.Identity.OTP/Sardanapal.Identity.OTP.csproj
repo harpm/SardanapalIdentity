@@ -1,12 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Authors>harpm</Authors>
-		<Company>Sardanapal</Company>
+		<Title>Sardanapal Identity OTP</Title>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -14,7 +9,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Domain" Version="0.6.17" />
+		<PackageReference Include="Sardanapal.Domain" />
 	</ItemGroup>
 
 </Project>

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Sardanapal.Identity.Share.Resources {
+namespace Sardanapal.Identity.Localization {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Sardanapal.Identity.Share.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Service_Messages {
+    public class Identity_Messages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Service_Messages() {
+        internal Identity_Messages() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Sardanapal.Identity.Share.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Sardanapal.Identity.Share.Resources.Service.Messages", typeof(Service_Messages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Sardanapal.Identity.Localization.Identity.Messages", typeof(Identity_Messages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,7 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to آدرس ایمیل وارد شده قبلا در سیستم ثبت شده است..
+        ///   Looks up a localized string similar to Entered Email address is already registered by someone else..
         /// </summary>
         public static string DuplicateEmail {
             get {
@@ -70,7 +70,7 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to شماره تلفن همراه وارد شده قبلا در سیستم ثبت شده است..
+        ///   Looks up a localized string similar to Entered Phonenumber is already registered by someone else..
         /// </summary>
         public static string DuplicatePhoneNumber {
             get {
@@ -79,7 +79,7 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ادرس ایمیل وارد شده در سیستم ثبت نشده است..
+        ///   Looks up a localized string similar to Entered  Email address doesn&apos;t exist..
         /// </summary>
         public static string EmailNotFound {
             get {
@@ -88,7 +88,7 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ساخت توکن با خطا مواجه شد..
+        ///   Looks up a localized string similar to Failed Generating new Token..
         /// </summary>
         public static string FailedGeneratingToken {
             get {
@@ -97,7 +97,16 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to آدرس ایمیل یا شماره تلفن همراه وارد شده در سیستم وجود ندارد..
+        ///   Looks up a localized string similar to Entered Email address is not valid.
+        /// </summary>
+        public static string InvalidEmailAddress {
+            get {
+                return ResourceManager.GetString("InvalidEmailAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sent Email address or PhoneNumber is not registered..
         /// </summary>
         public static string InvalidEmailOrNumber {
             get {
@@ -106,7 +115,7 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to کد تایید {0} معتبر نمی باشد..
+        ///   Looks up a localized string similar to Entered code {0} is invalid..
         /// </summary>
         public static string InvalidOtpCode {
             get {
@@ -115,7 +124,38 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to شناسه کاربری وارد شده معتبر نمی باشد.
+        ///   Looks up a localized string similar to Password must have:
+        ///- At least {0} characters.
+        /// </summary>
+        public static string InvalidPassword {
+            get {
+                return ResourceManager.GetString("InvalidPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password must have:
+        ///- At least {0} characters
+        ///- At least a Uppercase letter
+        ///- At least a Lowercase letter.
+        /// </summary>
+        public static string InvalidPasswordWithCapitalLetter {
+            get {
+                return ResourceManager.GetString("InvalidPasswordWithCapitalLetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entered Phone number&apos;s invalid.
+        /// </summary>
+        public static string InvalidPhoneNumber {
+            get {
+                return ResourceManager.GetString("InvalidPhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entered User ID is Invalid..
         /// </summary>
         public static string InvalidUserId {
             get {
@@ -124,7 +164,17 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to برای ارسال کد جدید {0} دقیقه صبر کنید.
+        ///   Looks up a localized string similar to Username must have:
+        ///- At least {0} characters.
+        /// </summary>
+        public static string InvalidUsername {
+            get {
+                return ResourceManager.GetString("InvalidUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to We cannot send a new Code for {0} minutes..
         /// </summary>
         public static string OtpCooldown {
             get {
@@ -133,7 +183,7 @@ namespace Sardanapal.Identity.Share.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to شماره تلفن همراه وارد شده در سیستم ثبت نشده است..
+        ///   Looks up a localized string similar to Entered phone number doesn&apos;t exist..
         /// </summary>
         public static string PhonenumberNotFound {
             get {

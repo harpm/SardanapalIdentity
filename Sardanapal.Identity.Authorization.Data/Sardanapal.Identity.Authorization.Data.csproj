@@ -1,13 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Authorization Data</Title>
-		<Authors>Harpm</Authors>
-		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>

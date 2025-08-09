@@ -12,12 +12,11 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Contract" Version="0.6.17" />
+		<PackageReference Include="Sardanapal.Contract" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
 	  <ProjectReference Include="..\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj" />
 	</ItemGroup>
 

@@ -1,6 +1,5 @@
 ﻿using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Dto;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.ViewModel.Response;
 
@@ -11,9 +10,9 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
     where TUserManager : class, IUserManager<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TLoginVM : LoginVM
+    where TLoginVM : LoginVM, new()
     where TLoginDto : LoginDto, new()
-    where TRegisterVM : RegisterVM
+    where TRegisterVM : RegisterVM, new()
 {
     protected TUserManager userManagerService;
     protected virtual string ServiceName => "AccountService";

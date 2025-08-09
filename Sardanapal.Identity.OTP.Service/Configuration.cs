@@ -26,13 +26,13 @@ namespace Sardanapal.Identity.OTP.Services
         {
             if (useCach)
             {
-                services.AddScoped<IOtpServiceBase<TUserKey, Guid, CachNewOtpVM<TUserKey, Guid>, ValidateOtpVM<TUserKey>>
-                    , OtpCachService<TUserKey, Guid, TOTPModel, CachNewOtpVM<TUserKey, Guid>, CachOtpEditableVM<TUserKey, Guid>, ValidateOtpVM<TUserKey>>>();
+                services.AddScoped<IOtpServiceBase<TUserKey, Guid, CachNewOtpVM<TUserKey, Guid>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>
+                    , OtpCachService<TUserKey, Guid, TOTPModel, CachNewOtpVM<TUserKey, Guid>, CachOtpEditableVM<TUserKey, Guid>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>>();
             }
             else
             {
-                services.AddScoped<IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, ValidateOtpVM<TUserKey>>
-                    , OtpService<TRepository, TUserKey, Guid, TOTPModel, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, ValidateOtpVM<TUserKey>>>();
+                services.AddScoped<IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>
+                    , OtpService<TRepository, TUserKey, Guid, TOTPModel, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>>();
             }
             return services;
         }

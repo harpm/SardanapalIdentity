@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Share.Static;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 

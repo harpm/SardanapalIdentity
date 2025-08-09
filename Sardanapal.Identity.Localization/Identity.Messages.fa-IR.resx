@@ -117,33 +117,53 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OtpCooldown" xml:space="preserve">
-    <value>برای ارسال کد جدید {0} دقیقه صبر کنید</value>
-    <comment>Parameter: ExpireTime</comment>
-  </data>
-  <data name="InvalidOtpCode" xml:space="preserve">
-    <value>کد تایید {0} معتبر نمی باشد.</value>
-    <comment>Parameter: Otp Code</comment>
-  </data>
-  <data name="PhonenumberNotFound" xml:space="preserve">
-    <value>شماره تلفن همراه وارد شده در سیستم ثبت نشده است.</value>
-  </data>
-  <data name="EmailNotFound" xml:space="preserve">
-    <value>ادرس ایمیل وارد شده در سیستم ثبت نشده است.</value>
-  </data>
   <data name="DuplicateEmail" xml:space="preserve">
     <value>آدرس ایمیل وارد شده قبلا در سیستم ثبت شده است.</value>
   </data>
   <data name="DuplicatePhoneNumber" xml:space="preserve">
     <value>شماره تلفن همراه وارد شده قبلا در سیستم ثبت شده است.</value>
   </data>
-  <data name="InvalidUserId" xml:space="preserve">
-    <value>شناسه کاربری وارد شده معتبر نمی باشد</value>
+  <data name="EmailNotFound" xml:space="preserve">
+    <value>ادرس ایمیل وارد شده در سیستم ثبت نشده است.</value>
+  </data>
+  <data name="FailedGeneratingToken" xml:space="preserve">
+    <value>ساخت توکن با خطا مواجه شد.</value>
+  </data>
+  <data name="InvalidEmailAddress" xml:space="preserve">
+    <value>آدرس ایمیل وارد شده معتبر نیست.</value>
   </data>
   <data name="InvalidEmailOrNumber" xml:space="preserve">
     <value>آدرس ایمیل یا شماره تلفن همراه وارد شده در سیستم وجود ندارد.</value>
   </data>
-  <data name="FailedGeneratingToken" xml:space="preserve">
-    <value>ساخت توکن با خطا مواجه شد.</value>
+  <data name="InvalidOtpCode" xml:space="preserve">
+    <value>کد تایید {0} معتبر نمی باشد.</value>
+  </data>
+  <data name="InvalidPassword" xml:space="preserve">
+    <value>کلمه عبور باید شامل:
+- حداقل {0} کاراکتر
+باشد.</value>
+  </data>
+  <data name="InvalidPasswordWithCapitalLetter" xml:space="preserve">
+    <value>کلمه عبور باید شامل:
+- حداقل {0} کاراکتر
+- حداقل یک حرف بزرگ و یک حرف کوچک
+باشد.</value>
+  </data>
+  <data name="InvalidPhoneNumber" xml:space="preserve">
+    <value>شماره تلفن همراه وارد شده معتبر نیست</value>
+  </data>
+  <data name="InvalidUserId" xml:space="preserve">
+    <value>شناسه کاربری وارد شده معتبر نمی باشد</value>
+  </data>
+  <data name="InvalidUsername" xml:space="preserve">
+    <value>نام کاربری باید شامل:
+- حداقل دارای {0} کاراکتر
+باشد.</value>
+  </data>
+  <data name="OtpCooldown" xml:space="preserve">
+    <value>برای ارسال کد جدید {0} دقیقه صبر کنید</value>
+  </data>
+  <data name="PhonenumberNotFound" xml:space="preserve">
+    <value>شماره تلفن همراه وارد شده در سیستم ثبت نشده است.</value>
   </data>
 </root>

@@ -1,18 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Sardanapal Identity Services</Title>
-		<Authors>Harpm</Authors>
-		<Company>Sardanapal</Company>
 	</PropertyGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj" />
-	  <ProjectReference Include="..\Sardanapal.Identity.Dto\Sardanapal.Identity.Dto.csproj" />
 	  <ProjectReference Include="..\Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj" />
 	</ItemGroup>
 

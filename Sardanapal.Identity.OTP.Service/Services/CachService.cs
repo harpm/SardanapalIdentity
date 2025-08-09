@@ -1,40 +1,42 @@
-﻿using StackExchange.Redis;
+﻿using AutoMapper;
+using Sardanapal.Contract.IModel;
+using Sardanapal.Contract.IService;
+using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Localization;
+using Sardanapal.Identity.OTP.Domain;
+using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.RedisCache.Services;
 using Sardanapal.ViewModel.Response;
-using AutoMapper;
+using StackExchange.Redis;
 using System.Text.Json;
-using Sardanapal.Identity.OTP.Domain;
-using Sardanapal.Contract.IService;
-using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.ViewModel.Otp;
-using Sardanapal.Identity.Contract.IModel;
-using Sardanapal.Contract.IModel;
-using Sardanapal.Identity.Share.Resources;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
+public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, TValidateVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
-    where TValidateVM : ValidateOtpVM<TUserKey>, new()
+    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
+    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
 
 }
 
-public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
+public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TValidateVM>
+    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : class, ICachModel<TKey>, IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
-    where TValidateVM : ValidateOtpVM<TUserKey>, new()
+    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
+    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
@@ -102,13 +104,13 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.UserMessage = string.Format(Service_Messages.OtpCooldown, expireTime);
+                result.UserMessage = string.Format(Identity_Messages.OtpCooldown, expireTime);
             }
 
         });
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
+    public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
         return await result.FillAsync(async () =>
@@ -123,7 +125,27 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
             else
             {
                 result.Set(StatusCode.NotExists);
-                result.UserMessage = string.Format(Service_Messages.InvalidOtpCode, model.Code);
+                result.UserMessage = string.Format(Identity_Messages.InvalidOtpCode, model.Code);
+            }
+        });
+    }
+
+    public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
+    {
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        return await result.FillAsync(async () =>
+        {
+            var items = await InternalGetAll();
+            if (items != null)
+            {
+                result.Set(StatusCode.Succeeded
+                    , items.Where(i => i.UserId.Equals(model.UserId) && i.Code == model.Code && i.RoleId == model.RoleId)
+                    .Any());
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+                result.UserMessage = string.Format(Identity_Messages.InvalidOtpCode, model.Code);
             }
         });
     }

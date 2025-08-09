@@ -25,8 +25,21 @@ public record OtpEditableVM<TUserKey> : NewOtpVM<TUserKey>
 
 public record OtpVM();
 
-public record ValidateOtpVM<TUserKey> : OtpEditableVM<TUserKey>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>;
+public record OTPLoginVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+{
+    public virtual TUserKey UserId { get; set; }
+    public virtual byte RoleId { get; set; }
+    public virtual string Code { get; set; }
+}
+
+public record OTPRegisterVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+{
+    public virtual TUserKey UserId { get; set; }
+    public virtual byte RoleId { get; set; }
+    public virtual string Code { get; set; }
+}
 
 public record OtpLoginRequestVM
 {

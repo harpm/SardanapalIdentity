@@ -1,4 +1,4 @@
-﻿namespace Sardanapal.Identity.Dto;
+﻿namespace Sardanapal.Identity.ViewModel.Models.Account;
 
 public record LoginDto
 {

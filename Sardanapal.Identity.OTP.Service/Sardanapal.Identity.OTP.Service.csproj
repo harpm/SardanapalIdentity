@@ -1,20 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Title>Sardanapal Identity OTP</Title>
-		<Authors>Harpm</Authors>
-		<Company>Sardanapal</Company>
+		<Title>Sardanapal Identity OTP Service base</Title>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Sardanapal.Http.Service" Version="0.6.17" />
-		<PackageReference Include="Sardanapal.RedisCache" Version="0.6.17" />
-		<PackageReference Include="Sardanapal.Service" Version="0.6.17" />
-		<PackageReference Include="Sardanapal.Ef" Version="0.6.17" />
+		<PackageReference Include="Sardanapal.Http.Service" />
+		<PackageReference Include="Sardanapal.RedisCache" />
+		<PackageReference Include="Sardanapal.Service" />
+		<PackageReference Include="Sardanapal.Ef" />
 	</ItemGroup>
 
 	<ItemGroup>

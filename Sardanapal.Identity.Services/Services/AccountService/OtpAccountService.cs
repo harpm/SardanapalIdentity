@@ -1,24 +1,27 @@
 ﻿
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Dto;
-using Sardanapal.Identity.Share.Resources;
+using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM>
+public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
     : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM>
-    , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+    , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
     where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
-    where TLoginVM : LoginVM
+    where TLoginVM : LoginVM, new()
     where TLoginDto : LoginDto, new()
-    where TRegisterVM : RegisterVM
+    where TRegisterVM : RegisterVM, new()
+    where TOTPLoginRequestVM : OtpLoginRequestVM, new()
+    where TOTPRegisterRequestVM : OtpRegisterRequestVM, new()
+    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
+    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     protected override string ServiceName => "OTP AccountService";
     public OtpAccountServiceBase(TOtpUserManager _userManagerService)
@@ -27,7 +30,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(OtpLoginRequestVM model)
+    public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(TOTPLoginRequestVM model)
     {
         var result = new Response<TUserKey>(ServiceName, OperationType.Function);
 
@@ -45,12 +48,12 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.DeveloperMessages = [Service_Messages.InvalidEmailOrNumber];
+                result.DeveloperMessages = [Identity_Messages.InvalidEmailOrNumber];
             }
         });
     }
 
-    public virtual async Task<IResponse<TLoginDto>> LoginWithOtp(ValidateOtpVM<TUserKey> Model)
+    public virtual async Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model)
     {
         var result = new Response<TLoginDto>();
 
@@ -65,12 +68,12 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
             else
             {
                 result.Set(StatusCode.Failed);
-                result.DeveloperMessages = [Service_Messages.FailedGeneratingToken];
+                result.DeveloperMessages = [Identity_Messages.FailedGeneratingToken];
             }
         });
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRegisterRequestVM model)
+    public virtual async Task<IResponse<TUserKey>> RequestRegisterOtp(TOTPRegisterRequestVM model)
     {
         var result = new Response<TUserKey>();
         return await result.FillAsync(async () =>
@@ -87,12 +90,12 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.DeveloperMessages = [Service_Messages.InvalidEmailOrNumber];
+                result.DeveloperMessages = [Identity_Messages.InvalidEmailOrNumber];
             }
         });
     }
 
-    public virtual async Task<IResponse<bool>> RegisterWithOtp(ValidateOtpVM<TUserKey> Model)
+    public virtual async Task<IResponse<bool>> RegisterWithOtp(TOTPRegisterVM Model)
     {
         var result = new Response<bool>();
 

@@ -2,21 +2,21 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Contract.IService;
-using Sardanapal.Service;
+using Sardanapal.Ef.Helper;
 using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Share.Resources;
+using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Otp;
+using Sardanapal.Service;
 using Sardanapal.ViewModel.Models;
 using Sardanapal.ViewModel.Response;
-using Sardanapal.Identity.Contract.IRepository;
-using Sardanapal.Ef.Helper;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
+public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     : CrudServiceBase<TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TValidateVM>
+    , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     where TRepository : class, IOTPRepository<TKey, TOTPModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
@@ -26,7 +26,8 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
     where TVM : OtpVM, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
-    where TValidateVM : ValidateOtpVM<TUserKey>, new()
+    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
+    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     public int expireTime { get; set; }
 
@@ -116,7 +117,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
             else
             {
                 result.Set(StatusCode.Canceled);
-                result.UserMessage = string.Format(Service_Messages.OtpCooldown, expireTime);
+                result.UserMessage = string.Format(Identity_Messages.OtpCooldown, expireTime);
             }
         });
     }
@@ -131,7 +132,21 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         await this._repository.SaveChangesAsync();
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtp(TValidateVM model)
+    public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
+    {
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+
+        return await result.FillAsync(async () =>
+        {
+            var isValid = await _repository.FetchAll().AsQueryable()
+                .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
+                .AnyAsync();
+
+            result.Set(StatusCode.Succeeded, isValid);
+        });
+    }
+
+    public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
 
