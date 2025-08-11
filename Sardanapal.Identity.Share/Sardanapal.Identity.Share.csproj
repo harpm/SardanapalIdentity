@@ -12,4 +12,8 @@
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 	</ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Sardanapal.Identity.Localization\Sardanapal.Identity.Localization.csproj" />
+    </ItemGroup>
+
 </Project>

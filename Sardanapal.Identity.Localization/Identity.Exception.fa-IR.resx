@@ -117,60 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DuplicateEmail" xml:space="preserve">
-    <value>Entered Email address is already registered by someone else.</value>
-  </data>
-  <data name="DuplicatePhoneNumber" xml:space="preserve">
-    <value>Entered Phonenumber is already registered by someone else.</value>
-  </data>
-  <data name="EmailNotFound" xml:space="preserve">
-    <value>Entered  Email address doesn't exist.</value>
-  </data>
-  <data name="FailedGeneratingToken" xml:space="preserve">
-    <value>Failed Generating new Token.</value>
-  </data>
-  <data name="InvalidEmailAddress" xml:space="preserve">
-    <value>Entered Email address is not valid</value>
-  </data>
-  <data name="InvalidEmailOrNumber" xml:space="preserve">
-    <value>Sent Email address or PhoneNumber is not registered.</value>
-  </data>
-  <data name="InvalidOtpCode" xml:space="preserve">
-    <value>Entered code {0} is invalid.</value>
-    <comment>Parameter: Otp Code</comment>
-  </data>
-  <data name="InvalidPassword" xml:space="preserve">
-    <value>Password must have:
-- At least {0} characters</value>
-  </data>
-  <data name="InvalidPasswordWithCapitalLetter" xml:space="preserve">
-    <value>Password must have:
-- At least {0} characters
-- At least a Uppercase letter
-- At least a Lowercase letter</value>
-  </data>
-  <data name="InvalidPhoneNumber" xml:space="preserve">
-    <value>Entered Phone number's invalid</value>
-  </data>
-  <data name="InvalidRefreshToken" xml:space="preserve">
-    <value>Provided Token is invalid for refresh token; Please login again with your credentials.</value>
-  </data>
-  <data name="InvalidUserId" xml:space="preserve">
-    <value>Entered User ID is Invalid.</value>
-  </data>
-  <data name="InvalidUsername" xml:space="preserve">
-    <value>Username must have:
-- At least {0} characters</value>
-    <comment>First paramer: the minimum length</comment>
-  </data>
-  <data name="OtpCooldown" xml:space="preserve">
-    <value>We cannot send a new Code for {0} minutes.</value>
-    <comment>Parameter: ExpireTime</comment>
-  </data>
-  <data name="PhonenumberNotFound" xml:space="preserve">
-    <value>Entered phone number doesn't exist.</value>
-  </data>
-  <data name="UserNotFound" xml:space="preserve">
-    <value>User with entered credentials is not found.</value>
+  <data name="NullReferenceEmailOrPhoneNumber" xml:space="preserve">
+    <value />
   </data>
 </root>

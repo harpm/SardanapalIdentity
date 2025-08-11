@@ -155,6 +155,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Provided Token is invalid for refresh token; Please login again with your credentials..
+        /// </summary>
+        public static string InvalidRefreshToken {
+            get {
+                return ResourceManager.GetString("InvalidRefreshToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered User ID is Invalid..
         /// </summary>
         public static string InvalidUserId {
@@ -188,6 +197,15 @@ namespace Sardanapal.Identity.Localization {
         public static string PhonenumberNotFound {
             get {
                 return ResourceManager.GetString("PhonenumberNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User with entered credentials is not found..
+        /// </summary>
+        public static string UserNotFound {
+            get {
+                return ResourceManager.GetString("UserNotFound", resourceCulture);
             }
         }
     }

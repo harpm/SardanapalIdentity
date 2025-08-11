@@ -1,10 +1,6 @@
-﻿namespace Sardanapal.Identity.OTP.Services;
+using Sardanapal.Identity.Contract.IService;
 
-public interface IOtpHelper
-{
-    int OtpLength { get; }
-    string GenerateNewOtp();
-}
+namespace Sardanapal.Identity.OTP.Services;
 
 public class OtpHelper : IOtpHelper
 {
