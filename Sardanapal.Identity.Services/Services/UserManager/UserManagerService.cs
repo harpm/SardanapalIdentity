@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Sardanapal.ViewModel.Response;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Identity.Contract.IModel;
@@ -10,7 +10,7 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 
 public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
     : IUserManager<TUserKey, TUser>
-    where TRepository : class, IUserRepository<TUserKey, byte, TUser, TUR>
+    where TRepository : IUserRepository<TUserKey, byte, TUser, TUR>
         , IEFRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()

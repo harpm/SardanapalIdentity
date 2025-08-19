@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
+using System.Text.Json;
+using StackExchange.Redis;
 using Sardanapal.Contract.IModel;
 using Sardanapal.Contract.IService;
 using Sardanapal.Identity.Contract.IModel;
@@ -8,8 +10,6 @@ using Sardanapal.Identity.OTP.Domain;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.RedisCache.Services;
 using Sardanapal.ViewModel.Response;
-using StackExchange.Redis;
-using System.Text.Json;
 
 namespace Sardanapal.Identity.OTP.Services;
 
