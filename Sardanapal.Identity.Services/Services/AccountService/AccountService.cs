@@ -1,5 +1,6 @@
-﻿using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.ViewModel.Response;
 
@@ -82,7 +83,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
             }
             else
             {
-                result.Set(StatusCode.Failed);
+                result.Set(StatusCode.Failed, [], Identity_Messages.InvalidRefreshToken);
             }
         });
     }

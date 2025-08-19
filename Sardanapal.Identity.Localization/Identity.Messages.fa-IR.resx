@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -152,6 +152,9 @@
   <data name="InvalidPhoneNumber" xml:space="preserve">
     <value>شماره تلفن همراه وارد شده معتبر نیست</value>
   </data>
+  <data name="InvalidRefreshToken" xml:space="preserve">
+    <value>توکن وارد شده برای ساخت مجدد توکن معتبر نمی باشد، لطفا مجددا وارد شوید.</value>
+  </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>شناسه کاربری وارد شده معتبر نمی باشد</value>
   </data>
@@ -165,5 +168,8 @@
   </data>
   <data name="PhonenumberNotFound" xml:space="preserve">
     <value>شماره تلفن همراه وارد شده در سیستم ثبت نشده است.</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>کاربری با مشخصات وارد شده یافت نشد.</value>
   </data>
 </root>

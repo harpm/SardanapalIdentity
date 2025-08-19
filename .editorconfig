@@ -123,7 +123,7 @@ dotnet_naming_style._camelcase.required_prefix = _
 dotnet_naming_style._camelcase.capitalization = camel_case
 
 # File headers (optional)
-file_header_template = Licensed under the MIT license.
+file_header_template = All copy rights are reserved for Sardanapal Corp. Licensed under the MIT license.
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_prefer_braces = true:silent

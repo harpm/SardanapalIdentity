@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
@@ -19,11 +19,16 @@ namespace Sardanapal.Identity.OTP.Services
         /// otherwise otp codes will be saved in main database
         /// </param>
         /// <returns></returns>
-        public static IServiceCollection AddOtpService<TRepository, TOTPModel, TUserKey>(this IServiceCollection services, bool useCach)
+        public static IServiceCollection AddOtpService<TRepository, TOTPModel, TUserKey>(this IServiceCollection services, int otpLength, bool useCach)
             where TRepository : class, IOTPRepository<Guid, TOTPModel>
             where TOTPModel : class, IOTPModel<TUserKey, Guid>, new()
             where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
         {
+            services.AddScoped<IOtpHelper, OtpHelper>(opt =>
+            {
+                return new OtpHelper(otpLength);
+            });
+
             if (useCach)
             {
                 services.AddScoped<IOtpServiceBase<TUserKey, Guid, CachNewOtpVM<TUserKey, Guid>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>

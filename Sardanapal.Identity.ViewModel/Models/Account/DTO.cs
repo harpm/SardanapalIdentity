@@ -1,4 +1,4 @@
-﻿namespace Sardanapal.Identity.ViewModel.Models.Account;
+namespace Sardanapal.Identity.ViewModel.Models.Account;
 
 public record LoginDto
 {
@@ -7,7 +7,8 @@ public record LoginDto
         
     }
 
-    public LoginDto(string token) : this()
+    public LoginDto(string token)
+        : this()
     {
         Token = token;
     }

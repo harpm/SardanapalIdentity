@@ -5,6 +5,8 @@ using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Services.Statics;
+using Sardanapal.Identity.Localization;
+using Sardanapal.Identity.Share.Static;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
@@ -49,7 +51,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
                 }
                 else
                 {
-                    result.Set(StatusCode.NotExists);
+                    result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 }
 
             }
@@ -66,19 +68,27 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
                 }
                 else
                 {
-                    result.Set(StatusCode.NotExists);
+                    result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 }
             }
             else
             {
-                throw new ArgumentNullException($"Parameter {nameof(email)} | {nameof(phoneNumber)} is null");
+                throw new ArgumentNullException(StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber(nameof(email), nameof(phoneNumber)));
             }
         });
 
         return result;
     }
 
-    public virtual async Task<IResponse> EditUserData(TUserKey id, string? username = null, string? password = null, long? phonenumber = null, string? email = null, string? firstname = null, string? lastname = null)
+
+    // TODO: The panel service should be applied and such methods will be removed accordingly
+    public virtual async Task<IResponse> EditUserData(TUserKey id,
+        string? username = null,
+        string? password = null,
+        long? phonenumber = null,
+        string? email = null,
+        string? firstname = null,
+        string? lastname = null)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Edit);
 
@@ -135,7 +145,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
             if (user == null)
             {
-                result.Set(StatusCode.NotExists);
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 return;
             }
 
@@ -234,10 +244,10 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
                 result.Set(StatusCode.Succeeded, newUser.Id);
 
             }
-            catch (Exception ex)
+            catch
             {
                 await transaction.RollbackAsync();
-                throw ex;
+                throw;
             }
         });
 
@@ -270,7 +280,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
             }
             else
             {
-                result.Set(StatusCode.NotExists);
+                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUserId);
             }
         });
 

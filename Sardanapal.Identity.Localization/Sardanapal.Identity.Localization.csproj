@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Update="Identity.Exception.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Identity.Exception.resx</DependentUpon>
+    </Compile>
     <Compile Update="Identity.Messages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -13,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Identity.Exception.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Identity.Exception.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Identity.Messages.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Identity.Messages.Designer.cs</LastGenOutput>
