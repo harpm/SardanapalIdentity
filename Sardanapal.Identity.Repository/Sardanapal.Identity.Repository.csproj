@@ -4,10 +4,11 @@
 		<Title>Sardanapal Identity Repository</Title>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Sardanapal.Ef.Repository" />
-	</ItemGroup>
-
+    <ItemGroup>
+        <PackageReference Include="Sardanapal.Ef" />
+        <PackageReference Include="Sardanapal.Service" />
+    </ItemGroup>
+    
 	<ItemGroup>
 	  <ProjectReference Include="..\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj" />
 	</ItemGroup>

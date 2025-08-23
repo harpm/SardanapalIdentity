@@ -7,6 +7,6 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
-		<CoreVersion>0.7.0</CoreVersion>
+		<CoreVersion>0.7.2</CoreVersion>
    </PropertyGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿
+
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Contract.IModel;
 using Sardanapal.Ef.Repository;
