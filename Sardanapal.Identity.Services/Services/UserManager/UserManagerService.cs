@@ -287,11 +287,11 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
 #endregion
 
-#region Base
+#region Memory
 
 public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
     : IUserManager<TUserKey, TUser>
-    where TRepository : IUserRepository<TUserKey, byte, TUser, TUR>
+    where TRepository : IUserRepository<TUserKey, byte, TUser, TUR>, IMemoryRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()

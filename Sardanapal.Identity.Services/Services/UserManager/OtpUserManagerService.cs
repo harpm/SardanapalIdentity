@@ -253,7 +253,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
 public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     : UserManager<TRepository, TUserKey, TUser, TUR, TUC>
     , IOtpUserManager<TUserKey, TUser>
-    where TRepository : IUserRepository<TUserKey, byte, TUser, TUR>, ICrudRepository<TUserKey, TUser>
+    where TRepository : IUserRepository<TUserKey, byte, TUser, TUR>, IMemoryRepository<TUserKey, TUser>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()

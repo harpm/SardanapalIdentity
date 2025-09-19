@@ -7,8 +7,8 @@
     <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.0.2" />
     <PackageVersion Include="Sardanapal.Contract" Version="$(CoreVersion)" />
     <PackageVersion Include="Sardanapal.Domain" Version="$(CoreVersion)" />
-    <PackageVersion Include="Sardanapal.Ef" Version="0.7.2" />
-    <PackageVersion Include="Sardanapal.Service" Version="0.7.2" />
+    <PackageVersion Include="Sardanapal.Ef" Version="$(CoreVersion)" />
+    <PackageVersion Include="Sardanapal.Service" Version="$(CoreVersion)" />
     <PackageVersion Include="Sardanapal.RedisCache" Version="$(CoreVersion)" />
     <PackageVersion Include="Sardanapal.Http.Service" Version="$(CoreVersion)" />
     <PackageVersion Include="Sardanapal.Share" Version="$(CoreVersion)" />

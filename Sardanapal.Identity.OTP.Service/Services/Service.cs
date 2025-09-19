@@ -1,6 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Sardanapal.Contract.IRepository;
 using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Helper;
 using Sardanapal.Identity.Contract.IModel;
@@ -166,7 +167,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
 public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
     : CrudServiceBase<TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    where TRepository : IOTPRepository<TKey, TOTPModel>
+    where TRepository : IOTPRepository<TKey, TOTPModel>, IMemoryRepository<TKey, TOTPModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOTPModel : class, IOTPModel<TUserKey, TKey>, new()
