@@ -269,7 +269,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
 
 public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM, TUR, TUC>
     : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM>
-    where TRepository : MemoryRepositoryBase<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
+    where TRepository : class, IMemoryRepository<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
