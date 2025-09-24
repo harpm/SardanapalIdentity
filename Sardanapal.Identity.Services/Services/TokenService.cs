@@ -1,5 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
@@ -9,9 +10,10 @@ namespace Sardanapal.Identity.Services.Services;
 
 public class TokenService : ITokenService
 {
+    protected readonly ILogger _logger;
     public string ServiceName => "TokenService";
 
-    public TokenService()
+    public TokenService(ILogger logger)
     {
 
     }
@@ -45,7 +47,7 @@ public class TokenService : ITokenService
 
     public virtual IResponse<string> GenerateToken(string uid, byte[] roleIds, byte[] claimIds)
     {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Function);
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Function, _logger);
 
         return result.Fill(() =>
         {
@@ -57,7 +59,7 @@ public class TokenService : ITokenService
 
     public virtual IResponse<bool> ValidateToken(string token, out ClaimsPrincipal claims)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Function);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         claims = new ClaimsPrincipal();
 
         try
@@ -78,7 +80,7 @@ public class TokenService : ITokenService
 
     public virtual IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds, byte[] claimIds)
     {
-        IResponse<bool> result = new Response(ServiceName, OperationType.Function);
+        IResponse<bool> result = new Response(ServiceName, OperationType.Fetch, _logger);
 
         return result.Fill(() =>
         {

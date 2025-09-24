@@ -1,5 +1,29 @@
-﻿
+
 namespace Sardanapal.Identity.ViewModel.Models.Account;
+
+public record UserSearchVM
+{
+    public string Username { get; init; }
+}
+
+public record UserVM<TKey>
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+
+{
+    public TKey Id { get; init; }
+    public string Username { get; init; }
+}
+
+public record NewUserVM
+{
+    public string Username { get; init; }
+    public string Password { get; init; }
+}
+
+public record UserEditableVM : NewUserVM
+{
+
+}
 
 public record LoginVM()
 {
@@ -10,8 +34,8 @@ public record LoginVM()
         this.Username = password;
     }
 
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string Username { get; init; }
+    public string Password { get; init; }
 }
 
 public record RegisterVM()
@@ -23,6 +47,6 @@ public record RegisterVM()
         this.Username = password;
     }
 
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public string Username { get; init; }
+    public string Password { get; init; }
 };

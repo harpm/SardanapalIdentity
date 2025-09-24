@@ -1,10 +1,10 @@
-﻿using System.Security.Cryptography;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Sardanapal.Identity.Services.Statics;
 public static class Utilities
 {
-    public static async Task<string> EncryptToMd5(string input)
+    public static Task<string> EncryptToMd5(string input)
     {
         using MD5 md5 = MD5.Create();
         byte[] inputBytes = Encoding.UTF8.GetBytes(input);
@@ -16,6 +16,6 @@ public static class Utilities
             sb.Append(hashBytes[i].ToString("x2"));
         }
 
-        return sb.ToString();
+        return Task.FromResult(sb.ToString());
     }
 }

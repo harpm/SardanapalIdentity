@@ -1,4 +1,5 @@
-﻿using Sardanapal.ViewModel.Models;
+using Sardanapal.Identity.ViewModel.Models.Account;
+using Sardanapal.ViewModel.Models;
 
 namespace Sardanapal.Identity.ViewModel.Otp;
 
@@ -10,7 +11,7 @@ public record OtpListItemVM<TKey> : BaseListItem<TKey>
 
 public record OtpSearchVM();
 
-public record NewOtpVM<TUserKey>
+public record NewOtpVM<TUserKey>: NewUserVM
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual string Code { get; set; }
@@ -20,8 +21,15 @@ public record NewOtpVM<TUserKey>
     public virtual string Recipient { get; set; }
 }
 
-public record OtpEditableVM<TUserKey> : NewOtpVM<TUserKey>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>;
+public record OtpEditableVM<TUserKey> : UserEditableVM
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+{
+    public virtual string Code { get; set; }
+    public virtual TUserKey UserId { get; set; }
+    public virtual DateTime ExpireTime { get; set; }
+    public virtual byte RoleId { get; set; }
+    public virtual string Recipient { get; set; }
+}
 
 public record OtpVM();
 

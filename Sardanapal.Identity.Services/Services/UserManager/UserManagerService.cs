@@ -1,4 +1,8 @@
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Sardanapal.Service;
+using Sardanapal.Service.Repository;
 using Sardanapal.ViewModel.Response;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Identity.Contract.IModel;
@@ -7,34 +11,51 @@ using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Services.Statics;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.Share.Static;
+using Sardanapal.Identity.ViewModel.Models.Account;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
 #region EF
 
-public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
-    : IUserManager<TUserKey, TUser>
+public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM, TUR, TUC>
+    : EFPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM>, IUserManager<TUserKey, TUser>
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>
         , IEFCrudRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
+    where TUserVM : UserVM<TUserKey>, new()
+    where TUserSearchVM : UserSearchVM, new()
+    where TNewUserVM : NewUserVM, new()
+    where TUserEditableVM : UserEditableVM, new()
 {
-    protected virtual string ServiceName => "UserManager";
+    protected override string ServiceName => "UserManager";
 
-    protected readonly TRepository _repository;
     protected readonly ITokenService _tokenService;
 
-    public EFUserManager(TRepository repository, ITokenService tokenService)
+    protected override IQueryable<TUser> Search(IQueryable<TUser> entities, TUserSearchVM searchVM)
     {
-        _repository = repository;
+        if (searchVM == null)
+        {
+            if (!string.IsNullOrWhiteSpace(searchVM.Username))
+            {
+                entities.Where(u => u.Username.Contains(searchVM.Username));
+            }
+        }
+
+        return entities;
+    }
+
+    public EFUserManager(TRepository repository, IMapper mapper, ILogger logger, ITokenService tokenService)
+        : base(repository, mapper, logger)
+    {
         _tokenService = tokenService;
     }
 
     public virtual async Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null)
     {
-        IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch);
+        IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -81,52 +102,9 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
         return result;
     }
 
-
-    // TODO: The panel service should be applied and such methods will be removed accordingly
-    public virtual async Task<IResponse> EditUserData(TUserKey id,
-        string? username = null,
-        string? password = null,
-        long? phonenumber = null,
-        string? email = null,
-        string? firstname = null,
-        string? lastname = null)
-    {
-        IResponse<bool> result = new Response(ServiceName, OperationType.Edit);
-
-        await result.FillAsync(async () =>
-        {
-            var user = await this._repository.FetchAll().Where(x => x.Id.Equals(id)).FirstAsync();
-
-            if (!string.IsNullOrWhiteSpace(username))
-                user.Username = username;
-
-            if (!string.IsNullOrWhiteSpace(password))
-                user.HashedPassword = password;
-
-            if (phonenumber.HasValue)
-                user.PhoneNumber = phonenumber.Value;
-
-            if (!string.IsNullOrWhiteSpace(email))
-                user.Email = email;
-
-            if (!string.IsNullOrWhiteSpace(firstname))
-                user.FirstName = firstname;
-
-            if (!string.IsNullOrWhiteSpace(lastname))
-                user.LastName = lastname;
-
-            await _repository.UpdateAsync(id, user);
-            await _repository.SaveChangesAsync();
-
-            result.Set(StatusCode.Succeeded, true);
-        });
-
-        return result;
-    }
-
     public virtual async Task<IResponse<string>> Login(string username, string password)
     {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch);
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -172,7 +150,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
     public virtual async Task<IResponse<bool>> HasRole(byte roleId, TUserKey userKey)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         await result.FillAsync(async () =>
         {
             var data = await this._repository.FetchAllUserRoles()
@@ -197,7 +175,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
     public virtual async Task<IResponse<TUserKey>> RegisterUser(string username, string password, byte role)
     {
-        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add);
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -253,7 +231,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
     public async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch);
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -289,30 +267,47 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
 #region Memory
 
-public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
-    : IUserManager<TUserKey, TUser>
-    where TRepository : IUserRepository<TUserKey, byte, TUser, TUR>, IMemoryRepository<TUserKey, TUser>
+public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM, TUR, TUC>
+    : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM>
+    where TRepository : MemoryRepositoryBase<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
+    where TUserVM : UserVM<TUserKey>, new()
+    where TUserSearchVM : UserSearchVM, new()
+    where TNewUserVM : NewUserVM, new()
+    where TUserEditableVM : UserEditableVM, new()
 {
-    protected virtual string ServiceName => "UserManager";
+    protected override string ServiceName => "UserManager";
 
-    protected readonly TRepository _repository;
     protected readonly ITokenService _tokenService;
 
-    public UserManager(TRepository repository, ITokenService tokenService)
+    public UserManager(TRepository repository, IMapper mapper, ILogger logger, ITokenService tokenService)
+        : base(repository, mapper, logger)
     {
-        _repository = repository;
         _tokenService = tokenService;
     }
 
-    public virtual async Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null)
+    protected override IEnumerable<TUser> Search(IEnumerable<TUser> entities, TUserSearchVM searchVM)
     {
-        IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch);
 
-        await result.FillAsync(async () =>
+        if (searchVM != null)
+        {
+            if (!string.IsNullOrWhiteSpace(searchVM.Username))
+            {
+                entities = entities.Where(u => u.Username.Contains(searchVM.Username));
+            }
+        }
+
+        return entities;
+    }
+
+    public virtual Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null)
+    {
+        IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
+
+        result.Fill(() =>
         {
             TUser? user;
             if (!string.IsNullOrWhiteSpace(email))
@@ -352,55 +347,12 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
             }
         });
 
-        return result;
-    }
-
-
-    // TODO: The panel service should be applied and such methods will be removed accordingly
-    public virtual async Task<IResponse> EditUserData(TUserKey id,
-        string? username = null,
-        string? password = null,
-        long? phonenumber = null,
-        string? email = null,
-        string? firstname = null,
-        string? lastname = null)
-    {
-        IResponse<bool> result = new Response(ServiceName, OperationType.Edit);
-
-        await result.FillAsync(async () =>
-        {
-            var user = this._repository.FetchAll()
-                .Where(x => x.Id.Equals(id)).First();
-
-            if (!string.IsNullOrWhiteSpace(username))
-                user.Username = username;
-
-            if (!string.IsNullOrWhiteSpace(password))
-                user.HashedPassword = password;
-
-            if (phonenumber.HasValue)
-                user.PhoneNumber = phonenumber.Value;
-
-            if (!string.IsNullOrWhiteSpace(email))
-                user.Email = email;
-
-            if (!string.IsNullOrWhiteSpace(firstname))
-                user.FirstName = firstname;
-
-            if (!string.IsNullOrWhiteSpace(lastname))
-                user.LastName = lastname;
-
-            await _repository.UpdateAsync(id, user);
-
-            result.Set(StatusCode.Succeeded, true);
-        });
-
-        return result;
+        return Task.FromResult(result);
     }
 
     public virtual async Task<IResponse<string>> Login(string username, string password)
     {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch);
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -442,10 +394,10 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
         return result;
     }
 
-    public virtual async Task<IResponse<bool>> HasRole(byte roleId, TUserKey userKey)
+    public virtual Task<IResponse<bool>> HasRole(byte roleId, TUserKey userKey)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
-        await result.FillAsync(async () =>
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
+        result.Fill(() =>
         {
             var data = this._repository.FetchAllUserRoles()
                 .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
@@ -454,7 +406,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
             result.Set(StatusCode.Succeeded, data);
         });
 
-        return result;
+        return Task.FromResult(result);
     }
 
     protected virtual TUser CreateNewUser(string username, string hashedPassword)
@@ -468,7 +420,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
     public virtual async Task<IResponse<TUserKey>> RegisterUser(string username, string password, byte role)
     {
-        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add);
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -522,7 +474,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUR, TUC>
 
     public async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch);
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {

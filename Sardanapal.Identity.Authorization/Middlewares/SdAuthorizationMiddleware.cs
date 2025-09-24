@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Sardanapal.Identity.Authorization.Filters;
@@ -17,9 +17,9 @@ public class SdAuthorizationMiddleware
         _next = next;
     }
 
-    protected virtual async Task ProcessIdentity(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    protected virtual Task ProcessIdentity(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
     {
-        if (context == null) return;
+        if (context == null) return Task.CompletedTask;
 
         string token = context?.Request?.Headers?
             .Where(x => x.Key.Equals(ConstantKeys.AUTH_HEADER_KEY, StringComparison.InvariantCultureIgnoreCase))
@@ -43,6 +43,8 @@ public class SdAuthorizationMiddleware
                 identityProvider.SetAnanymous();
             }
         }
+
+        return Task.CompletedTask;
     }
 
     public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)

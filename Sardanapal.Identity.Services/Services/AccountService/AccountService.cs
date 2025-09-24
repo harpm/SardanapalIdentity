@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
@@ -15,18 +16,20 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
     where TLoginDto : LoginDto, new()
     where TRegisterVM : RegisterVM, new()
 {
-    protected TUserManager userManagerService;
+    protected readonly TUserManager userManagerService;
+    protected readonly ILogger _logger;
     protected virtual string ServiceName => "AccountService";
     protected abstract byte roleId { get; }
 
-    public AccountServiceBase(TUserManager _userManagerService)
+    public AccountServiceBase(TUserManager _userManagerService, ILogger logger)
     {
         this.userManagerService = _userManagerService;
+        this._logger = logger;
     }
 
     public virtual async Task<IResponse<TLoginDto>> Login(TLoginVM model)
     {
-        IResponse<TLoginDto> result = new Response<TLoginDto>(ServiceName, OperationType.Fetch);
+        IResponse<TLoginDto> result = new Response<TLoginDto>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
@@ -49,7 +52,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
     public virtual async Task<IResponse<TUserKey>> Register(TRegisterVM model)
     {
-        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add);
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
         return await result.FillAsync(async () =>
         {
@@ -68,7 +71,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
     public virtual async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch);
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {

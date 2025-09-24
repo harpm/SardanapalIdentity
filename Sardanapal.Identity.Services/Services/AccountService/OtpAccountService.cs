@@ -1,10 +1,11 @@
-﻿
+
+using Microsoft.Extensions.Logging;
+using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
-using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
@@ -24,15 +25,15 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
     where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     protected override string ServiceName => "OTP AccountService";
-    public OtpAccountServiceBase(TOtpUserManager _userManagerService)
-        : base(_userManagerService)
+    public OtpAccountServiceBase(TOtpUserManager _userManagerService, ILogger logger)
+        : base(_userManagerService, logger)
     {
 
     }
 
     public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(TOTPLoginRequestVM model)
     {
-        var result = new Response<TUserKey>(ServiceName, OperationType.Function);
+        var result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
@@ -55,15 +56,15 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
     public virtual async Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model)
     {
-        var result = new Response<TLoginDto>();
+        var result = new Response<TLoginDto>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
-            var token = await userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
+            var tokenRes = await userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
 
-            if (!string.IsNullOrWhiteSpace(token))
+            if (tokenRes.IsSuccess)
             {
-                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = token });
+                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = tokenRes.Data });
             }
             else
             {
@@ -75,7 +76,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
     public virtual async Task<IResponse<TUserKey>> RequestRegisterOtp(TOTPRegisterRequestVM model)
     {
-        var result = new Response<TUserKey>();
+        var result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
         return await result.FillAsync(async () =>
         {
             dynamic identifier = model.PhoneNumber.HasValue ? model.PhoneNumber
@@ -97,12 +98,12 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
     public virtual async Task<IResponse<bool>> RegisterWithOtp(TOTPRegisterVM Model)
     {
-        var result = new Response<bool>();
+        var result = new Response<bool>(ServiceName, OperationType.Add, _logger);
 
         return await result.FillAsync(async () =>
         {
-            var isValid = await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
-            if (isValid)
+            var isValidRes = await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
+            if (isValidRes.IsSuccess)
             {
                 result.Set(StatusCode.Succeeded);
             }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Helper;
@@ -44,12 +45,13 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
         , IRequestService _request
         , IEmailService _emailService
         , ISmsService _smsService
-        , IOtpHelper _otpHelper) : base(repository, mapper)
+        , IOtpHelper _otpHelper
+        , ILogger logger) : base(repository, mapper, logger)
     {
         emailService = _emailService;
         smsService = _smsService;
         otpHelper = _otpHelper;
-        
+
     }
 
     protected override IQueryable<TOTPModel> Search(IQueryable<TOTPModel> query, TSearchVM searchModel)
@@ -59,7 +61,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
 
     public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null, CancellationToken ct = default)
     {
-        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch);
+        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -98,7 +100,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
         model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
         model.Code = otpHelper.GenerateNewOtp();
 
-        Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add);
+        Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add, _logger);
         return await result.FillAsync(async delegate
         {
             if (!await _repository.FetchAll().AsQueryable().AsNoTracking()
@@ -136,7 +138,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
 
     public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
@@ -150,7 +152,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
 
     public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
@@ -192,7 +194,8 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         , IRequestService _request
         , IEmailService _emailService
         , ISmsService _smsService
-        , IOtpHelper _otpHelper) : base(repository, mapper)
+        , IOtpHelper _otpHelper
+        , ILogger logger) : base(repository, mapper, logger)
     {
         emailService = _emailService;
         smsService = _smsService;
@@ -202,7 +205,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
 
     public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null, CancellationToken ct = default)
     {
-        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch);
+        IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
@@ -241,8 +244,8 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
         model.Code = otpHelper.GenerateNewOtp();
 
-        Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add);
-        return await result.FillAsync(async delegate
+        Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add, _logger);
+        return await result.FillAsync(async () =>
         {
             if (!_repository.FetchAll()
                 .Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId)
@@ -266,6 +269,7 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
         });
     }
 
+    [Obsolete("Use expire time on the cache provider instead of this method")]
     public virtual async Task RemoveExpireds()
     {
         await this._repository.DeleteRangeAsync(_repository
@@ -275,31 +279,31 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
             .ToList());
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
+    public virtual Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
 
-        return await result.FillAsync(async () =>
+        return Task.FromResult(result.Fill(() =>
         {
             var isValid = _repository.FetchAll()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
                 .Any();
 
             result.Set(StatusCode.Succeeded, isValid);
-        });
+        }));
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
+    public virtual Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
 
-        return await result.FillAsync(async () =>
+        return Task.FromResult(result.Fill(() =>
         {
             var isValid = _repository.FetchAll()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
                 .Any();
 
             result.Set(StatusCode.Succeeded, isValid);
-        });
+        }));
     }
 }

@@ -10,6 +10,7 @@ using Sardanapal.Identity.OTP.Domain;
 using Sardanapal.Identity.ViewModel.Otp;
 using Sardanapal.RedisCache.Services;
 using Sardanapal.ViewModel.Response;
+using Microsoft.Extensions.Logging;
 
 namespace Sardanapal.Identity.OTP.Services;
 
@@ -51,8 +52,9 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         , IMapper _mapper
         , IOtpHelper _otpHelper
         , IEmailService _emailService
-        , ISmsService _smsService)
-        : base(_conn, _mapper)
+        , ISmsService _smsService
+        , ILogger logger)
+        : base(_conn, _mapper, logger)
     {
         otpHelper = _otpHelper;
         emailService = _emailService;
@@ -74,7 +76,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
         model.Code = otpHelper.GenerateNewOtp();
 
-        Response<TKey> result = new Response<TKey>(GetType().Name, OperationType.Add);
+        Response<TKey> result = new Response<TKey>(GetType().Name, OperationType.Add, _logger);
         return await result.FillAsync(async () =>
         {
             TKey newId = model.Id;
@@ -112,7 +114,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
 
     public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         return await result.FillAsync(async () =>
         {
             var items = await InternalGetAll();
@@ -132,7 +134,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
 
     public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch);
+        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         return await result.FillAsync(async () =>
         {
             var items = await InternalGetAll();
