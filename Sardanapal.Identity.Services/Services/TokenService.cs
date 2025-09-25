@@ -88,8 +88,18 @@ public class TokenService : ITokenService
             var claimsPrinc = tokenHandler
                 .ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
 
-            result.Set(StatusCode.Succeeded, claimsPrinc.HasClaim(c => c.Type == SdClaimTypes.Roles
-                && roleIds.Select(r => r.ToString()).Contains(c.Value)));
+            var hasRole = claimsPrinc.HasClaim(c => c.Type == SdClaimTypes.Roles
+                && roleIds.Select(r => r.ToString()).Contains(c.Value));
+
+            if (hasRole)
+            {
+                result.Set(StatusCode.Succeeded, hasRole);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, false);
+            }
+
         });
     }
 }

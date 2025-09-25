@@ -1,6 +1,6 @@
 
-using System.Data;
 using AutoMapper;
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sardanapal.Contract.IRepository;
@@ -135,15 +135,6 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
             {
                 curUser = _mapper.Map<TUser>(model);
 
-                //curUser = new TUser()
-                //{
-                //    Username = model.PhoneNumber.HasValue ? model.PhoneNumber.ToString() : model.Email,
-                //    PhoneNumber = model.PhoneNumber,
-                //    Email = model.Email,
-                //    FirstName = model.FirstName,
-                //    LastName = model.LastName
-                //};
-
                 await _repository.AddAsync(curUser);
                 await _repository.SaveChangesAsync();
 
@@ -169,6 +160,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
 
         return result;
     }
+
     public virtual async Task<IResponse> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId)
     {
         var result = new Response(ServiceName, OperationType.Fetch, _logger);
@@ -197,17 +189,18 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
                     }
                     else
                     {
-                        result.Set(StatusCode.Failed, false);
+                        throw new InvalidOperationException(Identity_Messages.InvalidUserData);
                     }
 
                     await _repository.UpdateAsync(id, curUser);
                     await _repository.SaveChangesAsync();
 
                     result.Set(StatusCode.Succeeded, true);
-                    return;
                 }
-
-                result.Set(StatusCode.Failed, false);
+                else
+                {
+                    validationRes.ConvertTo<bool>(result);
+                }
             }
             else
             {
@@ -433,15 +426,17 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
                     }
                     else
                     {
-                        result.Set(StatusCode.Failed, false);
+                        throw new InvalidOperationException(Identity_Messages.InvalidUserData);
                     }
 
                     await _repository.UpdateAsync(id, curUser);
 
                     result.Set(StatusCode.Succeeded, true);
                 }
-
-                result.Set(StatusCode.Failed, false);
+                else
+                {
+                    validationRes.ConvertTo<bool>(result);
+                }
             }
             else
             {
@@ -458,7 +453,6 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
 
         await result.FillAsync(async () =>
         {
-
             var curUser = _repository
                 .FetchAll()
                 .Where(x => x.Id.Equals(id))
@@ -476,13 +470,19 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
                 if (validationRes.StatusCode == StatusCode.Succeeded && validationRes.Data)
                 {
                     var tokenRes = _tokenService.GenerateToken(curUser.Username, [roleId], []);
-                    result.Set(tokenRes.StatusCode, tokenRes.StatusCode == StatusCode.Succeeded ? tokenRes.Data : string.Empty);
+
+                    if (tokenRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, tokenRes.Data);
+                    }
+                    else
+                    {
+                        tokenRes.ConvertTo<string>(result);
+                    }
                 }
                 else
                 {
-                    throw new Exception(string.Join(", "
-                        , validationRes.DeveloperMessages
-                        , "StatusCode: " + validationRes.StatusCode.ToString()));
+                    validationRes.ConvertTo<string>(result);
                 }
             }
             else

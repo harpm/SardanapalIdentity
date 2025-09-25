@@ -1,7 +1,7 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace Sardanapal.Identity.Services.Statics;
+namespace Sardanapal.Identity.Share.Statics;
 public static class Utilities
 {
     public static Task<string> EncryptToMd5(string input)

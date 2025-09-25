@@ -1,12 +1,15 @@
-﻿using Sardanapal.Contract.IModel;
+using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.ViewModel.Otp;
 
-public record CachOtpListItemVM<TUserKey, TKey>(TUserKey UserId, DateTime ExpireTime)
+public record CachOtpListItemVM<TUserKey, TKey>
     : OtpListItemVM<TKey>
     , ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>;
+    where TKey : IComparable<TKey>, IEquatable<TKey>
+{
+    public TUserKey UserId { get; init; }
+}
 
 public record CachNewOtpVM<TUserKey, TKey> : NewOtpVM<TUserKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>

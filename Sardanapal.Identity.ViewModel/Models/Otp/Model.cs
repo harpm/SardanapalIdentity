@@ -9,7 +9,7 @@ public record OtpListItemVM<TKey> : BaseListItem<TKey>
     public virtual DateTime ExpireTime { get; set; }
 }
 
-public record OtpSearchVM();
+public record OtpSearchVM;
 
 public record NewOtpVM<TUserKey>: NewUserVM
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
@@ -31,7 +31,7 @@ public record OtpEditableVM<TUserKey> : UserEditableVM
     public virtual string Recipient { get; set; }
 }
 
-public record OtpVM();
+public record OtpVM;
 
 public record OTPLoginVM<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>

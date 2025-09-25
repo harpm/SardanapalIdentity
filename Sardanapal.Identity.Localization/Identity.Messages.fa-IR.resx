@@ -155,6 +155,9 @@
   <data name="InvalidRefreshToken" xml:space="preserve">
     <value>توکن وارد شده برای ساخت مجدد توکن معتبر نمی باشد، لطفا مجددا وارد شوید.</value>
   </data>
+  <data name="InvalidUserData" xml:space="preserve">
+    <value>اطلاعات کاربر معتبر نیست، با پشتیبانی تماس بگیرید.</value>
+  </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>شناسه کاربری وارد شده معتبر نمی باشد</value>
   </data>

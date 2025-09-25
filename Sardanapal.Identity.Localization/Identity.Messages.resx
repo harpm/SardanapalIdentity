@@ -155,11 +155,15 @@
   <data name="InvalidRefreshToken" xml:space="preserve">
     <value>Provided Token is invalid for refresh token; Please login again with your credentials.</value>
   </data>
+  <data name="InvalidUserData" xml:space="preserve">
+    <value>User data seems to be corrupted; Contact support.</value>
+  </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>Entered User ID is Invalid.</value>
   </data>
   <data name="InvalidUsername" xml:space="preserve">
     <value>Username must have:
+- characters
 - At least {0} characters</value>
     <comment>First paramer: the minimum length</comment>
   </data>

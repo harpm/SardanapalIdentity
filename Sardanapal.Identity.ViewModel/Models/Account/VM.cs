@@ -4,6 +4,8 @@ namespace Sardanapal.Identity.ViewModel.Models.Account;
 public record UserSearchVM
 {
     public string Username { get; init; }
+    public string Email { get; init; }
+    public long? PhoneNumber { get; init; }
 }
 
 public record UserVM<TKey>

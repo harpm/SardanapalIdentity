@@ -8,10 +8,10 @@ using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
-using Sardanapal.Identity.Services.Statics;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.ViewModel.Models.Account;
+using Sardanapal.Identity.Share.Statics;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
@@ -42,6 +42,16 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
             if (!string.IsNullOrWhiteSpace(searchVM.Username))
             {
                 entities.Where(u => u.Username.Contains(searchVM.Username));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchVM.Email))
+            {
+                entities.Where(u => u.Username.Contains(searchVM.Email));
+            }
+
+            if (searchVM.PhoneNumber.HasValue)
+            {
+                entities.Where(u => u.Username.Contains(searchVM.PhoneNumber.ToString()));
             }
         }
 
@@ -149,7 +159,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
         return result;
     }
 
-    public virtual async Task<IResponse<bool>> HasRole(byte roleId, TUserKey userKey)
+    public virtual async Task<IResponse<bool>> HasRole(TUserKey userKey, byte roleId)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         await result.FillAsync(async () =>
@@ -203,7 +213,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
                 await _repository.AddAsync(newUser);
                 await _repository.SaveChangesAsync();
 
-                var hasRoleRes = await HasRole(roleId, newUser.Id);
+                var hasRoleRes = await HasRole(newUser.Id, roleId);
                 if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
                 {
                     var roleUser = new TUR()
@@ -246,13 +256,13 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
             {
                 var resultModel = _tokenService.GenerateToken(userId.ToString(), roles, []);
 
-                if (!resultModel.IsSuccess)
+                if (resultModel.IsSuccess)
                 {
-                    result = resultModel;
+                    result.Set(StatusCode.Succeeded, resultModel.Data);
                 }
                 else
                 {
-                    result.Set(StatusCode.Succeeded, resultModel.Data);
+                    resultModel.ConvertTo<string>(result);
                 }
             }
             else
@@ -397,7 +407,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         return result;
     }
 
-    public virtual Task<IResponse<bool>> HasRole(byte roleId, TUserKey userKey)
+    public virtual Task<IResponse<bool>> HasRole(TUserKey userKey, byte roleId)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         result.Fill(() =>
@@ -449,7 +459,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
                 await _repository.AddAsync(newUser);
 
-                var hasRoleRes = await HasRole(role, newUser.Id);
+                var hasRoleRes = await HasRole(newUser.Id, role);
                 if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
                 {
                     var roleUser = new TUR()

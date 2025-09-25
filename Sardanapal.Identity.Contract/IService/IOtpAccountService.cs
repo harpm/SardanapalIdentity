@@ -1,4 +1,4 @@
-﻿
+
 using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
@@ -19,6 +19,6 @@ public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, 
     Task<IResponse<TUserKey>> RequestLoginOtp(TOTPLoginRequestVM Model);
     Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model);
     Task<IResponse<TUserKey>> RequestRegisterOtp(TOTPRegisterRequestVM model);
-    Task<IResponse<bool>> RegisterWithOtp(TOTPRegisterVM Model);
+    Task<IResponse> RegisterWithOtp(TOTPRegisterVM Model);
 
 }

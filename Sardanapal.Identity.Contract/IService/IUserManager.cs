@@ -12,6 +12,7 @@ public interface IUserManager<TUserKey, TUser, TRegisterVM>
     where TRegisterVM : RegisterVM, new()
 {
     Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null);
+    Task<IResponse<bool>> HasRole(TUserKey userKey, byte roleId);
     Task<IResponse<string>> Login(string username, string password);
     Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model, byte roleId);
     Task<IResponse<string>> RefreshToken(TUserKey userId);

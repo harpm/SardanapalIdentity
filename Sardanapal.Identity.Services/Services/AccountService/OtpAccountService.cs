@@ -96,21 +96,8 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
         });
     }
 
-    public virtual async Task<IResponse<bool>> RegisterWithOtp(TOTPRegisterVM Model)
+    public virtual async Task<IResponse> RegisterWithOtp(TOTPRegisterVM Model)
     {
-        var result = new Response<bool>(ServiceName, OperationType.Add, _logger);
-
-        return await result.FillAsync(async () =>
-        {
-            var isValidRes = await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
-            if (isValidRes.IsSuccess)
-            {
-                result.Set(StatusCode.Succeeded);
-            }
-            else
-            {
-                result.Set(StatusCode.Failed);
-            }
-        });
+        return await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
     }
 }

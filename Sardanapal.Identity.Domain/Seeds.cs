@@ -1,7 +1,9 @@
-﻿
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Share.Statics;
+using System.Threading.Tasks;
 
 namespace Sardanapal.Identity.Domain;
 
@@ -34,7 +36,7 @@ public static class IdentitySeeds
         return provider;
     }
 
-    public static IServiceProvider AddAdminUser<TRoleEnum, TUser, TUserRole, TUserKey, TRoleKey>(this IServiceProvider provider)
+    public static async Task<IServiceProvider> AddAdminUser<TRoleEnum, TUser, TUserRole, TUserKey, TRoleKey>(this IServiceProvider provider)
         where TRoleEnum : Enum
         where TUser : class, IUser<TUserKey>, new()
         where TUserRole : class, IUserRole<TUserKey, TRoleKey>, new()
@@ -56,10 +58,13 @@ public static class IdentitySeeds
             .AsNoTracking()
             .Any())
         {
+            var password = "admin";
+            var hashedPassword = await Utilities.EncryptToMd5(password);
+
             admin = new TUser()
             {
                 Username = "admin",
-                HashedPassword = "admin", // this should be hashed first
+                HashedPassword = hashedPassword,
                 FirstName = "کاربر",
                 LastName = "ارشد",
                 Email = "admin",
@@ -68,9 +73,9 @@ public static class IdentitySeeds
                 VerifiedPhoneNumber = true
             };
 
-            uow.Add(admin);
+            await uow.AddAsync(admin);
 
-            uow.SaveChanges();
+            await uow.SaveChangesAsync();
 
             foreach (TRoleKey roleEnumMember in typeof(TRoleEnum).GetEnumValues())
             {

@@ -164,6 +164,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User data seems to be corrupted; Contact support..
+        /// </summary>
+        public static string InvalidUserData {
+            get {
+                return ResourceManager.GetString("InvalidUserData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered User ID is Invalid..
         /// </summary>
         public static string InvalidUserId {
@@ -174,6 +183,7 @@ namespace Sardanapal.Identity.Localization {
         
         /// <summary>
         ///   Looks up a localized string similar to Username must have:
+        ///- characters
         ///- At least {0} characters.
         /// </summary>
         public static string InvalidUsername {
