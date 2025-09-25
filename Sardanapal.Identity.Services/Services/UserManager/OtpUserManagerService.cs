@@ -15,9 +15,9 @@ using Sardanapal.Identity.ViewModel.Otp;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    : EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TUR, TUC>
-    , IOtpUserManager<TUserKey, TUser>
+public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
+    : EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TOTPRegisterVM, TEditableVM, TUR, TUC>
+    , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM>
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>, IEFCrudRepository<TUserKey, TUser>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
@@ -30,6 +30,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
     where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
+    where TOTPRegisterRquestVM : OtpRegisterRequestVM, new()
 {
     protected TOtpService OtpService { get; set; }
 
@@ -118,7 +119,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
         return result;
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestRegisterUser(long phonenumber, string firstname, string lastName, byte role)
+    public virtual async Task<IResponse<TUserKey>> RequestRegisterUser(TOTPRegisterRquestVM model, byte role)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
@@ -127,18 +128,21 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
             var curUser = await _repository
                 .FetchAll()
                 .AsNoTracking()
-                .Where(x => x.PhoneNumber == phonenumber)
+                .Where(x => x.PhoneNumber == model.PhoneNumber || x.Email == model.Email)
                 .FirstOrDefaultAsync();
 
             if (curUser == null)
             {
-                curUser = new TUser()
-                {
-                    Username = phonenumber.ToString(),
-                    PhoneNumber = phonenumber,
-                    FirstName = firstname,
-                    LastName = lastName
-                };
+                curUser = _mapper.Map<TUser>(model);
+
+                //curUser = new TUser()
+                //{
+                //    Username = model.PhoneNumber.HasValue ? model.PhoneNumber.ToString() : model.Email,
+                //    PhoneNumber = model.PhoneNumber,
+                //    Email = model.Email,
+                //    FirstName = model.FirstName,
+                //    LastName = model.LastName
+                //};
 
                 await _repository.AddAsync(curUser);
                 await _repository.SaveChangesAsync();
@@ -154,7 +158,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
             {
                 await OtpService.Add(new TNewVM()
                 {
-                    Recipient = phonenumber.ToString(),
+                    Recipient = model.PhoneNumber.HasValue ? model.PhoneNumber.ToString() : model.Email,
                     UserId = curUser.Id,
                     RoleId = role
                 });
@@ -165,55 +169,6 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
 
         return result;
     }
-
-    public virtual async Task<IResponse<TUserKey>> RequestRegisterUser(string email, string firstname, string lastName, byte role)
-    {
-        var result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
-
-        await result.FillAsync(async () =>
-        {
-            var curUser = await _repository
-                .FetchAll()
-                .AsNoTracking()
-                .Where(x => x.Email == email)
-                .FirstOrDefaultAsync();
-
-            if (curUser == null)
-            {
-                curUser = new TUser()
-                {
-                    Username = email,
-                    Email = email,
-                    FirstName = firstname,
-                    LastName = lastName
-                };
-
-                await _repository.AddAsync(curUser);
-                await _repository.SaveChangesAsync();
-
-                result.Set(StatusCode.Succeeded, curUser.Id);
-            }
-            else if (curUser.VerifiedEmail)
-            {
-                throw new DuplicateNameException(Identity_Messages.DuplicateEmail);
-            }
-
-            if (curUser != null && !curUser.VerifiedEmail)
-            {
-                await OtpService.Add(new TNewVM()
-                {
-                    Recipient = email,
-                    UserId = curUser.Id,
-                    RoleId = role
-                });
-            }
-
-            result.Set(StatusCode.Succeeded, curUser.Id);
-        });
-
-        return result;
-    }
-
     public virtual async Task<IResponse> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId)
     {
         var result = new Response(ServiceName, OperationType.Fetch, _logger);
@@ -306,9 +261,9 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
     }
 }
 
-public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    : UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TUR, TUC>
-    , IOtpUserManager<TUserKey, TUser>
+public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
+    : UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TOTPRegisterVM, TEditableVM, TUR, TUC>
+    , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM>
     where TRepository : MemoryRepositoryBase<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
@@ -321,6 +276,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
     where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
+    where TOTPRegisterRquestVM : OtpRegisterRequestVM, new()
 {
     protected TOtpService OtpService { get; set; }
 
@@ -401,7 +357,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         return result;
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestRegisterUser(long phonenumber, string firstname, string lastName, byte role)
+    public virtual async Task<IResponse<TUserKey>> RequestRegisterUser(TOTPRegisterRquestVM model, byte role)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
@@ -409,18 +365,21 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         {
             var curUser = _repository
                 .FetchAll()
-                .Where(x => x.PhoneNumber == phonenumber)
+                .Where(x => x.PhoneNumber == model.PhoneNumber || x.Email == model.Email)
                 .FirstOrDefault();
 
             if (curUser == null)
             {
-                curUser = new TUser()
-                {
-                    Username = phonenumber.ToString(),
-                    PhoneNumber = phonenumber,
-                    FirstName = firstname,
-                    LastName = lastName
-                };
+                curUser = _mapper.Map<TUser>(model);
+
+                //curUser = new TUser()
+                //{
+                //    Username = model.PhoneNumber.HasValue ? model.PhoneNumber.ToString() : model.Email,
+                //    PhoneNumber = model.PhoneNumber,
+                //    Email = model.Email,
+                //    FirstName = model.FirstName,
+                //    LastName = model.LastName
+                //};
 
                 await _repository.AddAsync(curUser);
 
@@ -435,53 +394,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
             {
                 await OtpService.Add(new TNewVM()
                 {
-                    Recipient = phonenumber.ToString(),
-                    UserId = curUser.Id,
-                    RoleId = role
-                });
-            }
-
-            result.Set(StatusCode.Succeeded, curUser.Id);
-        });
-
-        return result;
-    }
-
-    public virtual async Task<IResponse<TUserKey>> RequestRegisterUser(string email, string firstname, string lastName, byte role)
-    {
-        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
-
-        await result.FillAsync(async () =>
-        {
-            var curUser = _repository
-                .FetchAll()
-                .Where(x => x.Email == email)
-                .FirstOrDefault();
-
-            if (curUser == null)
-            {
-                curUser = new TUser()
-                {
-                    Username = email,
-                    Email = email,
-                    FirstName = firstname,
-                    LastName = lastName
-                };
-
-                await _repository.AddAsync(curUser);
-
-                result.Set(StatusCode.Succeeded, curUser.Id);
-            }
-            else if (curUser.VerifiedEmail)
-            {
-                throw new DuplicateNameException(Identity_Messages.DuplicateEmail);
-            }
-
-            if (curUser != null && !curUser.VerifiedEmail)
-            {
-                await OtpService.Add(new TNewVM()
-                {
-                    Recipient = email,
+                    Recipient = model.PhoneNumber.HasValue ? model.PhoneNumber.ToString() : model.Email,
                     UserId = curUser.Id,
                     RoleId = role
                 });

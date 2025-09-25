@@ -1,10 +1,10 @@
+
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Service;
-using Sardanapal.Service.Repository;
-using Sardanapal.ViewModel.Response;
 using Sardanapal.Contract.IRepository;
+using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
@@ -17,8 +17,9 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 
 #region EF
 
-public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM, TUR, TUC>
-    : EFPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM>, IUserManager<TUserKey, TUser>
+public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
+    : EFPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
+    , IUserManager<TUserKey, TUser, TRegisterVM>
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>
         , IEFCrudRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
@@ -27,7 +28,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
     where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
-    where TNewUserVM : NewUserVM, new()
+    where TRegisterVM : RegisterVM, new()
     where TUserEditableVM : UserEditableVM, new()
 {
     protected override string ServiceName => "UserManager";
@@ -164,24 +165,25 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
         return result;
     }
 
-    protected virtual TUser CreateNewUser(string username, string hashedPassword)
+    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
     {
+        var hashedPass = await Utilities.EncryptToMd5(model.Password);
+
         return new TUser()
         {
-            Username = username,
-            HashedPassword = hashedPassword
+            Username = model.Username,
+            HashedPassword = hashedPass
         };
     }
 
-    public virtual async Task<IResponse<TUserKey>> RegisterUser(string username, string password, byte role)
+    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model, byte roleId)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
         await result.FillAsync(async () =>
         {
-            var hashedPass = await Utilities.EncryptToMd5(password);
 
-            var newUserRes = await GetUser(username);
+            var newUserRes = await GetUser(model.Username);
             if (newUserRes.StatusCode == StatusCode.Exception)
             {
                 newUserRes.ConvertTo<TUserKey>(result);
@@ -196,17 +198,17 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
 
             try
             {
-                var newUser = CreateNewUser(username, hashedPass);
+                var newUser = await CreateNewUser(model);
 
                 await _repository.AddAsync(newUser);
                 await _repository.SaveChangesAsync();
 
-                var hasRoleRes = await HasRole(role, newUser.Id);
+                var hasRoleRes = await HasRole(roleId, newUser.Id);
                 if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
                 {
                     var roleUser = new TUR()
                     {
-                        RoleId = role,
+                        RoleId = roleId,
                         UserId = newUser.Id
                     };
 
@@ -267,8 +269,9 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
 
 #region Memory
 
-public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM, TUR, TUC>
-    : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TNewUserVM, TUserEditableVM>
+public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
+    : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
+    , IUserManager<TUserKey, TUser, TRegisterVM>
     where TRepository : class, IMemoryRepository<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
@@ -276,7 +279,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
     where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
-    where TNewUserVM : NewUserVM, new()
+    where TRegisterVM : RegisterVM, new()
     where TUserEditableVM : UserEditableVM, new()
 {
     protected override string ServiceName => "UserManager";
@@ -409,24 +412,25 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         return Task.FromResult(result);
     }
 
-    protected virtual TUser CreateNewUser(string username, string hashedPassword)
+    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
     {
+        var hashedPass = await Utilities.EncryptToMd5(model.Password);
+
         return new TUser()
         {
-            Username = username,
-            HashedPassword = hashedPassword
+            Username = model.Username,
+            HashedPassword = hashedPass
         };
     }
 
-    public virtual async Task<IResponse<TUserKey>> RegisterUser(string username, string password, byte role)
+    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model, byte role)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
         await result.FillAsync(async () =>
         {
-            var hashedPass = await Utilities.EncryptToMd5(password);
 
-            var newUserRes = await GetUser(username);
+            var newUserRes = await GetUser(model.Username);
             if (newUserRes.StatusCode == StatusCode.Exception)
             {
                 newUserRes.ConvertTo<TUserKey>(result);
@@ -441,7 +445,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
             try
             {
-                var newUser = CreateNewUser(username, hashedPass);
+                var newUser = await CreateNewUser(model);
 
                 await _repository.AddAsync(newUser);
 

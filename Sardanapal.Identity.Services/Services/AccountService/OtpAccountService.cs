@@ -12,7 +12,7 @@ namespace Sardanapal.Identity.Services.Services.AccountService;
 public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
     : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM>
     , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
-    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser>
+    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRegisterRequestVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
@@ -84,9 +84,9 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
             if (identifier != null)
             {
-                var uid = await userManagerService
-                    .RequestRegisterUser(identifier, model.FirstName, model.LastName, roleId);
-                result.Set(StatusCode.Succeeded, uid);
+                var uidRes = await userManagerService
+                    .RequestRegisterUser(model, roleId);
+                result.Set(uidRes.StatusCode, uidRes.Data);
             }
             else
             {

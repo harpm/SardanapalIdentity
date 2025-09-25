@@ -9,7 +9,7 @@ namespace Sardanapal.Identity.Services.Services.AccountService;
 
 public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM>
     : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TUserManager : class, IUserManager<TUserKey, TUser>
+    where TUserManager : class, IUserManager<TUserKey, TUser, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TLoginVM : LoginVM, new()
@@ -56,7 +56,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         return await result.FillAsync(async () =>
         {
-            IResponse<TUserKey> userIdRes = await userManagerService.RegisterUser(model.Username, model.Password, this.roleId);
+            IResponse<TUserKey> userIdRes = await userManagerService.RegisterUser(model, this.roleId);
 
             if (userIdRes.IsSuccess)
             {

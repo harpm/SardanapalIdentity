@@ -41,7 +41,7 @@ public record OTPLoginVM<TUserKey>
     public virtual string Code { get; set; }
 }
 
-public record OTPRegisterVM<TUserKey>
+public record OTPRegisterVM<TUserKey> : RegisterVM
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual TUserKey UserId { get; set; }
