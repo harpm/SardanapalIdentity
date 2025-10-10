@@ -1,5 +1,6 @@
-﻿
+
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.ViewModel.Response;
@@ -13,12 +14,14 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
     }
 
-    protected override async Task ProcessIdentity(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    protected override async Task ProcessIdentity(HttpContext context, IIdentityProvider identityProvider)
     {
-        await base.ProcessIdentity(context, tokenService, identityProvider);
+        await base.ProcessIdentity(context, identityProvider);
         
         if (identityProvider.IsAuthorized)
         {
+            var tokenService = context.RequestServices.GetRequiredService<ITokenService>();
+
             var token = tokenService.GenerateToken(identityProvider.Claims.FindFirst(SdClaimTypes.NameIdentifier).Value
                         , identityProvider.Claims.FindAll(SdClaimTypes.Roles).Select(c => Convert.ToByte(c.Value))
                         .ToArray(), []);

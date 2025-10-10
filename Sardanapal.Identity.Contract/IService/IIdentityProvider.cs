@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 
 namespace Sardanapal.Identity.Contract.IService;
 
@@ -9,9 +9,6 @@ public interface IIdentityProvider
     bool IsAuthorized { get; }
     string Token { get; }
     void SetAnanymous();
-    void SetUserId(object userId);
-    void SetToken(string token);
     void SetAuthorize();
-    void SetAuthorize(string token, ClaimsPrincipal claims);
-    void SetAuthorize(string token, ClaimsPrincipal claims, object userId);
+    void SetAuthorize(string token);
 }

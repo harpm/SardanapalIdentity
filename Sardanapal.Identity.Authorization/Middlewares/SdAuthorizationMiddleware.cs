@@ -1,10 +1,8 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Sardanapal.Identity.Authorization.Filters;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
-using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Authorization.Middlewares;
 
@@ -17,7 +15,7 @@ public class SdAuthorizationMiddleware
         _next = next;
     }
 
-    protected virtual Task ProcessIdentity(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    protected virtual Task ProcessIdentity(HttpContext context, IIdentityProvider identityProvider)
     {
         if (context == null) return Task.CompletedTask;
 
@@ -28,11 +26,7 @@ public class SdAuthorizationMiddleware
 
         if (!string.IsNullOrWhiteSpace(token))
         {
-            var res = tokenService.ValidateToken(token, out ClaimsPrincipal cp);
-            if (res.StatusCode == StatusCode.Succeeded && res.Data)
-            {
-                identityProvider.SetAuthorize(token, cp, cp?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
-            }
+            identityProvider.SetAuthorize(token);
 
             var descriptor = context.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>();
 
@@ -47,9 +41,9 @@ public class SdAuthorizationMiddleware
         return Task.CompletedTask;
     }
 
-    public virtual async Task InvokeAsync(HttpContext context, ITokenService tokenService, IIdentityProvider identityProvider)
+    public virtual async Task InvokeAsync(HttpContext context, IIdentityProvider identityProvider)
     {
-        await ProcessIdentity(context, tokenService, identityProvider);
+        await ProcessIdentity(context, identityProvider);
 
         // Call the next delegate/middleware in the pipeline.
         await _next(context);

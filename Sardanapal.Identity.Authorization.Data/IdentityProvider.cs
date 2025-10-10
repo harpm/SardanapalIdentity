@@ -1,11 +1,21 @@
-﻿
+
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Share.Static;
+using Sardanapal.ViewModel.Response;
 using System.Security.Claims;
 
 namespace Sardanapal.Identity.Authorization.Data;
 
 public class IdentityProvider : IIdentityProvider
 {
+    #region Services
+
+    protected readonly ITokenService _tokenService;
+
+    #endregion
+
+    #region Properties
+
     protected string _userId;
     public string UserId
     {
@@ -51,6 +61,13 @@ public class IdentityProvider : IIdentityProvider
         }
     }
 
+    #endregion
+
+    public IdentityProvider(ITokenService tokenService)
+    {
+        this._tokenService = tokenService;
+    }
+
     public virtual void SetAnanymous()
     {
         _isAnanymous = true;
@@ -61,25 +78,29 @@ public class IdentityProvider : IIdentityProvider
         _authorized = true;
     }
 
-    public virtual void SetAuthorize(string token, ClaimsPrincipal claims)
+    public virtual void SetAuthorize(string token)
     {
-        SetAuthorize();
-        SetToken(token);
-        _claims = claims;
+        var res = _tokenService.ValidateToken(token, out ClaimsPrincipal cp);
+        if (res.StatusCode == StatusCode.Succeeded && res.Data)
+        {
+            SetAuthorize();
+            SetToken(token);
+            _claims = cp;
+
+            var id = cp?.FindFirst(SdClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                SetUserId(id);
+            }
+        }
     }
 
-    public virtual void SetAuthorize(string token, ClaimsPrincipal claims, object userId)
-    {
-        SetAuthorize(token, claims);
-        SetUserId(userId);
-    }
-
-    public virtual void SetToken(string token)
+    protected virtual void SetToken(string token)
     {
         _token = token;
     }
 
-    public virtual void SetUserId(object userId)
+    protected virtual void SetUserId(object userId)
     {
         _userId = userId.ToString();
     }
