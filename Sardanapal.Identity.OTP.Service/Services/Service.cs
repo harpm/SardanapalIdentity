@@ -111,6 +111,9 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
                 await _repository.AddAsync(Item);
                 await _repository.SaveChangesAsync();
 
+                // TODO: should implement a background service to remove expired otps
+                // or better to create a setTimeout func to handle the expired otps
+
                 if (long.TryParse(model.Recipient, out long _))
                     smsService.Send(model.Recipient, CreateSMSOtpMessage(model));
                 else
@@ -126,6 +129,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
         });
     }
 
+    // TODO: this method should be removed and handled by a background service or cache expiration
     public virtual async Task RemoveExpireds()
     {
         await this._repository.DeleteRangeAsync(_repository
