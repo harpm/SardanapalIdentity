@@ -44,7 +44,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
 
     protected IOtpHelper otpHelper { get; set; }
 
-    protected override int expireTime { get => base.expireTime; set => base.expireTime = value; }
+    protected override int expireTime { get; set; }
     protected IEmailService emailService { get; set; }
     protected ISmsService smsService { get; set; }
 
@@ -73,7 +73,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
 
     public override async Task<IResponse<TKey>> Add(TNewVM model, CancellationToken ct = default)
     {
-        model.ExpireTime = DateTime.UtcNow.AddMinutes(base.expireTime);
+        model.ExpireTime = DateTime.UtcNow.AddMinutes(expireTime);
         model.Code = otpHelper.GenerateNewOtp();
 
         Response<TKey> result = new Response<TKey>(GetType().Name, OperationType.Add, _logger);

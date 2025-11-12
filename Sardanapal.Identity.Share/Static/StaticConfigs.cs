@@ -1,13 +1,13 @@
-﻿
+
 using Microsoft.IdentityModel.Tokens;
 
 namespace Sardanapal.Identity.Share.Static;
 
-public static class StaticConfigs
+public record StaticConfigs
 {
-    public static string DbConnectionString { get; set; }
-    public static string? RedisConnectionString { get; set; }
-    public static TokenValidationParameters TokenParameters { get; set; }
-    public static int ExpirationTime { get; set; }
-    public static int? OTPLength { get; set; }
+    public string DbConnectionString { get; set; }
+    public string? RedisConnectionString { get; set; }
+    public TokenValidationParameters TokenParameters { get; set; }
+    public int ExpirationTime { get; set; }
+    public int? OTPLength { get; set; }
 }

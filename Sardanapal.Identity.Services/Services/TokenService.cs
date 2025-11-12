@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
@@ -11,16 +12,18 @@ namespace Sardanapal.Identity.Services.Services;
 public class TokenService : ITokenService
 {
     protected readonly ILogger _logger;
+    protected readonly StaticConfigs _config;
     public string ServiceName => "TokenService";
 
-    public TokenService(ILogger logger)
+    public TokenService(IOptions<StaticConfigs> config, ILogger logger)
     {
-
+        this._logger = logger;
+        this._config = config.Value;
     }
 
     protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, byte[] claimIds)
     {
-        if (StaticConfigs.TokenParameters == null) throw new NullReferenceException(nameof(StaticConfigs.TokenParameters));
+        if (_config.TokenParameters == null) throw new NullReferenceException(nameof(StaticConfigs.TokenParameters));
 
         var roleClaims = new Claim[roleIds.Length];
         for (int i = 0; i < roleIds.Length; i++)
@@ -35,9 +38,9 @@ public class TokenService : ITokenService
 
         Claims.AddRange(roleClaims);
 
-        var Credentials = new SigningCredentials(StaticConfigs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(StaticConfigs.TokenParameters.ValidIssuer
-            , StaticConfigs.TokenParameters.ValidAudience
+        var Credentials = new SigningCredentials(_config.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(_config.TokenParameters.ValidIssuer
+            , _config.TokenParameters.ValidAudience
             , Claims
             , expires: DateTime.UtcNow.AddMinutes(expireTime)
             , signingCredentials: Credentials);
@@ -51,7 +54,7 @@ public class TokenService : ITokenService
 
         return result.Fill(() =>
         {
-            string token = GenerateToken(uid, StaticConfigs.ExpirationTime, roleIds, []);
+            string token = GenerateToken(uid, _config.ExpirationTime, roleIds, []);
 
             result.Set(StatusCode.Succeeded, token);
         });
@@ -65,7 +68,7 @@ public class TokenService : ITokenService
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            claims = tokenHandler.ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
+            claims = tokenHandler.ValidateToken(token, _config.TokenParameters, out SecurityToken validatedToken);
 
             result.Set(StatusCode.Succeeded, true);
             return result;
@@ -86,7 +89,7 @@ public class TokenService : ITokenService
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var claimsPrinc = tokenHandler
-                .ValidateToken(token, StaticConfigs.TokenParameters, out SecurityToken validatedToken);
+                .ValidateToken(token, _config.TokenParameters, out SecurityToken validatedToken);
 
             var hasRole = claimsPrinc.HasClaim(c => c.Type == SdClaimTypes.Roles
                 && roleIds.Select(r => r.ToString()).Contains(c.Value));
