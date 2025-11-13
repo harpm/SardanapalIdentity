@@ -70,7 +70,7 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
             {
                 var userId = CreateUserKey(_reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
                 t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreatedBy")?.SetValue(entity, _);
+                t.GetProperty("CreatedBy")?.SetValue(entity, userId);
             }
             else if (model.State == EntityState.Modified)
             {
