@@ -1,4 +1,4 @@
-﻿using Sardanapal.Contract.Data;
+using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.Contract.IModel;
@@ -46,12 +46,13 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
     public DbSet<TUR> UserRoles { get; set; }
     public DbSet<TUC> UserClaims { get; set; }
 
-
     public SdIdentityUnitOfWorkBase(DbContextOptions opt, IIdentityProvider requestClaim)
         : base(opt)
     {
         _reqClaim = requestClaim;
     }
+
+    protected abstract TUserKey CreateUserKey(string rawUserKey);
 
     protected override void SetBaseValues()
     {
@@ -67,13 +68,15 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
 
             if (model.State == EntityState.Added)
             {
+                var userId = CreateUserKey(_reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
                 t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreatedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("CreatedBy")?.SetValue(entity, _);
             }
             else if (model.State == EntityState.Modified)
             {
+                var userId = CreateUserKey(_reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
                 t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("ModifiedBy")?.SetValue(entity, _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
+                t.GetProperty("ModifiedBy")?.SetValue(entity, userId);
             }
         }
 
