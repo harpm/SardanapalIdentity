@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Sardanapal.Contract.Data;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
@@ -19,7 +20,8 @@ public static class Configuration
     /// otherwise otp codes will be saved in main database
     /// </param>
     /// <returns></returns>
-    public static IServiceCollection AddOtpService<TRepository, TOTPModel, TUserKey>(this IServiceCollection services, int otpLength, bool useCach)
+    public static IServiceCollection AddOtpService<TEFDatabaseManager, TRepository, TOTPModel, TUserKey>(this IServiceCollection services, int otpLength, bool useCach)
+        where TEFDatabaseManager : IEFDatabaseManager
         where TRepository : class, IEFOTPRepository<Guid, TOTPModel>
         where TOTPModel : class, IOTPModel<TUserKey, Guid>, new()
         where TUserKey : IEquatable<TUserKey>, IComparable<TUserKey>
@@ -37,7 +39,7 @@ public static class Configuration
         else
         {
             services.AddScoped<IOtpServiceBase<TUserKey, Guid, NewOtpVM<TUserKey>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>
-                , EFOtpService<TRepository, TUserKey, Guid, TOTPModel, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>>();
+                , EFOtpService<TEFDatabaseManager, TRepository, TUserKey, Guid, TOTPModel, OtpListItemVM<Guid>, OtpSearchVM, OtpVM, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>, OTPLoginVM<TUserKey>, OTPRegisterVM<TUserKey>>>();
         }
         return services;
     }

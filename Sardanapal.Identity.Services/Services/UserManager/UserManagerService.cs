@@ -12,14 +12,16 @@ using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.Share.Statics;
+using Sardanapal.Contract.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
 #region EF
 
-public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
-    : EFPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
+public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
+    : EFPanelServiceBase<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
     , IUserManager<TUserKey, TUser, TRegisterVM>
+    where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>
         , IEFCrudRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
@@ -58,8 +60,12 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
         return entities;
     }
 
-    public EFUserManager(TRepository repository, IMapper mapper, ILogger logger, ITokenService tokenService)
-        : base(repository, mapper, logger)
+    public EFUserManager(TEFDatabaseManager dbManager
+        , TRepository repository
+        , IMapper mapper
+        , ILogger logger
+        , ITokenService tokenService)
+        : base(dbManager, repository, mapper, logger)
     {
         _tokenService = tokenService;
     }
@@ -204,14 +210,14 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
                 return;
             }
 
-            using var transaction = await _repository.BeginTransactionAsync();
+            using var transaction = await _dbManager.CreatTransactionAsync(default);
 
             try
             {
                 var newUser = await CreateNewUser(model);
 
                 await _repository.AddAsync(newUser);
-                await _repository.SaveChangesAsync();
+                await _dbManager.SaveChangesAsync(default);
 
                 var hasRoleRes = await HasRole(newUser.Id, roleId);
                 if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
@@ -223,7 +229,7 @@ public class EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM,
                     };
 
                     await _repository.AddUserRoleAsync(roleUser);
-                    await _repository.SaveChangesAsync();
+                    await _dbManager.SaveChangesAsync(default);
                 }
 
                 await transaction.CommitAsync();

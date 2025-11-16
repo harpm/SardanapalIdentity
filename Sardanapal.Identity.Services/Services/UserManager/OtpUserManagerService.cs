@@ -12,12 +12,14 @@ using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
+using Sardanapal.Contract.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
-public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
-    : EFUserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TOTPRegisterVM, TEditableVM, TUR, TUC>
+public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
+    : EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TOTPRegisterVM, TEditableVM, TUR, TUC>
     , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM>
+    where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>, IEFCrudRepository<TUserKey, TUser>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
@@ -34,12 +36,13 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
 {
     protected TOtpService OtpService { get; set; }
 
-    public EFOtpUserManagerService(TRepository repository
+    public EFOtpUserManagerService(TEFDatabaseManager dbManager
+        , TRepository repository
         , IMapper mapper
         , ILogger logger
         , ITokenService tokenService
         , TOtpService _otpService)
-        : base(repository, mapper, logger, tokenService)
+        : base(dbManager, repository, mapper, logger, tokenService)
 
     {
         OtpService = _otpService;
@@ -136,7 +139,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
                 curUser = _mapper.Map<TUser>(model);
 
                 await _repository.AddAsync(curUser);
-                await _repository.SaveChangesAsync();
+                await _dbManager.SaveChangesAsync(default);
 
                 result.Set(StatusCode.Succeeded, curUser.Id);
             }
@@ -193,7 +196,7 @@ public class EFOtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, 
                     }
 
                     await _repository.UpdateAsync(id, curUser);
-                    await _repository.SaveChangesAsync();
+                    await _dbManager.SaveChangesAsync(default);
 
                     result.Set(StatusCode.Succeeded, true);
                 }

@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Helper;
@@ -17,9 +18,10 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    : EFCurdServiceBase<TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
+public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+    : EFCurdServiceBase<TEFDatabaseManager, TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+    where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFOTPRepository<TKey, TOTPModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
@@ -40,13 +42,14 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
     protected IEmailService emailService { get; set; }
     protected ISmsService smsService { get; set; }
 
-    public EFOtpService(TRepository repository
+    public EFOtpService(TEFDatabaseManager dbManager
+        , TRepository repository
         , IMapper mapper
         , IRequestService _request
         , IEmailService _emailService
         , ISmsService _smsService
         , IOtpHelper _otpHelper
-        , ILogger logger) : base(repository, mapper, logger)
+        , ILogger logger) : base(dbManager, repository, mapper, logger)
     {
         emailService = _emailService;
         smsService = _smsService;
@@ -109,7 +112,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
             {
                 TOTPModel Item = _mapper.Map<TOTPModel>(model);
                 await _repository.AddAsync(Item);
-                await _repository.SaveChangesAsync();
+                await _dbManager.SaveChangesAsync(ct);
 
                 // TODO: should implement a background service to remove expired otps
                 // or better to create a setTimeout func to handle the expired otps
@@ -137,7 +140,7 @@ public class EFOtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, T
             .Where(x => x.ExpireTime <= DateTime.UtcNow)
             .Select(x => x.Id)
             .ToList());
-        await this._repository.SaveChangesAsync();
+        await this._dbManager.SaveChangesAsync(default);
     }
 
     public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
