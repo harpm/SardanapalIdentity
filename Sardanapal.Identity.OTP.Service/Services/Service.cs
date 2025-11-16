@@ -140,7 +140,7 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
             .Where(x => x.ExpireTime <= DateTime.UtcNow)
             .Select(x => x.Id)
             .ToList());
-        await this._dbManager.SaveChangesAsync(default);
+        await this._dbManager.SaveChangesAsync();
     }
 
     public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)

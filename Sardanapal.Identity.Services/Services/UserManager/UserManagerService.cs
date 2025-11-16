@@ -210,14 +210,14 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 return;
             }
 
-            using var transaction = await _dbManager.CreatTransactionAsync(default);
+            using var transaction = await _dbManager.CreatTransactionAsync();
 
             try
             {
                 var newUser = await CreateNewUser(model);
 
                 await _repository.AddAsync(newUser);
-                await _dbManager.SaveChangesAsync(default);
+                await _dbManager.SaveChangesAsync();
 
                 var hasRoleRes = await HasRole(newUser.Id, roleId);
                 if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
@@ -229,7 +229,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                     };
 
                     await _repository.AddUserRoleAsync(roleUser);
-                    await _dbManager.SaveChangesAsync(default);
+                    await _dbManager.SaveChangesAsync();
                 }
 
                 await transaction.CommitAsync();

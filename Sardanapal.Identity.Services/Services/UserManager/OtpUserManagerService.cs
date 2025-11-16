@@ -139,7 +139,7 @@ public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpServic
                 curUser = _mapper.Map<TUser>(model);
 
                 await _repository.AddAsync(curUser);
-                await _dbManager.SaveChangesAsync(default);
+                await _dbManager.SaveChangesAsync();
 
                 result.Set(StatusCode.Succeeded, curUser.Id);
             }
@@ -196,7 +196,7 @@ public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpServic
                     }
 
                     await _repository.UpdateAsync(id, curUser);
-                    await _dbManager.SaveChangesAsync(default);
+                    await _dbManager.SaveChangesAsync();
 
                     result.Set(StatusCode.Succeeded, true);
                 }
