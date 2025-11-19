@@ -54,7 +54,7 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
 
     protected abstract TUserKey CreateUserKey(string rawUserKey);
 
-    protected override void SetBaseValues()
+    protected override void SetBaseValues(object? sender, SavingChangesEventArgs e)
     {
         var EntityModels = ChangeTracker
             .Entries()
@@ -80,6 +80,6 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
             }
         }
 
-        base.SetBaseValues();
+        base.SetBaseValues(sender, e);
     }
 }
