@@ -5,6 +5,7 @@ using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Ef.UnitOfWork;
+using Sardanapal.Share.Extensions;
 
 namespace Sardanapal.Identity.Domain.Data;
 
@@ -58,7 +59,8 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
     {
         var EntityModels = ChangeTracker
             .Entries()
-            .Where(e => e.Entity.GetType().IsSubclassOf(typeof(IEntityModel<,>)) && (e.State == EntityState.Added || e.State == EntityState.Modified))
+            .Where(e => e.Entity.GetType().ImplementsRawGeneric(typeof(IEntityModel<,>))
+                && (e.State == EntityState.Added || e.State == EntityState.Modified))
             .ToList();
 
         foreach (var model in EntityModels)
@@ -70,7 +72,7 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
             {
                 var userId = CreateUserKey(_reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
                 t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreatedBy")?.SetValue(entity, userId);
+                t.GetProperty("CreateBy")?.SetValue(entity, userId);
             }
             else if (model.State == EntityState.Modified)
             {
