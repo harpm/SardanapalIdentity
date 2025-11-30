@@ -40,6 +40,35 @@ public record LoginVM()
     public string Password { get; init; }
 }
 
+public record ChangePasswordVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+{
+    public TUserKey UserId { get; init; }
+    public string NewPassword { get; init; }
+}
+
+public record ChangePasswordVM
+{
+    public string Username { get; init; }
+    public string OldPassword { get; init; }
+    public string NewPassword { get; init; }
+}
+
+public record ResetPasswordRequestVM
+{
+    public string? Email { get; init; }
+    public ulong? PhoneNumber { get; init; }
+}
+
+public record ResetPasswordVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+{
+    public TUserKey UserId { get; init; }
+    public byte RoleId { get; init; }
+    public string Code { get; init; }
+    public string NewPassword { get; init; }
+}
+
 public record RegisterVM()
 {
     public RegisterVM(string username, string password)

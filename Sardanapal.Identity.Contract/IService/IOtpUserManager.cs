@@ -12,9 +12,12 @@ public interface IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRequestRegist
     where TRegisterVM : RegisterVM, new()
     where TOTPRequestRegisterVM : OtpRegisterRequestVM, new()
 {
-    Task<IResponse<TUserKey>> RequestLoginUser(long phonenumber, byte role);
+    Task<IResponse<TUserKey>> RequestLoginUser(ulong phonenumber, byte role);
     Task<IResponse<TUserKey>> RequestLoginUser(string email, byte role);
     Task<IResponse<TUserKey>> RequestRegisterUser(TOTPRequestRegisterVM model, byte role);
     Task<IResponse> VerifyRegisterOtpCode(string code, TUserKey id, byte roleId);
     Task<IResponse<string>> VerifyLoginOtpCode(string code, TUserKey id, byte roleId);
+    Task<IResponse<TUserKey>> RequestResetPassword(ulong phonenumber);
+    Task<IResponse<TUserKey>> RequestResetPassword(string email);
+    Task<IResponse> ResetPassword(string code, TUserKey id, byte roleId, string newPassword);
 }

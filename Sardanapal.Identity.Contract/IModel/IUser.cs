@@ -1,4 +1,4 @@
-﻿
+
 using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.Contract.IModel;
@@ -11,6 +11,6 @@ public interface IUser<TUserKey> : IBaseEntityModel<TUserKey>
     string HashedPassword { get; set; }
     string? Email { get; set; }
     bool VerifiedEmail { get; set; }
-    long? PhoneNumber { get; set; }
+    ulong? PhoneNumber { get; set; }
     bool VerifiedPhoneNumber { get; set; }
 }

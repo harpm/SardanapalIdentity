@@ -70,19 +70,18 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         _tokenService = tokenService;
     }
 
-    public virtual async Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null)
+    public virtual async Task<IResponse<TUser>> GetUser(string username)
     {
         IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
-            TUser? user;
-            if (!string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrWhiteSpace(username))
             {
-                user = await _repository.FetchAll()
-                    .AsNoTracking()
-                    .Where(x => x.Email == email || x.Username == email)
-                    .FirstOrDefaultAsync();
+                TUser? user = await _repository.FetchAll()
+                        .AsNoTracking()
+                        .Where(x => x.Email == username || x.Username == username || x.PhoneNumber.ToString() == username)
+                        .FirstOrDefaultAsync();
 
                 if (user != null)
                 {
@@ -93,26 +92,11 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                     result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 }
 
-            }
-            else if (phoneNumber.HasValue)
-            {
-                user = await _repository.FetchAll()
-                    .AsNoTracking()
-                    .Where(x => x.PhoneNumber == phoneNumber)
-                    .FirstOrDefaultAsync();
-
-                if (user != null)
-                {
-                    result.Set(StatusCode.Succeeded, user);
-                }
-                else
-                {
-                    result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
-                }
             }
             else
             {
-                throw new ArgumentNullException(StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber(nameof(email), nameof(phoneNumber)));
+                throw new ArgumentNullException(
+                    StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber("Email", "Phone Number"));
             }
         });
 
@@ -247,6 +231,30 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         return result;
     }
 
+    public async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchAll()
+                .Where(x => x.Id.Equals(userId))
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                var hashedPass = await Utilities.EncryptToMd5(newPassword);
+                user.HashedPassword = hashedPass;
+                await _repository.UpdateAsync(userId, user);
+                await _dbManager.SaveChangesAsync();
+                result.Set(StatusCode.Succeeded);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+            }
+        });
+        return result;
+    }
+
     public async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
@@ -322,18 +330,17 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         return entities;
     }
 
-    public virtual Task<IResponse<TUser>> GetUser(string? email = null, long? phoneNumber = null)
+    public virtual Task<IResponse<TUser>> GetUser(string username)
     {
         IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
 
         result.Fill(() =>
         {
-            TUser? user;
-            if (!string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrWhiteSpace(username))
             {
-                user = _repository.FetchAll()
-                    .Where(x => x.Email == email || x.Username == email)
-                    .FirstOrDefault();
+                TUser? user = _repository.FetchAll()
+                        .Where(x => x.Email == username || x.Username == username || x.PhoneNumber.ToString() == username)
+                        .FirstOrDefault();
 
                 if (user != null)
                 {
@@ -344,25 +351,11 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                     result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 }
 
-            }
-            else if (phoneNumber.HasValue)
-            {
-                user = _repository.FetchAll()
-                    .Where(x => x.PhoneNumber == phoneNumber)
-                    .FirstOrDefault();
-
-                if (user != null)
-                {
-                    result.Set(StatusCode.Succeeded, user);
-                }
-                else
-                {
-                    result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
-                }
             }
             else
             {
-                throw new ArgumentNullException(StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber(nameof(email), nameof(phoneNumber)));
+                throw new ArgumentNullException(
+                    StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber("Email", "Phone Number"));
             }
         });
 
@@ -491,6 +484,30 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
         return result;
     }
+
+    public async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = _repository.FetchAll()
+                .Where(x => x.Id.Equals(userId))
+                .FirstOrDefault();
+            if (user != null)
+            {
+                var hashedPass = await Utilities.EncryptToMd5(newPassword);
+                user.HashedPassword = hashedPass;
+                await _repository.UpdateAsync(userId, user);
+                result.Set(StatusCode.Succeeded);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+            }
+        });
+        return result;
+    }
+
 
     public async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {

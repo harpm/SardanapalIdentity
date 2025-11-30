@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DifferentPassword" xml:space="preserve">
+    <value>رمز عبور جدید باید با رمز عبور قدیم تفاوت داشته باشد.</value>
+  </data>
   <data name="DuplicateEmail" xml:space="preserve">
     <value>آدرس ایمیل وارد شده قبلا در سیستم ثبت شده است.</value>
   </data>
@@ -174,5 +177,8 @@
   </data>
   <data name="UserNotFound" xml:space="preserve">
     <value>کاربری با مشخصات وارد شده یافت نشد.</value>
+  </data>
+  <data name="WrongPassword" xml:space="preserve">
+    <value>نام کاربری یا گذروازه وارد شده صحبح نمی باشد.</value>
   </data>
 </root>

@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Localization;
+using Sardanapal.Identity.Share.Statics;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.ViewModel.Response;
 
@@ -66,6 +68,55 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
                 userIdRes.ConvertTo<TUserKey>(result);
             }
         });
+    }
+
+    public virtual async Task<IResponse> ChangePassword(ChangePasswordVM<TUserKey> model) =>
+        await userManagerService.ChangePassword(model.UserId, model.NewPassword);
+
+    public virtual async Task<IResponse> ChangePassword(ChangePasswordVM model)
+    {
+        var result = new Response(ServiceName, OperationType.Edit, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var userRes = await userManagerService.GetUser(model.Username);
+            if (userRes.IsSuccess)
+            {
+                var oldPass = await Utilities.EncryptToMd5(model.OldPassword);
+                if (userRes.Data.HashedPassword == oldPass)
+                {
+
+                    if (model.NewPassword == model.OldPassword)
+                    {
+                        result.Set(StatusCode.Failed, Identity_Messages.DifferentPassword);
+                    }
+                    else
+                    {
+                        var changePassRes = await userManagerService.ChangePassword(userRes.Data.Id, model.NewPassword);
+                        if (changePassRes.IsSuccess)
+                        {
+                            result.Set(StatusCode.Succeeded, true);
+                        }
+                        else
+                        {
+                            changePassRes.ConvertTo<bool>(result);
+                        }
+                    }
+                }
+                else
+                {
+                    result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
+                }
+            }
+            else
+            {
+                userRes.ConvertTo<bool>(result);
+            }
+
+
+        });
+
+        return result;
     }
 
     public virtual async Task<IResponse<string>> RefreshToken(TUserKey userId)

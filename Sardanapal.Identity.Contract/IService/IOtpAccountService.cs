@@ -20,5 +20,6 @@ public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, 
     Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model);
     Task<IResponse<TUserKey>> RequestRegisterOtp(TOTPRegisterRequestVM model);
     Task<IResponse> RegisterWithOtp(TOTPRegisterVM Model);
-
+    Task<IResponse<TUserKey>> RequestResetPassword(ResetPasswordRequestVM model);
+    Task<IResponse> ResetPassword(ResetPasswordVM<TUserKey> model);
 }

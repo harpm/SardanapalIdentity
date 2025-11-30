@@ -1,4 +1,4 @@
-﻿using Sardanapal.Domain.Model;
+using Sardanapal.Domain.Model;
 using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Model;
@@ -13,7 +13,7 @@ public abstract class UserBase<TUserKey> : BaseEntityModel<TUserKey>
     public virtual string HashedPassword { get; set; }
     public virtual string? Email { get; set; }
     public virtual bool VerifiedEmail { get; set; } = false;
-    public virtual long? PhoneNumber { get; set; }
+    public virtual ulong? PhoneNumber { get; set; }
     public virtual bool VerifiedPhoneNumber { get; set; } = false;
 }
 

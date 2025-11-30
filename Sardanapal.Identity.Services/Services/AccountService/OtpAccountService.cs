@@ -100,4 +100,30 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
     {
         return await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
     }
+
+    public virtual async Task<IResponse<TUserKey>> RequestResetPassword(ResetPasswordRequestVM model)
+    {
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            dynamic identifier = model.PhoneNumber.HasValue ? model.PhoneNumber
+                : !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null;
+            if (identifier != null)
+            {
+                var uid = await userManagerService
+                    .RequestResetPassword(identifier);
+                result.Set(StatusCode.Succeeded, uid);
+            }
+            else
+            {
+                result.Set(StatusCode.Canceled, Identity_Messages.InvalidEmailOrNumber);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse> ResetPassword(ResetPasswordVM<TUserKey> model) =>
+        await userManagerService.ResetPassword(model.Code, model.UserId, model.RoleId, model.NewPassword);
 }

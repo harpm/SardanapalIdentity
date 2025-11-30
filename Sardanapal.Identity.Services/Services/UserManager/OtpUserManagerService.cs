@@ -3,6 +3,7 @@ using AutoMapper;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Service.Repository;
 using Sardanapal.ViewModel.Response;
@@ -12,7 +13,7 @@ using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
-using Sardanapal.Contract.Data;
+using Sardanapal.Identity.Share.Statics;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 
@@ -48,7 +49,7 @@ public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpServic
         OtpService = _otpService;
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestLoginUser(long phonenumber, byte role)
+    public virtual async Task<IResponse<TUserKey>> RequestLoginUser(ulong phonenumber, byte role)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
 
@@ -255,6 +256,107 @@ public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpServic
 
         return result;
     }
+
+    public virtual async Task<IResponse<TUserKey>> RequestResetPassword(ulong phonenumber)
+    {
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository
+                .FetchAll()
+                .AsNoTracking()
+                .Where(x => x.PhoneNumber == phonenumber)
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                var otpRes = await OtpService.Add(new TNewVM()
+                {
+                    UserId = user.Id,
+                    Recipient = phonenumber.ToString()
+                });
+
+                if (otpRes.IsSuccess)
+                {
+                    result.Set(StatusCode.Succeeded, user.Id);
+                }
+                else
+                {
+                    otpRes.ConvertTo<TUserKey>(result);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.PhonenumberNotFound);
+            }
+        });
+        return result;
+    }
+
+    public virtual async Task<IResponse<TUserKey>> RequestResetPassword(string email)
+    {
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository
+                .FetchAll()
+                .AsNoTracking()
+                .Where(x => x.Email == email)
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                var otpRes = await OtpService.Add(new TNewVM()
+                {
+                    UserId = user.Id,
+                    Recipient = email
+                });
+                if (otpRes.IsSuccess)
+                {
+                    result.Set(StatusCode.Succeeded, user.Id);
+                }
+                else
+                {
+                    otpRes.ConvertTo<TUserKey>(result);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.EmailNotFound);
+            }
+        });
+        return result;
+    }
+
+    public virtual async Task<IResponse> ResetPassword(string code, TUserKey id, byte roleId, string newPassword)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var validationRes = await OtpService.ValidateOtpLogin(new TOTPLoginVM
+            {
+                Code = code,
+                UserId = id,
+                RoleId = roleId
+            });
+
+            if (validationRes.IsSuccess && validationRes.Data)
+            {
+                var user = await _repository.FetchByIdAsync(id);
+                var md5Pass = await Utilities.EncryptToMd5(newPassword);
+                user.HashedPassword = md5Pass;
+                await _repository.UpdateAsync(id, user);
+                await _dbManager.SaveChangesAsync();
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                validationRes.ConvertTo<bool>(result);
+            }
+        });
+
+        return result;
+    }
 }
 
 public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
@@ -287,7 +389,7 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
         OtpService = _otpService;
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestLoginUser(long phonenumber, byte role)
+    public virtual async Task<IResponse<TUserKey>> RequestLoginUser(ulong phonenumber, byte role)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
 
@@ -367,16 +469,6 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
             if (curUser == null)
             {
                 curUser = _mapper.Map<TUser>(model);
-
-                //curUser = new TUser()
-                //{
-                //    Username = model.PhoneNumber.HasValue ? model.PhoneNumber.ToString() : model.Email,
-                //    PhoneNumber = model.PhoneNumber,
-                //    Email = model.Email,
-                //    FirstName = model.FirstName,
-                //    LastName = model.LastName
-                //};
-
                 await _repository.AddAsync(curUser);
 
                 result.Set(StatusCode.Succeeded, curUser.Id);
@@ -491,6 +583,104 @@ public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TU
             else
             {
                 throw new Exception(Identity_Messages.InvalidUserId);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse<TUserKey>> RequestResetPassword(ulong phonenumber)
+    {
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = _repository
+                .FetchAll()
+                .Where(x => x.PhoneNumber == phonenumber)
+                .FirstOrDefault();
+            if (user != null)
+            {
+                var otpRes = await OtpService.Add(new TNewVM()
+                {
+                    UserId = user.Id,
+                    Recipient = phonenumber.ToString()
+                });
+
+                if (otpRes.IsSuccess)
+                {
+                    result.Set(StatusCode.Succeeded, user.Id);
+                }
+                else
+                {
+                    otpRes.ConvertTo<TUserKey>(result);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.PhonenumberNotFound);
+            }
+        });
+        return result;
+    }
+
+    public virtual async Task<IResponse<TUserKey>> RequestResetPassword(string email)
+    {
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = _repository
+                .FetchAll()
+                .Where(x => x.Email == email)
+                .FirstOrDefault();
+            if (user != null)
+            {
+                var otpRes = await OtpService.Add(new TNewVM()
+                {
+                    UserId = user.Id,
+                    Recipient = email
+                });
+                if (otpRes.IsSuccess)
+                {
+                    result.Set(StatusCode.Succeeded, user.Id);
+                }
+                else
+                {
+                    otpRes.ConvertTo<TUserKey>(result);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.EmailNotFound);
+            }
+        });
+        return result;
+    }
+
+    public virtual async Task<IResponse> ResetPassword(string code, TUserKey id, byte roleId, string newPassword)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var validationRes = await OtpService.ValidateOtpLogin(new TOTPLoginVM
+            {
+                Code = code,
+                UserId = id,
+                RoleId = roleId
+            });
+
+            if (validationRes.IsSuccess && validationRes.Data)
+            {
+                var user = _repository.FetchById(id);
+                var md5Pass = await Utilities.EncryptToMd5(newPassword);
+                user.HashedPassword = md5Pass;
+                await _repository.UpdateAsync(id, user);
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                validationRes.ConvertTo<bool>(result);
             }
         });
 

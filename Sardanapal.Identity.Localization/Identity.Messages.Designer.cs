@@ -61,6 +61,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The new password must be different from the old password..
+        /// </summary>
+        public static string DifferentPassword {
+            get {
+                return ResourceManager.GetString("DifferentPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered Email address is already registered by someone else..
         /// </summary>
         public static string DuplicateEmail {
@@ -216,6 +225,15 @@ namespace Sardanapal.Identity.Localization {
         public static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entered password or username is wrong..
+        /// </summary>
+        public static string WrongPassword {
+            get {
+                return ResourceManager.GetString("WrongPassword", resourceCulture);
             }
         }
     }

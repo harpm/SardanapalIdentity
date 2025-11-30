@@ -52,7 +52,7 @@ public record OTPRegisterVM<TUserKey> : RegisterVM
 public record OtpLoginRequestVM
 {
     public virtual string? Email { get; set; }
-    public virtual long? PhoneNumber { get; set; }
+    public virtual ulong? PhoneNumber { get; set; }
 }
 
 public record OtpRegisterRequestVM : OtpLoginRequestVM
