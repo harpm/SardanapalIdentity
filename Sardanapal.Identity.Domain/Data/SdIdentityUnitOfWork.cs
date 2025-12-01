@@ -68,17 +68,24 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
             var entity = model.Entity;
             var t = entity.GetType();
 
-            if (model.State == EntityState.Added)
+            var id = _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrWhiteSpace(id))
             {
-                var userId = CreateUserKey(_reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
-                t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("CreateBy")?.SetValue(entity, userId);
+                var userId = CreateUserKey(id);
+                if (model.State == EntityState.Added)
+                {
+                    t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
+                    t.GetProperty("CreateBy")?.SetValue(entity, userId);
+                }
+                else if (model.State == EntityState.Modified)
+                {
+                    t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
+                    t.GetProperty("ModifiedBy")?.SetValue(entity, userId);
+                }
             }
-            else if (model.State == EntityState.Modified)
+            else
             {
-                var userId = CreateUserKey(_reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value);
-                t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                t.GetProperty("ModifiedBy")?.SetValue(entity, userId);
+                break;
             }
         }
 
