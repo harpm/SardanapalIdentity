@@ -1,10 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
-using Sardanapal.Identity.Share.Static;
+using Sardanapal.Ef.UnitOfWork;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
-using Microsoft.EntityFrameworkCore;
-using Sardanapal.Ef.UnitOfWork;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.Share.Extensions;
 
 namespace Sardanapal.Identity.Domain.Data;
@@ -57,6 +57,8 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
 
     protected override void SetBaseValues(object? sender, SavingChangesEventArgs e)
     {
+        base.SetBaseValues(sender, e);
+
         var EntityModels = ChangeTracker
             .Entries()
             .Where(e => e.Entity.GetType().ImplementsRawGeneric(typeof(IEntityModel<,>))
@@ -67,28 +69,32 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
         {
             var entity = model.Entity;
             var t = entity.GetType();
+            if (_reqClaim?.IsAuthorized ?? false)
+            {
+                var id = _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    var userId = CreateUserKey(id);
+                    if (model.State == EntityState.Added)
+                    {
+                        t.GetProperty("CreateBy")?.SetValue(entity, userId);
+                    }
+                    else if (model.State == EntityState.Modified)
+                    {
+                        t.GetProperty("ModifiedBy")?.SetValue(entity, userId);
+                    }
+                }
+            }
 
-            var id = _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrWhiteSpace(id))
+            if (model.State == EntityState.Added)
             {
-                var userId = CreateUserKey(id);
-                if (model.State == EntityState.Added)
-                {
-                    t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                    t.GetProperty("CreateBy")?.SetValue(entity, userId);
-                }
-                else if (model.State == EntityState.Modified)
-                {
-                    t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-                    t.GetProperty("ModifiedBy")?.SetValue(entity, userId);
-                }
+                t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
             }
-            else
+            else if (model.State == EntityState.Modified)
             {
-                break;
+                t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
             }
+
         }
-
-        base.SetBaseValues(sender, e);
     }
 }
