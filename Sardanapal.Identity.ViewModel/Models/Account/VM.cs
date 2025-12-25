@@ -81,5 +81,5 @@ public record RegisterVM<TRoleKey>()
 
     public string Username { get; init; }
     public string Password { get; init; }
-    public TRoleKey[] Roles { get; init; }
+    public List<TRoleKey> Roles { get; init; }
 };
