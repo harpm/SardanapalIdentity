@@ -69,7 +69,8 @@ public record ResetPasswordVM<TUserKey>
     public string NewPassword { get; init; }
 }
 
-public record RegisterVM()
+public record RegisterVM<TRoleKey>()
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
 {
     public RegisterVM(string username, string password)
         : this()
@@ -80,4 +81,5 @@ public record RegisterVM()
 
     public string Username { get; init; }
     public string Password { get; init; }
+    public TRoleKey[] Roles { get; init; }
 };

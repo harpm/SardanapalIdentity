@@ -30,7 +30,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
     where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
-    where TRegisterVM : RegisterVM, new()
+    where TRegisterVM : RegisterVM<byte>, new()
     where TUserEditableVM : UserEditableVM, new()
 {
     protected override string ServiceName => "UserManager";
@@ -176,7 +176,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         };
     }
 
-    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model, byte roleId)
+    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
@@ -203,17 +203,20 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 await _repository.AddAsync(newUser);
                 await _dbManager.SaveChangesAsync();
 
-                var hasRoleRes = await HasRole(newUser.Id, roleId);
-                if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
+                foreach (byte role in model.Roles)
                 {
-                    var roleUser = new TUR()
+                    var hasRoleRes = await HasRole(newUser.Id, role);
+                    if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
                     {
-                        RoleId = roleId,
-                        UserId = newUser.Id
-                    };
+                        var roleUser = new TUR()
+                        {
+                            RoleId = role,
+                            UserId = newUser.Id
+                        };
 
-                    await _repository.AddUserRoleAsync(roleUser);
-                    await _dbManager.SaveChangesAsync();
+                        await _repository.AddUserRoleAsync(roleUser);
+                        await _dbManager.SaveChangesAsync();
+                    }
                 }
 
                 await transaction.CommitAsync();
@@ -303,7 +306,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
     where TUC : class, IUserClaim<TUserKey, byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
-    where TRegisterVM : RegisterVM, new()
+    where TRegisterVM : RegisterVM<byte>, new()
     where TUserEditableVM : UserEditableVM, new()
 {
     protected override string ServiceName => "UserManager";
@@ -432,7 +435,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         };
     }
 
-    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model, byte role)
+    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model)
     {
         IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
 
@@ -458,16 +461,19 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
                 await _repository.AddAsync(newUser);
 
-                var hasRoleRes = await HasRole(newUser.Id, role);
-                if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
+                foreach (byte role in model.Roles)
                 {
-                    var roleUser = new TUR()
+                    var hasRoleRes = await HasRole(newUser.Id, role);
+                    if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
                     {
-                        RoleId = role,
-                        UserId = newUser.Id
-                    };
+                        var roleUser = new TUR()
+                        {
+                            RoleId = role,
+                            UserId = newUser.Id
+                        };
 
-                    await _repository.AddUserRoleAsync(roleUser);
+                        await _repository.AddUserRoleAsync(roleUser);
+                    }
                 }
 
                 // TODO: Trasaction commit

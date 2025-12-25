@@ -41,7 +41,7 @@ public record OTPLoginVM<TUserKey>
     public virtual string Code { get; set; }
 }
 
-public record OTPRegisterVM<TUserKey> : RegisterVM
+public record OTPRegisterVM<TUserKey> : RegisterVM<byte>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual TUserKey UserId { get; set; }
@@ -49,13 +49,16 @@ public record OTPRegisterVM<TUserKey> : RegisterVM
     public virtual string Code { get; set; }
 }
 
-public record OtpLoginRequestVM
+public record OtpLoginRequestVM<TRoleKey>
+    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
+
 {
     public virtual string? Email { get; set; }
     public virtual ulong? PhoneNumber { get; set; }
+    public virtual TRoleKey Role { get; set; }
 }
 
-public record OtpRegisterRequestVM : OtpLoginRequestVM
+public record OtpRegisterRequestVM : OtpLoginRequestVM<byte>
 {
     public virtual string FirstName { get; set; }
     public virtual string LastName { get; set; }

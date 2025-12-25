@@ -15,12 +15,12 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
     where TUser : class, IUser<TUserKey>, new()
     where TLoginVM : LoginVM, new()
     where TLoginDto : LoginDto, new()
-    where TRegisterVM : RegisterVM, new()
+    where TRegisterVM : RegisterVM<byte>, new()
 {
+    protected virtual string ServiceName => "AccountService";
+
     protected readonly TUserManager userManagerService;
     protected readonly ILogger _logger;
-    protected virtual string ServiceName => "AccountService";
-    protected abstract byte roleId { get; }
 
     public AccountServiceBase(TUserManager _userManagerService, ILogger logger)
     {
@@ -57,7 +57,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         return await result.FillAsync(async () =>
         {
-            IResponse<TUserKey> userIdRes = await userManagerService.RegisterUser(model, this.roleId);
+            IResponse<TUserKey> userIdRes = await userManagerService.RegisterUser(model);
 
             if (userIdRes.IsSuccess)
             {

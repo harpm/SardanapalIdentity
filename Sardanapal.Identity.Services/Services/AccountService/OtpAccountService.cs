@@ -18,8 +18,8 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TLoginVM : LoginVM, new()
     where TLoginDto : LoginDto, new()
-    where TRegisterVM : RegisterVM, new()
-    where TOTPLoginRequestVM : OtpLoginRequestVM, new()
+    where TRegisterVM : RegisterVM<byte>, new()
+    where TOTPLoginRequestVM : OtpLoginRequestVM<byte>, new()
     where TOTPRegisterRequestVM : OtpRegisterRequestVM, new()
     where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
     where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
@@ -43,7 +43,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
             if (identifier != null)
             {
                 var uid = await userManagerService
-                    .RequestLoginUser(identifier, roleId);
+                    .RequestLoginUser(identifier, model.Role);
                 result.Set(StatusCode.Succeeded, uid);
             }
             else
@@ -85,7 +85,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
             if (identifier != null)
             {
                 var uidRes = await userManagerService
-                    .RequestRegisterUser(model, roleId);
+                    .RequestRegisterUser(model, model.Role);
                 result.Set(uidRes.StatusCode, uidRes.Data);
             }
             else

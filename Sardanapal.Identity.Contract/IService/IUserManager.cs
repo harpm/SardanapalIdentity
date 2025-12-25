@@ -9,12 +9,12 @@ namespace Sardanapal.Identity.Contract.IService;
 public interface IUserManager<TUserKey, TUser, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRegisterVM : RegisterVM, new()
+    where TRegisterVM : RegisterVM<byte>, new()
 {
     Task<IResponse<TUser>> GetUser(string username);
     Task<IResponse<bool>> HasRole(TUserKey userKey, byte roleId);
     Task<IResponse<string>> Login(string username, string password);
-    Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model, byte roleId);
+    Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model);
     Task<IResponse> ChangePassword(TUserKey userId, string newPassword);
     Task<IResponse<string>> RefreshToken(TUserKey userId);
 }

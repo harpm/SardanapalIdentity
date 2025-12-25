@@ -9,7 +9,7 @@ namespace Sardanapal.Identity.Contract.IService;
 public interface IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRequestRegisterVM> : IUserManager<TUserKey, TUser, TRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRegisterVM : RegisterVM, new()
+    where TRegisterVM : RegisterVM<byte>, new()
     where TOTPRequestRegisterVM : OtpRegisterRequestVM, new()
 {
     Task<IResponse<TUserKey>> RequestLoginUser(ulong phonenumber, byte role);
