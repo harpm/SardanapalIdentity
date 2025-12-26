@@ -2,7 +2,7 @@
 using Sardanapal.Contract.IModel;
 
 namespace Sardanapal.Identity.Contract.IModel;
-public interface IUser<TUserKey> : IBaseEntityModel<TUserKey>
+public interface IUser<TUserKey> : IEntityModel<TUserKey, TUserKey>, ILogicalEntityModel
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     string FirstName { get; set; }

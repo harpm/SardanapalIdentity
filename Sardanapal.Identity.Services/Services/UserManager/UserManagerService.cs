@@ -20,7 +20,7 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 
 public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
     : EFPanelServiceBase<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
-    , IUserManager<TUserKey, TUser, TRegisterVM>
+    , IUserManager<TUserKey, TUser, TRegisterVM, TUserEditableVM>
     where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>
         , IEFCrudRepository<TUserKey, TUser>
@@ -97,6 +97,52 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
             {
                 throw new ArgumentNullException(
                     StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber("Email", "Phone Number"));
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse<TUserEditableVM>> GetUserEditable(TUserKey id)
+    {
+        IResponse<TUserEditableVM> result = new Response<TUserEditableVM>(ServiceName, OperationType.Fetch, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchByIdAsync(id);
+            if (user != null)
+            {
+                var editalbe = _mapper.Map<TUser, TUserEditableVM>(user);
+                result.Set(StatusCode.Succeeded, editalbe);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse> Edit(TUserKey id, TUserEditableVM model)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchByIdAsync(id);
+            if (user != null)
+            {
+                _mapper.Map(model, user);
+
+                await _repository.UpdateAsync(id, user);
+                await _dbManager.SaveChangesAsync();
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
             }
         });
 
@@ -234,7 +280,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         return result;
     }
 
-    public async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
+    public virtual async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
         await result.FillAsync(async () =>
@@ -258,7 +304,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         return result;
     }
 
-    public async Task<IResponse<string>> RefreshToken(TUserKey userId)
+    public virtual async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
@@ -290,6 +336,28 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
         return result;
     }
+
+    public virtual async Task<IResponse> DeleteUser(TUserKey userId)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Delete, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            if (await _repository.FetchAll().AsNoTracking().Where(x => x.Id.Equals(userId)).AnyAsync())
+            {
+                await _repository.DeleteAsync(userId);
+                await _dbManager.SaveChangesAsync();
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, false);
+            }
+        });
+
+        return result;
+    }
 }
 
 #endregion
@@ -298,7 +366,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
 public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
     : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
-    , IUserManager<TUserKey, TUser, TRegisterVM>
+    , IUserManager<TUserKey, TUser, TRegisterVM, TUserEditableVM>
     where TRepository : class, IMemoryRepository<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
@@ -542,6 +610,72 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             else
             {
                 result.Set(StatusCode.NotExists, Identity_Messages.InvalidUserId);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse<TUserEditableVM>> GetUserEditable(TUserKey id)
+    {
+        IResponse<TUserEditableVM> result = new Response<TUserEditableVM>(ServiceName, OperationType.Fetch, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchByIdAsync(id);
+            if (user != null)
+            {
+                var editalbe = _mapper.Map<TUser, TUserEditableVM>(user);
+                result.Set(StatusCode.Succeeded, editalbe);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse> Edit(TUserKey id, TUserEditableVM model)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchByIdAsync(id);
+            if (user != null)
+            {
+                _mapper.Map(model, user);
+
+                await _repository.UpdateAsync(id, user);
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse> DeleteUser(TUserKey userId)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Delete, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            if (_repository.FetchAll().Where(x => x.Id.Equals(userId)).Any())
+            {
+                await _repository.DeleteAsync(userId);
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, false);
             }
         });
 

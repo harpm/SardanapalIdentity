@@ -8,33 +8,42 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM>
-    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
-    where TUserManager : class, IUserManager<TUserKey, TUser, TRegisterVM>
+public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
+    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
+    where TUserManager : class, IUserManager<TUserKey, TUser, TRegisterVM, TUserEditable>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TLoginVM : LoginVM, new()
     where TLoginDto : LoginDto, new()
     where TRegisterVM : RegisterVM<byte>, new()
+    where TUserEditable : UserEditableVM, new()
 {
     protected virtual string ServiceName => "AccountService";
 
-    protected readonly TUserManager userManagerService;
+    protected readonly TUserManager _userManagerService;
     protected readonly ILogger _logger;
 
     public AccountServiceBase(TUserManager _userManagerService, ILogger logger)
     {
-        this.userManagerService = _userManagerService;
+        this._userManagerService = _userManagerService;
         this._logger = logger;
     }
 
+    public virtual async Task<IResponse> Edit(TUserKey id, TUserEditable model)
+    {
+        return await _userManagerService.Edit(id, model);
+    }
+    public virtual async Task<IResponse<TUserEditable>> GetEditable(TUserKey id)
+    {
+        return await _userManagerService.GetUserEditable(id);
+    }
     public virtual async Task<IResponse<TLoginDto>> Login(TLoginVM model)
     {
         IResponse<TLoginDto> result = new Response<TLoginDto>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
-            var tokenRes = await userManagerService.Login(model.Username, model.Password);
+            var tokenRes = await _userManagerService.Login(model.Username, model.Password);
 
             if (tokenRes.IsSuccess)
             {
@@ -57,7 +66,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         return await result.FillAsync(async () =>
         {
-            IResponse<TUserKey> userIdRes = await userManagerService.RegisterUser(model);
+            IResponse<TUserKey> userIdRes = await _userManagerService.RegisterUser(model);
 
             if (userIdRes.IsSuccess)
             {
@@ -71,7 +80,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
     }
 
     public virtual async Task<IResponse> ChangePassword(ChangePasswordVM<TUserKey> model) =>
-        await userManagerService.ChangePassword(model.UserId, model.NewPassword);
+        await _userManagerService.ChangePassword(model.UserId, model.NewPassword);
 
     public virtual async Task<IResponse> ChangePassword(ChangePasswordVM model)
     {
@@ -79,7 +88,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         await result.FillAsync(async () =>
         {
-            var userRes = await userManagerService.GetUser(model.Username);
+            var userRes = await _userManagerService.GetUser(model.Username);
             if (userRes.IsSuccess)
             {
                 var oldPass = await Utilities.EncryptToMd5(model.OldPassword);
@@ -92,7 +101,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
                     }
                     else
                     {
-                        var changePassRes = await userManagerService.ChangePassword(userRes.Data.Id, model.NewPassword);
+                        var changePassRes = await _userManagerService.ChangePassword(userRes.Data.Id, model.NewPassword);
                         if (changePassRes.IsSuccess)
                         {
                             result.Set(StatusCode.Succeeded, true);
@@ -125,7 +134,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         return await result.FillAsync(async () =>
         {
-            var tokenRes = await userManagerService.RefreshToken(userId);
+            var tokenRes = await _userManagerService.RefreshToken(userId);
             if (tokenRes.IsSuccess)
             {
                 result.Set(StatusCode.Succeeded, tokenRes.Data);
@@ -136,4 +145,9 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
             }
         });
     }
+    public virtual async Task<IResponse> Delete(TUserKey userId)
+    {
+        return await _userManagerService.DeleteUser(userId);
+    }
+
 }

@@ -9,10 +9,10 @@ using Sardanapal.Identity.ViewModel.Otp;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
-    : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM>
-    , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
-    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRegisterRequestVM>
+public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM, TUserEditable>
+    : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
+    , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM, TUserEditable>
+    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRegisterRequestVM, TUserEditable>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
@@ -23,6 +23,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
     where TOTPRegisterRequestVM : OtpRegisterRequestVM, new()
     where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
     where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
+    where TUserEditable : UserEditableVM, new()
 {
     protected override string ServiceName => "OTP AccountService";
     public OtpAccountServiceBase(TOtpUserManager _userManagerService, ILogger logger)
@@ -42,7 +43,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
             if (identifier != null)
             {
-                var uid = await userManagerService
+                var uid = await _userManagerService
                     .RequestLoginUser(identifier, model.Role);
                 result.Set(StatusCode.Succeeded, uid);
             }
@@ -60,7 +61,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
         return await result.FillAsync(async () =>
         {
-            var tokenRes = await userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
+            var tokenRes = await _userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
 
             if (tokenRes.IsSuccess)
             {
@@ -84,7 +85,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
             if (identifier != null)
             {
-                var uidRes = await userManagerService
+                var uidRes = await _userManagerService
                     .RequestRegisterUser(model, model.Role);
                 result.Set(uidRes.StatusCode, uidRes.Data);
             }
@@ -98,7 +99,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
     public virtual async Task<IResponse> RegisterWithOtp(TOTPRegisterVM Model)
     {
-        return await userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
+        return await _userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
     }
 
     public virtual async Task<IResponse<TUserKey>> RequestResetPassword(ResetPasswordRequestVM model)
@@ -111,7 +112,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
                 : !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null;
             if (identifier != null)
             {
-                var uid = await userManagerService
+                var uid = await _userManagerService
                     .RequestResetPassword(identifier);
                 result.Set(StatusCode.Succeeded, uid);
             }
@@ -125,5 +126,5 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
     }
 
     public virtual async Task<IResponse> ResetPassword(ResetPasswordVM<TUserKey> model) =>
-        await userManagerService.ResetPassword(model.Code, model.UserId, model.RoleId, model.NewPassword);
+        await _userManagerService.ResetPassword(model.Code, model.UserId, model.RoleId, model.NewPassword);
 }

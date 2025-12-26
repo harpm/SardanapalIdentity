@@ -19,7 +19,7 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 
 public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
     : EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TOTPRegisterVM, TEditableVM, TUR, TUC>
-    , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM>
+    , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM, TEditableVM>
     where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>, IEFCrudRepository<TUserKey, TUser>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
@@ -361,7 +361,7 @@ public class EFOtpUserManagerService<TEFDatabaseManager, TRepository, TOtpServic
 
 public class OtpUserManagerService<TRepository, TOtpService, TUserKey, TUser, TUR, TUC, TUserSearchVM, TUserVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM, TOTPRegisterRquestVM>
     : UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TOTPRegisterVM, TEditableVM, TUR, TUC>
-    , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM>
+    , IOtpUserManager<TUserKey, TUser, TOTPRegisterVM, TOTPRegisterRquestVM, TEditableVM>
     where TRepository : MemoryRepositoryBase<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TOtpService : class, IOtpServiceBase<TUserKey, Guid, TNewVM, TOTPLoginVM, TOTPRegisterVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>

@@ -5,8 +5,8 @@ using Sardanapal.Identity.ViewModel.Otp;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM>
-    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM>
+public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM, TUserEditable>
+    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TLoginVM : LoginVM
     where TLoginDto : LoginDto, new()
@@ -15,6 +15,7 @@ public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, 
     where TOTPRegisterRequestVM : OtpRegisterRequestVM, new()
     where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
     where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
+    where TUserEditable : UserEditableVM, new()
 {
     Task<IResponse<TUserKey>> RequestLoginOtp(TOTPLoginRequestVM Model);
     Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model);

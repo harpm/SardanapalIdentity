@@ -3,7 +3,7 @@ using Sardanapal.Identity.Contract.IModel;
 
 namespace Sardanapal.Identity.Domain.Model;
 
-public abstract class UserBase<TUserKey> : BaseEntityModel<TUserKey>
+public abstract class UserBase<TUserKey> : LogicalEntityModel<TUserKey, TUserKey>
     , IUser<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {

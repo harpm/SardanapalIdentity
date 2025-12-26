@@ -6,11 +6,13 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRequestRegisterVM> : IUserManager<TUserKey, TUser, TRegisterVM>
+public interface IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRequestRegisterVM, TUserEditable>
+    : IUserManager<TUserKey, TUser, TRegisterVM, TUserEditable>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TRegisterVM : RegisterVM<byte>, new()
     where TOTPRequestRegisterVM : OtpRegisterRequestVM, new()
+    where TUserEditable : UserEditableVM, new()
 {
     Task<IResponse<TUserKey>> RequestLoginUser(ulong phonenumber, byte role);
     Task<IResponse<TUserKey>> RequestLoginUser(string email, byte role);
