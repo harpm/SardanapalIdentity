@@ -9,12 +9,14 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditable>
+public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, TUser, TRole, TUR, TUserSearchVM, TUserVM, TRegisterVM, TUserEditable>
     : IAccountService<TUserKey, TRegisterVM, TUserEditable>
     where TUserManager : IUserManager<TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditable>
-    where TRoleManager : IRoleManager<TUserKey, byte, RoleBase<byte>, UserRoleBase<TUserKey, byte>>
+    where TRoleManager : IRoleManager<TUserKey, byte, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRoleBase<byte>, new()
+    where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
     where TRegisterVM : RegisterVM<byte>, new()

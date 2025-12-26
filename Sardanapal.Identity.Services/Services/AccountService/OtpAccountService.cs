@@ -10,13 +10,15 @@ using Sardanapal.Identity.Domain.Model;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
-    : AccountServiceBase<TOtpUserManager, TRoleManager, TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
+public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUserKey, TUser, TRole, TUR, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
+    : AccountServiceBase<TOtpUserManager, TRoleManager, TUserKey, TUser, TRole, TUR, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
     , IOtpAccountService<TUserKey, TRegisterVM, TUserEditable>
     where TOtpUserManager : class, IUserManager<TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
-    where TRoleManager : IRoleManager<TUserKey, byte, RoleBase<byte>, UserRoleBase<TUserKey, byte>>
+    where TRoleManager : IRoleManager<TUserKey, byte, TRole, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
+    where TRole : class, IRoleBase<byte>, new()
+    where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TSearchVM : UserSearchVM, new()
     where TRegisterVM : RegisterVM<byte>, new()
