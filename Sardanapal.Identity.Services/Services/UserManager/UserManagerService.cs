@@ -20,7 +20,7 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 
 public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
     : EFPanelServiceBase<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
-    , IUserManager<TUserKey, TUser, TRegisterVM, TUserEditableVM>
+    , IUserManager<TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
     where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>
         , IEFCrudRepository<TUserKey, TUser>
@@ -70,6 +70,17 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         _tokenService = tokenService;
     }
 
+    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
+    {
+        var hashedPass = await Utilities.EncryptToMd5(model.Password);
+
+        return new TUser()
+        {
+            Username = model.Username,
+            HashedPassword = hashedPass
+        };
+    }
+
     public virtual async Task<IResponse<TUser>> GetUser(string username)
     {
         IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
@@ -103,67 +114,40 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         return result;
     }
 
-    public virtual async Task<IResponse<TUserEditableVM>> GetUserEditable(TUserKey id)
+    public virtual async Task<IResponse<TUser>> GetUser(TUserKey id)
     {
-        IResponse<TUserEditableVM> result = new Response<TUserEditableVM>(ServiceName, OperationType.Fetch, _logger);
+        IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
-            var user = await _repository.FetchByIdAsync(id);
+            TUser? user = await _repository.FetchAll()
+                    .AsNoTracking()
+                    .Where(x => x.Id.Equals(id))
+                    .FirstOrDefaultAsync();
+
             if (user != null)
             {
-                var editalbe = _mapper.Map<TUser, TUserEditableVM>(user);
-                result.Set(StatusCode.Succeeded, editalbe);
+                result.Set(StatusCode.Succeeded, user);
             }
             else
             {
-                result.Set(StatusCode.NotExists);
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
             }
+
         });
 
         return result;
     }
 
-    public virtual async Task<IResponse> Edit(TUserKey id, TUserEditableVM model)
-    {
-        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
-
-        await result.FillAsync(async () =>
-        {
-            var user = await _repository.FetchByIdAsync(id);
-            if (user != null)
-            {
-                _mapper.Map(model, user);
-
-                await _repository.UpdateAsync(id, user);
-                await _dbManager.SaveChangesAsync();
-
-                result.Set(StatusCode.Succeeded, true);
-            }
-            else
-            {
-                result.Set(StatusCode.NotExists);
-            }
-        });
-
-        return result;
-    }
-
-    public virtual async Task<IResponse<string>> Login(string username, string password)
+    public virtual async Task<IResponse<string>> Login(TUserKey id)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException(nameof(username));
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentNullException(nameof(password));
-
-            var md5Pass = await Utilities.EncryptToMd5(password);
-
             var user = await _repository.FetchAll()
                 .AsNoTracking()
-                .Where(x => x.Username == username
-                    && x.HashedPassword == md5Pass)
+                .Where(x => x.Id.Equals(id))
                 .FirstOrDefaultAsync();
 
             if (user == null)
@@ -171,136 +155,29 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 return;
             }
-
-            var roles = await _repository.FetchAllUserRoles()
-                .AsNoTracking()
-                .Where(x => x.UserId.Equals(user.Id))
-                .Select(x => x.RoleId)
-                .ToListAsync();
-
-            var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
-                , roles?.ToArray() ?? []
-                , []);
-
-            if (!tokenRes.IsSuccess)
-            {
-                tokenRes.ConvertTo<string>(result);
-            }
             else
             {
-                result.Set(StatusCode.Succeeded, tokenRes.Data);
-            }
-        });
+                var roles = await _repository.FetchAllUserRoles()
+                    .AsNoTracking()
+                    .Where(x => x.UserId.Equals(user.Id))
+                    .Select(x => x.RoleId)
+                    .ToListAsync();
 
-        return result;
-    }
+                var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
+                    , roles?.ToArray() ?? []
+                    , []);
 
-    public virtual async Task<IResponse<bool>> HasRole(TUserKey userKey, byte roleId)
-    {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
-        await result.FillAsync(async () =>
-        {
-            var data = await this._repository.FetchAllUserRoles()
-                .AsNoTracking()
-                .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
-                .AnyAsync();
-
-            result.Set(StatusCode.Succeeded, data);
-        });
-
-        return result;
-    }
-
-    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
-    {
-        var hashedPass = await Utilities.EncryptToMd5(model.Password);
-
-        return new TUser()
-        {
-            Username = model.Username,
-            HashedPassword = hashedPass
-        };
-    }
-
-    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model)
-    {
-        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
-
-        await result.FillAsync(async () =>
-        {
-
-            var newUserRes = await GetUser(model.Username);
-            if (newUserRes.StatusCode == StatusCode.Exception)
-            {
-                newUserRes.ConvertTo<TUserKey>(result);
-            }
-            else if (newUserRes.IsSuccess)
-            {
-                result.Set(StatusCode.Duplicate, newUserRes.Data.Id);
-                return;
-            }
-
-            using var transaction = await _dbManager.CreatTransactionAsync();
-
-            try
-            {
-                var newUser = await CreateNewUser(model);
-
-                await _repository.AddAsync(newUser);
-                await _dbManager.SaveChangesAsync();
-
-                foreach (byte role in model.Roles)
+                if (!tokenRes.IsSuccess)
                 {
-                    var hasRoleRes = await HasRole(newUser.Id, role);
-                    if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
-                    {
-                        var roleUser = new TUR()
-                        {
-                            RoleId = role,
-                            UserId = newUser.Id
-                        };
-
-                        await _repository.AddUserRoleAsync(roleUser);
-                        await _dbManager.SaveChangesAsync();
-                    }
+                    tokenRes.ConvertTo<string>(result);
                 }
-
-                await transaction.CommitAsync();
-
-                result.Set(StatusCode.Succeeded, newUser.Id);
-
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
+                else
+                {
+                    result.Set(StatusCode.Succeeded, tokenRes.Data);
+                }
             }
         });
 
-        return result;
-    }
-
-    public virtual async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
-    {
-        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
-        await result.FillAsync(async () =>
-        {
-            var user = await _repository.FetchAll()
-                .Where(x => x.Id.Equals(userId))
-                .FirstOrDefaultAsync();
-            if (user != null)
-            {
-                var hashedPass = await Utilities.EncryptToMd5(newPassword);
-                user.HashedPassword = hashedPass;
-                await _repository.UpdateAsync(userId, user);
-                await _dbManager.SaveChangesAsync();
-                result.Set(StatusCode.Succeeded);
-            }
-            else
-            {
-                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
-            }
-        });
         return result;
     }
 
@@ -337,6 +214,160 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         return result;
     }
 
+    public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model)
+    {
+        IResponse<TUserKey> result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
+
+        await result.FillAsync(async () =>
+        {
+
+            var newUserRes = await GetUser(model.Username);
+            if (newUserRes.StatusCode == StatusCode.Exception)
+            {
+                newUserRes.ConvertTo<TUserKey>(result);
+            }
+            else if (newUserRes.IsSuccess)
+            {
+                result.Set(StatusCode.Duplicate, newUserRes.Data.Id);
+                return;
+            }
+
+            using var transaction = await _dbManager.CreatTransactionAsync();
+
+            try
+            {
+                var newUser = await CreateNewUser(model);
+
+                await _repository.AddAsync(newUser);
+                await _dbManager.SaveChangesAsync();
+
+                foreach (byte role in model.Roles)
+                {
+                    var roleUser = new TUR()
+                    {
+                        RoleId = role,
+                        UserId = newUser.Id
+                    };
+
+                    await _repository.AddUserRoleAsync(roleUser);
+                    await _dbManager.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+
+                result.Set(StatusCode.Succeeded, newUser.Id);
+
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse> VerifyUser(string recepient)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+        await result.FillAsync(async () =>
+        {
+            if (!string.IsNullOrWhiteSpace(recepient))
+            {
+                TUser? user = null;
+                if (ulong.TryParse(recepient, out ulong phoneNumber))
+                {
+                    user = await _repository.FetchAll()
+                        .Where(x => x.PhoneNumber.HasValue && x.PhoneNumber.Value == phoneNumber)
+                        .FirstOrDefaultAsync();
+
+                    if (user != null)
+                    {
+                        user.VerifiedPhoneNumber = true;
+                    }
+                }
+                else
+                {
+                    user = await _repository.FetchAll()
+                        .Where(x => x.Email == recepient)
+                        .FirstOrDefaultAsync();
+
+                    if (user != null)
+                    {
+                        user.VerifiedEmail = true;
+                    }
+                }
+
+                if (user != null)
+                {
+                    await _repository.UpdateAsync(user.Id, user);
+                    await _dbManager.SaveChangesAsync();
+                    result.Set(StatusCode.Succeeded);
+                }
+                else
+                {
+                    result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.Failed, Identity_Messages.InvalidEmailOrNumber);
+            }
+            
+        });
+        return result;
+    }
+
+    public virtual async Task<IResponse> Edit(TUserKey id, TUserEditableVM model)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchByIdAsync(id);
+            if (user != null)
+            {
+                _mapper.Map(model, user);
+
+                await _repository.UpdateAsync(id, user);
+                await _dbManager.SaveChangesAsync();
+
+                result.Set(StatusCode.Succeeded, true);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = await _repository.FetchAll()
+                .Where(x => x.Id.Equals(userId))
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                var hashedPass = await Utilities.EncryptToMd5(newPassword);
+                user.HashedPassword = hashedPass;
+                await _repository.UpdateAsync(userId, user);
+                await _dbManager.SaveChangesAsync();
+                result.Set(StatusCode.Succeeded);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+            }
+        });
+        return result;
+    }
+
     public virtual async Task<IResponse> DeleteUser(TUserKey userId)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Delete, _logger);
@@ -366,7 +397,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
 public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
     : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
-    , IUserManager<TUserKey, TUser, TRegisterVM, TUserEditableVM>
+    , IUserManager<TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
     where TRepository : class, IMemoryRepository<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
@@ -401,11 +432,22 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         return entities;
     }
 
-    public virtual Task<IResponse<TUser>> GetUser(string username)
+    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
+    {
+        var hashedPass = await Utilities.EncryptToMd5(model.Password);
+
+        return new TUser()
+        {
+            Username = model.Username,
+            HashedPassword = hashedPass
+        };
+    }
+
+    public virtual async Task<IResponse<TUser>> GetUser(string username)
     {
         IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
 
-        result.Fill(() =>
+        await result.FillAsync(async () =>
         {
             if (!string.IsNullOrWhiteSpace(username))
             {
@@ -430,23 +472,41 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             }
         });
 
-        return Task.FromResult(result);
+        return result;
     }
 
-    public virtual async Task<IResponse<string>> Login(string username, string password)
+    public virtual async Task<IResponse<TUser>> GetUser(TUserKey id)
+    {
+        IResponse<TUser> result = new Response<TUser>(ServiceName, OperationType.Fetch, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            TUser? user = _repository.FetchAll()
+                    .Where(x => x.Id.Equals(id))
+                    .FirstOrDefault();
+
+            if (user != null)
+            {
+                result.Set(StatusCode.Succeeded, user);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
+            }
+
+        });
+
+        return result;
+    }
+
+    public virtual async Task<IResponse<string>> Login(TUserKey id)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullException(nameof(username));
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentNullException(nameof(password));
-
-            var md5Pass = await Utilities.EncryptToMd5(password);
-
             var user = _repository.FetchAll()
-                .Where(x => x.Username == username
-                    && x.HashedPassword == md5Pass)
+                .Where(x => x.Id.Equals(id))
                 .FirstOrDefault();
 
             if (user == null)
@@ -454,53 +514,62 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                 result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 return;
             }
-
-            var roles = _repository.FetchAllUserRoles()
-                .Where(x => x.UserId.Equals(user.Id))
-                .Select(x => x.RoleId)
-                .ToList();
-
-            var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
-                , roles?.ToArray() ?? []
-                , []);
-
-            if (!tokenRes.IsSuccess)
-            {
-                tokenRes.ConvertTo<string>(result);
-            }
             else
             {
-                result.Set(StatusCode.Succeeded, tokenRes.Data);
+                var roles = _repository.FetchAllUserRoles()
+                    .Where(x => x.UserId.Equals(user.Id))
+                    .Select(x => x.RoleId)
+                    .ToList();
+
+                var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
+                    , roles?.ToArray() ?? []
+                    , []);
+
+                if (!tokenRes.IsSuccess)
+                {
+                    tokenRes.ConvertTo<string>(result);
+                }
+                else
+                {
+                    result.Set(StatusCode.Succeeded, tokenRes.Data);
+                }
             }
         });
 
         return result;
     }
 
-    public virtual Task<IResponse<bool>> HasRole(TUserKey userKey, byte roleId)
+    public virtual async Task<IResponse<string>> RefreshToken(TUserKey userId)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
-        result.Fill(() =>
-        {
-            var data = this._repository.FetchAllUserRoles()
-                .Where(x => x.UserId.Equals(userKey) && x.RoleId.Equals(roleId))
-                .Any();
+        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
 
-            result.Set(StatusCode.Succeeded, data);
+        await result.FillAsync(async () =>
+        {
+            var roles = _repository.FetchAllUserRoles()
+                .Where(x => x.UserId.Equals(userId))
+                .Select(x => x.RoleId)
+                .ToArray();
+
+            if (roles != null && roles.Any())
+            {
+                var resultModel = _tokenService.GenerateToken(userId.ToString(), roles, []);
+
+                if (resultModel.IsSuccess)
+                {
+                    result.Set(StatusCode.Succeeded, resultModel.Data);
+                }
+                else
+                {
+                    resultModel.ConvertTo<string>(result);
+                }
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUserId);
+            }
         });
 
-        return Task.FromResult(result);
-    }
-
-    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
-    {
-        var hashedPass = await Utilities.EncryptToMd5(model.Password);
-
-        return new TUser()
-        {
-            Username = model.Username,
-            HashedPassword = hashedPass
-        };
+        return result;
     }
 
     public virtual async Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model)
@@ -521,119 +590,75 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                 return;
             }
 
-            // TODO: Need Transaction support in base repository
+            var newUser = await CreateNewUser(model);
 
-            try
+            await _repository.AddAsync(newUser);
+
+            foreach (byte role in model.Roles)
             {
-                var newUser = await CreateNewUser(model);
-
-                await _repository.AddAsync(newUser);
-
-                foreach (byte role in model.Roles)
+                var roleUser = new TUR()
                 {
-                    var hasRoleRes = await HasRole(newUser.Id, role);
-                    if (hasRoleRes.IsSuccess && !hasRoleRes.Data)
-                    {
-                        var roleUser = new TUR()
-                        {
-                            RoleId = role,
-                            UserId = newUser.Id
-                        };
+                    RoleId = role,
+                    UserId = newUser.Id
+                };
 
-                        await _repository.AddUserRoleAsync(roleUser);
-                    }
-                }
-
-                // TODO: Trasaction commit
-
-                result.Set(StatusCode.Succeeded, newUser.Id);
-
+                await _repository.AddUserRoleAsync(roleUser);
             }
-            catch
-            {
-                // TODO: Transaction rollback
-                throw;
-            }
+
+
+            result.Set(StatusCode.Succeeded, newUser.Id);
         });
 
         return result;
     }
 
-    public async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
+    public virtual async Task<IResponse> VerifyUser(string recepient)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
         await result.FillAsync(async () =>
         {
-            var user = _repository.FetchAll()
-                .Where(x => x.Id.Equals(userId))
-                .FirstOrDefault();
-            if (user != null)
+            if (!string.IsNullOrWhiteSpace(recepient))
             {
-                var hashedPass = await Utilities.EncryptToMd5(newPassword);
-                user.HashedPassword = hashedPass;
-                await _repository.UpdateAsync(userId, user);
-                result.Set(StatusCode.Succeeded);
-            }
-            else
-            {
-                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
-            }
-        });
-        return result;
-    }
-
-
-    public async Task<IResponse<string>> RefreshToken(TUserKey userId)
-    {
-        IResponse<string> result = new Response<string>(ServiceName, OperationType.Fetch, _logger);
-
-        await result.FillAsync(async () =>
-        {
-            var roles = _repository.FetchAllUserRoles()
-                .Where(x => x.UserId.Equals(userId))
-                .Select(x => x.RoleId)
-                .ToArray();
-
-            if (roles != null && roles.Any())
-            {
-                var resultModel = _tokenService.GenerateToken(userId.ToString(), roles, []);
-
-                if (!resultModel.IsSuccess)
+                TUser? user = null;
+                if (ulong.TryParse(recepient, out ulong phoneNumber))
                 {
-                    result = resultModel;
+                    user = _repository.FetchAll()
+                        .Where(x => x.PhoneNumber.HasValue && x.PhoneNumber.Value == phoneNumber)
+                        .FirstOrDefault();
+
+                    if (user != null)
+                    {
+                        user.VerifiedPhoneNumber = true;
+                    }
                 }
                 else
                 {
-                    result.Set(StatusCode.Succeeded, resultModel.Data);
+                    user = _repository.FetchAll()
+                        .Where(x => x.Email == recepient)
+                        .FirstOrDefault();
+
+                    if (user != null)
+                    {
+                        user.VerifiedEmail = true;
+                    }
+                }
+
+                if (user != null)
+                {
+                    await _repository.UpdateAsync(user.Id, user);
+                    result.Set(StatusCode.Succeeded);
+                }
+                else
+                {
+                    result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
                 }
             }
             else
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUserId);
+                result.Set(StatusCode.Failed, Identity_Messages.InvalidEmailOrNumber);
             }
+
         });
-
-        return result;
-    }
-
-    public virtual async Task<IResponse<TUserEditableVM>> GetUserEditable(TUserKey id)
-    {
-        IResponse<TUserEditableVM> result = new Response<TUserEditableVM>(ServiceName, OperationType.Fetch, _logger);
-
-        await result.FillAsync(async () =>
-        {
-            var user = await _repository.FetchByIdAsync(id);
-            if (user != null)
-            {
-                var editalbe = _mapper.Map<TUser, TUserEditableVM>(user);
-                result.Set(StatusCode.Succeeded, editalbe);
-            }
-            else
-            {
-                result.Set(StatusCode.NotExists);
-            }
-        });
-
         return result;
     }
 
@@ -658,6 +683,29 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             }
         });
 
+        return result;
+    }
+
+    public virtual async Task<IResponse> ChangePassword(TUserKey userId, string newPassword)
+    {
+        IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
+        await result.FillAsync(async () =>
+        {
+            var user = _repository.FetchAll()
+                .Where(x => x.Id.Equals(userId))
+                .FirstOrDefault();
+            if (user != null)
+            {
+                var hashedPass = await Utilities.EncryptToMd5(newPassword);
+                user.HashedPassword = hashedPass;
+                await _repository.UpdateAsync(userId, user);
+                result.Set(StatusCode.Succeeded);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+            }
+        });
         return result;
     }
 

@@ -31,9 +31,17 @@ public record OtpEditableVM<TUserKey> : UserEditableVM
     public virtual string Recipient { get; set; }
 }
 
-public record OtpVM;
+public record OtpVM<TUserKey>
+    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
+{
+    public virtual string Code { get; set; }
+    public virtual TUserKey UserId { get; set; }
+    public virtual DateTime ExpireTime { get; set; }
+    public virtual byte RoleId { get; set; }
+    public virtual string Recipient { get; set; }
+}
 
-public record OTPLoginVM<TUserKey>
+public record OTPResponseVM<TUserKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
 {
     public virtual TUserKey UserId { get; set; }
@@ -41,25 +49,9 @@ public record OTPLoginVM<TUserKey>
     public virtual string Code { get; set; }
 }
 
-public record OTPRegisterVM<TUserKey> : RegisterVM<byte>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-{
-    public virtual TUserKey UserId { get; set; }
-    public virtual byte RoleId { get; set; }
-    public virtual string Code { get; set; }
-}
-
-public record OtpLoginRequestVM<TRoleKey>
-    where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
-
+public record OtpRequestVM
 {
     public virtual string? Email { get; set; }
     public virtual ulong? PhoneNumber { get; set; }
-    public virtual TRoleKey Role { get; set; }
-}
-
-public record OtpRegisterRequestVM : OtpLoginRequestVM<byte>
-{
-    public virtual string FirstName { get; set; }
-    public virtual string LastName { get; set; }
+    public virtual byte Role { get; set; }
 }

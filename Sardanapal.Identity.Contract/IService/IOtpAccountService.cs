@@ -5,22 +5,16 @@ using Sardanapal.Identity.ViewModel.Otp;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM, TUserEditable>
-    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
+public interface IOtpAccountService<TUserKey, TRegisterVM, TUserEditable>
+    : IAccountService<TUserKey, TRegisterVM, TUserEditable>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TLoginVM : LoginVM
-    where TLoginDto : LoginDto, new()
     where TRegisterVM : RegisterVM<byte>, new()
-    where TOTPLoginRequestVM : OtpLoginRequestVM<byte>, new()
-    where TOTPRegisterRequestVM : OtpRegisterRequestVM, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
     where TUserEditable : UserEditableVM, new()
 {
-    Task<IResponse<TUserKey>> RequestLoginOtp(TOTPLoginRequestVM Model);
-    Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model);
-    Task<IResponse<TUserKey>> RequestRegisterOtp(TOTPRegisterRequestVM model);
-    Task<IResponse> RegisterWithOtp(TOTPRegisterVM Model);
+    Task<IResponse<TUserKey>> RequestLoginOtp(OtpRequestVM model);
+    Task<IResponse<LoginDto>> LoginWithOtp(OTPResponseVM<TUserKey> model);
+    Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRequestVM model);
+    Task<IResponse> RegisterWithOtp(OTPResponseVM<TUserKey> model);
     Task<IResponse<TUserKey>> RequestResetPassword(ResetPasswordRequestVM model);
     Task<IResponse> ResetPassword(ResetPasswordVM<TUserKey> model);
 }

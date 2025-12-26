@@ -25,7 +25,7 @@ public record CachOtpEditableVM<TUserKey, TKey> : OtpEditableVM<TUserKey>, ICach
     public TKey Id { get; set; }
 }
 
-public record CachOtpVM<TUserKey, TKey> : OtpVM, ICachModel<TKey>
+public record CachOtpVM<TUserKey, TKey> : OtpVM<TUserKey>, ICachModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {

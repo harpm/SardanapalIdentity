@@ -18,21 +18,18 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    : EFCurdServiceBase<TEFDatabaseManager, TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM, TNewVM, TEditableVM>
+    : EFCurdServiceBase<TEFDatabaseManager, TRepository, TKey, TOTPModel, OtpSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpService<TUserKey, TKey, TVM, TNewVM, TEditableVM>
     where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFOTPRepository<TKey, TOTPModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOTPModel : class, IOTPModel<TUserKey, TKey>, new()
     where TListItemVM : OtpListItemVM<TKey>
-    where TSearchVM : OtpSearchVM, new()
-    where TVM : OtpVM, new()
+    where TVM : OtpVM<TUserKey>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     public int expireTime { get; set; }
 
@@ -57,19 +54,19 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
 
     }
 
-    protected override IQueryable<TOTPModel> Search(IQueryable<TOTPModel> query, TSearchVM searchModel)
+    protected override IQueryable<TOTPModel> Search(IQueryable<TOTPModel> query, OtpSearchVM searchModel)
     {
         return query;
     }
 
-    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null, CancellationToken ct = default)
+    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, OtpSearchVM> SearchModel = null, CancellationToken ct = default)
     {
         IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
-            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, TSearchVM>();
-            SearchModel.Fields = SearchModel.Fields ?? new TSearchVM();
+            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, OtpSearchVM>();
+            SearchModel.Fields = SearchModel.Fields ?? new OtpSearchVM();
 
             var data = new GridVM<TKey, T>(SearchModel);
 
@@ -106,7 +103,7 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
         Response<TKey> result = new Response<TKey>(ServiceName, OperationType.Add, _logger);
         return await result.FillAsync(async delegate
         {
-            if (!await _repository.FetchAll().AsQueryable().AsNoTracking()
+            if (!await _repository.FetchAll().AsNoTracking()
                 .Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId)
                 .AnyAsync())
             {
@@ -136,57 +133,49 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
     public virtual async Task RemoveExpireds()
     {
         await this._repository.DeleteRangeAsync(_repository
-            .FetchAll().AsQueryable()
+            .FetchAll()
             .Where(x => x.ExpireTime <= DateTime.UtcNow)
             .Select(x => x.Id)
             .ToList());
         await this._dbManager.SaveChangesAsync();
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
+    public virtual async Task<IResponse<TVM>> ValidateCode(TNewVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
+        IResponse<TVM> result = new Response<TVM>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
-            var isValid = await _repository.FetchAll().AsQueryable()
+            var otpModel = await _repository.FetchAll().AsNoTracking()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
-                .AnyAsync();
+                .FirstOrDefaultAsync();
 
-            result.Set(StatusCode.Succeeded, isValid);
+            if (otpModel != null)
+            {
+                var data = _mapper.Map<TVM>(otpModel);
+                result.Set(StatusCode.Succeeded, data);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
         });
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
-    {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
-
-        return await result.FillAsync(async () =>
-        {
-            var isValid = await _repository.FetchAll().AsQueryable()
-                .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
-                .AnyAsync();
-
-            result.Set(StatusCode.Succeeded, isValid);
-        });
-    }
 }
 
 
-public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    : CrudServiceBase<TRepository, TKey, TOTPModel, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM, TNewVM, TEditableVM>
+    : CrudServiceBase<TRepository, TKey, TOTPModel, OtpSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpService<TUserKey, TKey, TVM, TNewVM, TEditableVM>
     where TRepository : IOTPRepository<TKey, TOTPModel>, IMemoryRepository<TKey, TOTPModel>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOTPModel : class, IOTPModel<TUserKey, TKey>, new()
     where TListItemVM : OtpListItemVM<TKey>
-    where TSearchVM : OtpSearchVM, new()
-    where TVM : OtpVM, new()
+    where TVM : OtpVM<TUserKey>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     public int expireTime { get; set; }
 
@@ -210,14 +199,14 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
 
     }
 
-    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, TSearchVM> SearchModel = null, CancellationToken ct = default)
+    public override async Task<IResponse<GridVM<TKey, T>>> GetAll<T>(GridSearchModelVM<TKey, OtpSearchVM> SearchModel = null, CancellationToken ct = default)
     {
         IResponse<GridVM<TKey, T>> result = new Response<GridVM<TKey, T>>(ServiceName, OperationType.Fetch, _logger);
 
         await result.FillAsync(async () =>
         {
-            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, TSearchVM>();
-            SearchModel.Fields = SearchModel.Fields ?? new TSearchVM();
+            SearchModel = SearchModel ?? new GridSearchModelVM<TKey, OtpSearchVM>();
+            SearchModel.Fields = SearchModel.Fields ?? new OtpSearchVM();
 
             var data = new GridVM<TKey, T>(SearchModel);
 
@@ -286,31 +275,26 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TSe
             .ToList());
     }
 
-    public virtual Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
+    public virtual Task<IResponse<TVM>> ValidateCode(TNewVM model)
     {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
+        IResponse<TVM> result = new Response<TVM>(ServiceName, OperationType.Fetch, _logger);
 
         return Task.FromResult(result.Fill(() =>
         {
-            var isValid = _repository.FetchAll()
+            var otpModel = _repository.FetchAll()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
-                .Any();
+                .FirstOrDefault();
 
-            result.Set(StatusCode.Succeeded, isValid);
-        }));
-    }
+            if (otpModel != null)
+            {
+                var data = _mapper.Map<TVM>(otpModel);
+                result.Set(StatusCode.Succeeded, data);
+            }
+            else
+            {
+                result.Set(StatusCode.NotExists);
+            }
 
-    public virtual Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
-    {
-        IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
-
-        return Task.FromResult(result.Fill(() =>
-        {
-            var isValid = _repository.FetchAll()
-                .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
-                .Any();
-
-            result.Set(StatusCode.Succeeded, isValid);
         }));
     }
 }

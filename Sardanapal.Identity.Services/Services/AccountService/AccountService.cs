@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.Share.Statics;
 using Sardanapal.Identity.ViewModel.Models.Account;
@@ -8,54 +9,70 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
-    : IAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
-    where TUserManager : class, IUserManager<TUserKey, TUser, TRegisterVM, TUserEditable>
+public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditable>
+    : IAccountService<TUserKey, TRegisterVM, TUserEditable>
+    where TUserManager : IUserManager<TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditable>
+    where TRoleManager : IRoleManager<TUserKey, byte, RoleBase<byte>, UserRoleBase<TUserKey, byte>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TLoginVM : LoginVM, new()
-    where TLoginDto : LoginDto, new()
+    where TUserVM : UserVM<TUserKey>, new()
+    where TUserSearchVM : UserSearchVM, new()
     where TRegisterVM : RegisterVM<byte>, new()
     where TUserEditable : UserEditableVM, new()
 {
     protected virtual string ServiceName => "AccountService";
 
-    protected readonly TUserManager _userManagerService;
+    protected readonly TUserManager _userManager;
+    protected readonly TRoleManager _roleManager;
     protected readonly ILogger _logger;
 
-    public AccountServiceBase(TUserManager _userManagerService, ILogger logger)
+    public AccountServiceBase(TUserManager _userManager, TRoleManager roleManager, ILogger logger)
     {
-        this._userManagerService = _userManagerService;
+        this._userManager = _userManager;
+        this._roleManager = roleManager;
         this._logger = logger;
     }
 
     public virtual async Task<IResponse> Edit(TUserKey id, TUserEditable model)
     {
-        return await _userManagerService.Edit(id, model);
+        return await _userManager.Edit(id, model);
     }
-    public virtual async Task<IResponse<TUserEditable>> GetEditable(TUserKey id)
+
+    public virtual Task<IResponse<TUserEditable>> GetEditable(TUserKey id) => _userManager.GetEditable(id);
+
+    public virtual async Task<IResponse<LoginDto>> Login(LoginVM model)
     {
-        return await _userManagerService.GetUserEditable(id);
-    }
-    public virtual async Task<IResponse<TLoginDto>> Login(TLoginVM model)
-    {
-        IResponse<TLoginDto> result = new Response<TLoginDto>(ServiceName, OperationType.Fetch, _logger);
+        IResponse<LoginDto> result = new Response<LoginDto>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
-            var tokenRes = await _userManagerService.Login(model.Username, model.Password);
-
-            if (tokenRes.IsSuccess)
+            var userRes = await _userManager.GetUser(model.Username);
+            if (userRes.IsSuccess)
             {
-                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = tokenRes.Data });
-            }
-            else if (tokenRes.StatusCode == StatusCode.Exception)
-            {
-                tokenRes.ConvertTo<TLoginDto>(result);
+                if (userRes.Data.HashedPassword == await Utilities.EncryptToMd5(model.Password))
+                {
+                    var loginRes = await _userManager.Login(userRes.Data.Id);
+                    if (loginRes.IsSuccess)
+                    {
+                        LoginDto loginDto = new LoginDto()
+                        {
+                            Token = loginRes.Data
+                        };
+                        result.Set(StatusCode.Succeeded, loginDto);
+                    }
+                    else
+                    {
+                        loginRes.ConvertTo<LoginDto>(result);
+                    }
+                }
+                else
+                {
+                    result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
+                }
             }
             else
             {
-                result.Set(StatusCode.NotExists);
+                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUsername);
             }
         });
     }
@@ -66,7 +83,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         return await result.FillAsync(async () =>
         {
-            IResponse<TUserKey> userIdRes = await _userManagerService.RegisterUser(model);
+            IResponse<TUserKey> userIdRes = await _userManager.RegisterUser(model);
 
             if (userIdRes.IsSuccess)
             {
@@ -80,7 +97,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
     }
 
     public virtual async Task<IResponse> ChangePassword(ChangePasswordVM<TUserKey> model) =>
-        await _userManagerService.ChangePassword(model.UserId, model.NewPassword);
+        await _userManager.ChangePassword(model.UserId, model.NewPassword);
 
     public virtual async Task<IResponse> ChangePassword(ChangePasswordVM model)
     {
@@ -88,7 +105,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         await result.FillAsync(async () =>
         {
-            var userRes = await _userManagerService.GetUser(model.Username);
+            var userRes = await _userManager.GetUser(model.Username);
             if (userRes.IsSuccess)
             {
                 var oldPass = await Utilities.EncryptToMd5(model.OldPassword);
@@ -101,7 +118,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
                     }
                     else
                     {
-                        var changePassRes = await _userManagerService.ChangePassword(userRes.Data.Id, model.NewPassword);
+                        var changePassRes = await _userManager.ChangePassword(userRes.Data.Id, model.NewPassword);
                         if (changePassRes.IsSuccess)
                         {
                             result.Set(StatusCode.Succeeded, true);
@@ -134,7 +151,7 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
 
         return await result.FillAsync(async () =>
         {
-            var tokenRes = await _userManagerService.RefreshToken(userId);
+            var tokenRes = await _userManager.RefreshToken(userId);
             if (tokenRes.IsSuccess)
             {
                 result.Set(StatusCode.Succeeded, tokenRes.Data);
@@ -145,9 +162,10 @@ public abstract class AccountServiceBase<TUserManager, TUserKey, TUser, TLoginVM
             }
         });
     }
+
     public virtual async Task<IResponse> Delete(TUserKey userId)
     {
-        return await _userManagerService.DeleteUser(userId);
+        return await _userManager.DeleteUser(userId);
     }
 
 }

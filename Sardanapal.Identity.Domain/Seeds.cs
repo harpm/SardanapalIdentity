@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Share.Statics;
-using System.Threading.Tasks;
 
 namespace Sardanapal.Identity.Domain;
 
@@ -11,7 +10,7 @@ public static class IdentitySeeds
 {
     public static IServiceProvider AddRoles<TRoleEnum, TRole, TRoleKey>(this IServiceProvider provider)
         where TRoleEnum : Enum
-        where TRole : class, IRole<TRoleKey>, new()
+        where TRole : class, IRoleBase<TRoleKey>, new()
         where TRoleKey : IEquatable<TRoleKey>, IComparable<TRoleKey>
     {
         var scope = provider.CreateScope();

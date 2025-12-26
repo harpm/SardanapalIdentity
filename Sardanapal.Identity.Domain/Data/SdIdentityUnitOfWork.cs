@@ -15,7 +15,7 @@ public interface ISdIdentityUnitOfWork<TUserKey, TRoleKey, TClaimKey, TUser, TRo
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TClaimKey : IComparable<TClaimKey>, IEquatable<TClaimKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRole : class, IRole<TRoleKey>, new()
+    where TRole : class, IRoleBase<TRoleKey>, new()
     where TClaim : class, IClaim<TClaimKey>, new()
     where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
     where TUC : class, IUserClaim<TUserKey, TClaimKey>, new()
@@ -34,7 +34,7 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
     where TClaimKey : IComparable<TClaimKey>, IEquatable<TClaimKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TRole : class, IRole<TRoleKey>, new()
+    where TRole : class, IRoleBase<TRoleKey>, new()
     where TClaim : class, IClaim<TClaimKey>, new()
     where TUR : class, IUserRole<TUserKey, TRoleKey>, new()
     where TUC : class, IUserClaim<TUserKey, TClaimKey>, new()

@@ -6,33 +6,36 @@ using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.ViewModel.Otp;
+using Sardanapal.Identity.Domain.Model;
 
 namespace Sardanapal.Identity.Services.Services.AccountService;
 
-public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TUR, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM, TUserEditable>
-    : AccountServiceBase<TOtpUserManager, TUserKey, TUser, TLoginVM, TLoginDto, TRegisterVM, TUserEditable>
-    , IOtpAccountService<TUserKey, TLoginVM, TLoginDto, TRegisterVM, TOTPLoginRequestVM, TOTPLoginVM, TOTPRegisterRequestVM, TOTPRegisterVM, TUserEditable>
-    where TOtpUserManager : class, IOtpUserManager<TUserKey, TUser, TRegisterVM, TOTPRegisterRequestVM, TUserEditable>
+public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
+    : AccountServiceBase<TOtpUserManager, TRoleManager, TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
+    , IOtpAccountService<TUserKey, TRegisterVM, TUserEditable>
+    where TOtpUserManager : class, IUserManager<TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, TUserEditable>
+    where TRoleManager : IRoleManager<TUserKey, byte, RoleBase<byte>, UserRoleBase<TUserKey, byte>>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
-    where TUR : class, IUserRole<TUserKey, byte>, new()
-    where TLoginVM : LoginVM, new()
-    where TLoginDto : LoginDto, new()
+    where TUserVM : UserVM<TUserKey>, new()
+    where TSearchVM : UserSearchVM, new()
     where TRegisterVM : RegisterVM<byte>, new()
-    where TOTPLoginRequestVM : OtpLoginRequestVM<byte>, new()
-    where TOTPRegisterRequestVM : OtpRegisterRequestVM, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
     where TUserEditable : UserEditableVM, new()
 {
     protected override string ServiceName => "OTP AccountService";
-    public OtpAccountServiceBase(TOtpUserManager _userManagerService, ILogger logger)
-        : base(_userManagerService, logger)
-    {
 
+    protected readonly IOtpService<TUserKey, Guid, OtpVM<TUserKey>, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> _otpService;
+
+    public OtpAccountServiceBase(TOtpUserManager _userManager
+        , TRoleManager roleManager
+        , IOtpService<TUserKey, Guid, OtpVM<TUserKey>, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> otpService
+        , ILogger logger)
+        : base(_userManager, roleManager, logger)
+    {
+        _otpService = otpService;
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(TOTPLoginRequestVM model)
+    public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(OtpRequestVM model)
     {
         var result = new Response<TUserKey>(ServiceName, OperationType.Fetch, _logger);
 
@@ -43,9 +46,22 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
             if (identifier != null)
             {
-                var uid = await _userManagerService
-                    .RequestLoginUser(identifier, model.Role);
-                result.Set(StatusCode.Succeeded, uid);
+                IResponse<TUser> userRes = await _userManager.GetUser(identifier);
+
+                if (userRes.IsSuccess)
+                {
+                    await _otpService.Add(new NewOtpVM<TUserKey>()
+                    {
+                        Recipient = identifier,
+                        Username = userRes.Data.Username,
+                        UserId = userRes.Data.Id,
+                        RoleId = model.Role
+                    });
+                }
+                else
+                {
+                    userRes.ConvertTo<TUserKey>(result);
+                }
             }
             else
             {
@@ -55,27 +71,40 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
         });
     }
 
-    public virtual async Task<IResponse<TLoginDto>> LoginWithOtp(TOTPLoginVM Model)
+    public virtual async Task<IResponse<LoginDto>> LoginWithOtp(OTPResponseVM<TUserKey> model)
     {
-        var result = new Response<TLoginDto>(ServiceName, OperationType.Fetch, _logger);
+        IResponse<LoginDto> result = new Response<LoginDto>(ServiceName, OperationType.Fetch, _logger);
 
         return await result.FillAsync(async () =>
         {
-            var tokenRes = await _userManagerService.VerifyLoginOtpCode(Model.Code, Model.UserId, Model.RoleId);
-
-            if (tokenRes.IsSuccess)
+            var validateRes = await _otpService.ValidateCode(new NewOtpVM<TUserKey>()
             {
-                result.Set(StatusCode.Succeeded, new TLoginDto() { Token = tokenRes.Data });
+                UserId = model.UserId,
+                RoleId = model.RoleId,
+                Code = model.Code
+            });
+
+            if (validateRes.IsSuccess)
+            {
+                var loginRes = await _userManager.Login(model.UserId);
+                if (loginRes.IsSuccess)
+                {
+
+                    result.Set(StatusCode.Succeeded, new LoginDto() { Token = loginRes.Data });
+                }
+                else
+                {
+                    loginRes.ConvertTo<LoginDto>(result);
+                }
             }
             else
             {
-                result.Set(StatusCode.Failed);
-                result.DeveloperMessages = [Identity_Messages.FailedGeneratingToken];
+                validateRes.ConvertTo<LoginDto>(result);
             }
         });
     }
 
-    public virtual async Task<IResponse<TUserKey>> RequestRegisterOtp(TOTPRegisterRequestVM model)
+    public virtual async Task<IResponse<TUserKey>> RequestRegisterOtp(OtpRequestVM model)
     {
         var result = new Response<TUserKey>(ServiceName, OperationType.Add, _logger);
         return await result.FillAsync(async () =>
@@ -85,9 +114,22 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
 
             if (identifier != null)
             {
-                var uidRes = await _userManagerService
-                    .RequestRegisterUser(model, model.Role);
-                result.Set(uidRes.StatusCode, uidRes.Data);
+                IResponse<TUser> userRes = await _userManager.GetUser(identifier);
+
+                if (userRes.IsSuccess)
+                {
+                    await _otpService.Add(new NewOtpVM<TUserKey>()
+                    {
+                        Recipient = identifier,
+                        Username = userRes.Data.Username,
+                        UserId = userRes.Data.Id,
+                        RoleId = model.Role
+                    });
+                }
+                else
+                {
+                    userRes.ConvertTo<TUserKey>(result);
+                }
             }
             else
             {
@@ -97,9 +139,46 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
         });
     }
 
-    public virtual async Task<IResponse> RegisterWithOtp(TOTPRegisterVM Model)
+    public virtual async Task<IResponse> RegisterWithOtp(OTPResponseVM<TUserKey> model)
     {
-        return await _userManagerService.VerifyRegisterOtpCode(Model.Code, Model.UserId, Model.RoleId);
+        var result = new Response(ServiceName, OperationType.Add, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var validateRes = await _otpService.ValidateCode(new NewOtpVM<TUserKey>()
+            {
+                Code = model.Code,
+                UserId = model.UserId,
+                RoleId = model.RoleId
+            });
+
+            if (validateRes.IsSuccess)
+            {
+                IResponse<TUser> userRes = await _userManager.GetUser(model.UserId);
+                if (userRes.IsSuccess)
+                {
+                    var verifyRes = await _userManager.VerifyUser(validateRes.Data.Recipient);
+                    if (verifyRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, true);
+                    }
+                    else
+                    {
+                        verifyRes.ConvertTo<bool>(result);
+                    }
+                }
+                else
+                {
+                    userRes.ConvertTo<bool>(result);
+                }
+            }
+            else
+            {
+                validateRes.ConvertTo<bool>(result);
+            }
+        });
+
+        return result;
     }
 
     public virtual async Task<IResponse<TUserKey>> RequestResetPassword(ResetPasswordRequestVM model)
@@ -112,9 +191,28 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
                 : !string.IsNullOrWhiteSpace(model.Email) ? model.Email : null;
             if (identifier != null)
             {
-                var uid = await _userManagerService
-                    .RequestResetPassword(identifier);
-                result.Set(StatusCode.Succeeded, uid);
+                var userRes = await _userManager.GetUser(identifier);
+                if (!userRes.IsSuccess)
+                {
+                    var otpRes = await _otpService.Add(new NewOtpVM<TUserKey>()
+                    {
+                        Recipient = identifier,
+                        Username = userRes.Data.Username,
+                        UserId = userRes.Data.Id
+                    });
+                    if (otpRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, userRes.Data.Id);
+                    }
+                    else
+                    {
+                        otpRes.ConvertTo<TUserKey>(result);
+                    }
+                }
+                else
+                {
+                    userRes.ConvertTo<TUserKey>(result);
+                }
             }
             else
             {
@@ -125,6 +223,45 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TUserKey, TUser, TU
         return result;
     }
 
-    public virtual async Task<IResponse> ResetPassword(ResetPasswordVM<TUserKey> model) =>
-        await _userManagerService.ResetPassword(model.Code, model.UserId, model.RoleId, model.NewPassword);
+    public virtual async Task<IResponse> ResetPassword(ResetPasswordVM<TUserKey> model)
+    {
+        var result = new Response(ServiceName, OperationType.Add, _logger);
+
+        await result.FillAsync(async () =>
+        {
+            var validateRes = await _otpService.ValidateCode(new NewOtpVM<TUserKey>()
+            {
+                Code = model.Code,
+                UserId = model.UserId,
+                RoleId = model.RoleId
+            });
+
+            if (validateRes.IsSuccess)
+            {
+                IResponse<TUser> userRes = await _userManager.GetUser(model.UserId);
+                if (userRes.IsSuccess)
+                {
+                    var resetRes = await _userManager.ChangePassword(model.UserId, model.NewPassword);
+                    if (resetRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, true);
+                    }
+                    else
+                    {
+                        resetRes.ConvertTo<bool>(result);
+                    }
+                }
+                else
+                {
+                    userRes.ConvertTo<bool>(result);
+                }
+            }
+            else
+            {
+                validateRes.ConvertTo<bool>(result);
+            }
+        });
+
+        return result;
+    }
 }

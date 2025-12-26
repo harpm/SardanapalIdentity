@@ -1,35 +1,30 @@
-﻿
-using Sardanapal.ViewModel.Response;
-using Sardanapal.Identity.ViewModel.Otp;
+
 using Sardanapal.Contract.IService;
 using Sardanapal.Contract.IService.ICrud;
+using Sardanapal.Identity.ViewModel.Otp;
+using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Contract.IService;
 
-public interface IOtpServiceBase<TUserKey, TKey, TNewVM, TOTPLoginVM, TOTPRegisterVM>
+public interface IOtpServiceBase<TUserKey, TKey, TNewVM>
     : ICreateService<TKey, TNewVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TNewVM : class, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
-    Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model);
-    Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model);
+    [Obsolete("Use expire time on the cache provider instead of this method")]
     Task RemoveExpireds();
 }
 
-public interface IOtpService<TUserKey, TKey, TSearchVM, TVM, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
-    : ICrudService<TKey, TSearchVM, TVM, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, TOTPLoginVM, TOTPRegisterVM>
+public interface IOtpService<TUserKey, TKey, TVM, TNewVM, TEditableVM>
+    : ICrudService<TKey, OtpSearchVM, TVM, TNewVM, TEditableVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TSearchVM : OtpSearchVM, new()
-    where TVM : OtpVM, new()
+    where TVM : OtpVM<TUserKey>, new()
     where TNewVM : NewOtpVM<TUserKey>, new()
     where TEditableVM : OtpEditableVM<TUserKey>, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
+    Task<IResponse<TVM>> ValidateCode(TNewVM model);
 
 }

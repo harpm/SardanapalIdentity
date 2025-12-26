@@ -14,30 +14,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM, TOTPLoginVM, TOTPRegisterVM>
+    , IOtpServiceBase<TUserKey, TKey, TNewVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
 
 }
 
-public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, TOTPLoginVM, TOTPRegisterVM>
+    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TOtpCachModel : class, ICachModel<TKey>, IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
-    where TOTPLoginVM : OTPLoginVM<TUserKey>, new()
-    where TOTPRegisterVM : OTPRegisterVM<TUserKey>, new()
 {
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
@@ -112,7 +108,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         });
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtpRegister(TOTPRegisterVM model)
+    public virtual async Task<IResponse<bool>> ValidateOtpRegister(OTPResponseVM<TUserKey> model)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         return await result.FillAsync(async () =>
@@ -132,7 +128,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM, 
         });
     }
 
-    public virtual async Task<IResponse<bool>> ValidateOtpLogin(TOTPLoginVM model)
+    public virtual async Task<IResponse<bool>> ValidateOtpLogin(OTPResponseVM<TUserKey> model)
     {
         IResponse<bool> result = new Response<bool>(ServiceName, OperationType.Fetch, _logger);
         return await result.FillAsync(async () =>
