@@ -13,6 +13,7 @@ public class HasRoleAttribute : ActionFilterAttribute
     protected byte[] roleIds;
     public HasRoleAttribute(params byte[] _roleIds)
     {
+        Order = 3;
         roleIds = _roleIds;
     }
 
