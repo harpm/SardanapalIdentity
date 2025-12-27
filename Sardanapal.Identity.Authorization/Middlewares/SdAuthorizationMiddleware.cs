@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Sardanapal.Identity.Authorization.Filters;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
 
@@ -19,22 +17,16 @@ public class SdAuthorizationMiddleware
     {
         if (context == null) return Task.CompletedTask;
 
-        string token = context?.Request?.Headers?
-            .Where(x => x.Key.Equals(ConstantKeys.AUTH_HEADER_KEY, StringComparison.InvariantCultureIgnoreCase))
-            .Select(x => x.Value)
-            .FirstOrDefault();
-
-        if (!string.IsNullOrWhiteSpace(token))
+        if (context?.Request?.Headers != null)
         {
-            identityProvider.SetAuthorize(token);
+            string? token = context?.Request?.Headers?
+                .Where(x => x.Key.Equals(ConstantKeys.AUTH_HEADER_KEY, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x => x.Value)
+                .FirstOrDefault();
 
-            var descriptor = context.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>();
-
-            if (descriptor?.FilterDescriptors
-                .Where(f => f.GetType() == typeof(AnanymousAttribute))
-                .Any() ?? false)
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                identityProvider.SetAnanymous();
+                identityProvider.SetAuthorize(token);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Net;
+
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,25 +12,21 @@ public class AuthorizeAttribute : ActionFilterAttribute
 {
     public AuthorizeAttribute()
     {
-
+        Order = 1;
     }
 
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        try
+        if (context != null)
         {
             IIdentityProvider idHolder = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
 
-            if (!idHolder.IsAuthorized && !idHolder.IsAnanymous)
+            if (!idHolder.IsAnanymous && !idHolder.IsAuthorized)
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
+                return Task.CompletedTask;
             }
-        }
-        catch (Exception ex)
-        {
-            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-            context.Result = new UnauthorizedResult();
         }
 
         return base.OnActionExecutionAsync(context, next);

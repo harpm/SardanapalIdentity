@@ -1,9 +1,7 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IService;
-using System.Net;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 
@@ -12,22 +10,14 @@ public class AnanymousAttribute : ActionFilterAttribute
 {
     public AnanymousAttribute()
     {
-
+        this.Order = 0;
     }
 
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        try
-        {
-            IIdentityProvider idProvider = context.HttpContext.RequestServices.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
-            idProvider.SetAnanymous();
-        }
-        catch (Exception ex)
-        {
-            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-            context.Result = new UnauthorizedResult();
-        }
-        
+        IIdentityProvider? idProvider = context?.HttpContext?.RequestServices?.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
+        idProvider?.SetAnanymous();
+
         return base.OnActionExecutionAsync(context, next);
     }
 }
