@@ -16,6 +16,11 @@ public interface IEFUserRepository<TUserKey, TRoleKey, TUserModel, TUR>
 
     long AddUserRole(TUR userRole);
     Task<long> AddUserRoleAsync(TUR userRole);
+
+    Task<bool> DeleteUserRoleAsync(TUserKey userId, TRoleKey uid);
+    Task<bool> DeleteUserRolesAsync(TUserKey userId, TRoleKey[] uids);
+
+
 }
 
 public interface IUserRepository<TUserKey, TRoleKey, TUserModel, TUR>

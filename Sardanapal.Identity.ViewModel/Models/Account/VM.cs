@@ -20,6 +20,7 @@ public record NewUserVM
 {
     public string Username { get; init; }
     public string Password { get; init; }
+    public List<byte> Roles { get; init; }
 }
 
 public record UserEditableVM : NewUserVM

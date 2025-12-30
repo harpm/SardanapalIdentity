@@ -46,6 +46,44 @@ public abstract class EFUserRepositoryBase<TContext, TUserKey, TRoleKey, TUserMo
         await _unitOfWork.AddAsync(userRole);
         return userRole.Id;
     }
+
+    public async Task<bool> DeleteUserRoleAsync(long urId)
+    {
+        EnsureNotNullReference(urId);
+        var userRole = await _unitOfWork.Set<TUR>().FindAsync(urId);
+        if (userRole != null)
+        {
+            _unitOfWork.Remove(userRole);
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteUserRoleAsync(TUserKey userId, TRoleKey urId)
+    {
+        EnsureNotNullReference(urId);
+        var userRole = await _unitOfWork.Set<TUR>().Where(ur => ur.UserId.Equals(userId) && ur.Id.Equals(urId))
+            .FirstOrDefaultAsync();
+        if (userRole != null)
+        {
+            _unitOfWork.Remove(userRole);
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<bool> DeleteUserRolesAsync(TUserKey userId, TRoleKey[] urId)
+    {
+        EnsureNotNullReference(urId);
+        var userRoles = await _unitOfWork.Set<TUR>().Where(ur => ur.UserId.Equals(userId) && ur.Id.Equals(urId))
+            .ToListAsync();
+        if (userRoles != null && userRoles.Any())
+        {
+            _unitOfWork.RemoveRange(userRoles);
+            return true;
+        }
+        return false;
+    }
 }
 
 public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR>

@@ -331,6 +331,26 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 _mapper.Map(model, user);
 
                 await _repository.UpdateAsync(id, user);
+
+                var currentRoles = await _repository.FetchAllUserRoles()
+                        .AsNoTracking()
+                        .Where(r => r.UserId.Equals(id))
+                        .Select(r => r.RoleId)
+                        .ToArrayAsync();
+
+                await _repository.DeleteUserRolesAsync(id,
+                    currentRoles.Where(r => !model.Roles.Contains(r)).ToArray());
+
+                foreach (var role in model.Roles.Where(r => !currentRoles.Contains(r)))
+                {
+                    var userRole = new TUR()
+                    {
+                        UserId = id,
+                        RoleId = role
+                    };
+                    await _repository.AddUserRoleAsync(userRole);
+                }
+
                 await _dbManager.SaveChangesAsync();
 
                 result.Set(StatusCode.Succeeded, true);
