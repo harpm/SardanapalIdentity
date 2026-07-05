@@ -4,28 +4,28 @@ namespace Sardanapal.Identity.ViewModel.Otp;
 
 public record CachOtpListItemVM<TUserKey, TKey>
     : OtpListItemVM<TKey>
-    , ICachModel<TKey>
+    , ICacheModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public TUserKey UserId { get; init; }
 }
 
-public record CachNewOtpVM<TUserKey, TKey> : NewOtpVM<TUserKey>, ICachModel<TKey>
+public record CachNewOtpVM<TUserKey, TKey> : NewOtpVM<TUserKey>, ICacheModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public TKey Id { get; set; }
 }
 
-public record CachOtpEditableVM<TUserKey, TKey> : OtpEditableVM<TUserKey>, ICachModel<TKey>
+public record CachOtpEditableVM<TUserKey, TKey> : OtpEditableVM<TUserKey>, ICacheModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {
     public TKey Id { get; set; }
 }
 
-public record CachOtpVM<TUserKey, TKey> : OtpVM<TUserKey>, ICachModel<TKey>
+public record CachOtpVM<TUserKey, TKey> : OtpVM<TUserKey>, ICacheModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {

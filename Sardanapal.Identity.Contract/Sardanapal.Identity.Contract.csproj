@@ -13,6 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Sardanapal.Contract" />
+		<PackageReference Include="Sardanapal.EF" />
 	</ItemGroup>
 
 

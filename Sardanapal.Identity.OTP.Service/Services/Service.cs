@@ -2,7 +2,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Contract.IService;
 using Sardanapal.Ef.Helper;
@@ -15,11 +14,12 @@ using Sardanapal.Service;
 using Sardanapal.Service.Utilities;
 using Sardanapal.ViewModel.Models;
 using Sardanapal.ViewModel.Response;
+using Sardanapal.Ef.UnitOfWork;
 
 namespace Sardanapal.Identity.OTP.Services;
 
 public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM, TNewVM, TEditableVM>
-    : EFCurdServiceBase<TEFDatabaseManager, TRepository, TKey, TOTPModel, OtpSearchVM, TVM, TNewVM, TEditableVM>
+    : EFCrudServiceBase<TEFDatabaseManager, TRepository, TKey, TOTPModel, OtpSearchVM, TVM, TNewVM, TEditableVM>
     , IOtpService<TUserKey, TKey, TVM, TNewVM, TEditableVM>
     where TEFDatabaseManager : IEFDatabaseManager
     where TRepository : IEFOTPRepository<TKey, TOTPModel>

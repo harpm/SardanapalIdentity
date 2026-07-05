@@ -3,7 +3,7 @@
 namespace Sardanapal.Identity.Contract.IModel;
 
 public interface IOTPModel<TUserKey, TKey>
-    : IBaseEntityModel<TKey>, ICachModel<TKey>
+    : IBaseEntityModel<TKey>, ICacheModel<TKey>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
 {

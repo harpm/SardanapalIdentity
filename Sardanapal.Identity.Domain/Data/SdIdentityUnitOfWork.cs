@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Sardanapal.Contract.Data;
 using Sardanapal.Contract.IModel;
 using Sardanapal.Ef.UnitOfWork;
 using Sardanapal.Identity.Contract.IModel;

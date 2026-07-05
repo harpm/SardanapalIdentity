@@ -3,6 +3,8 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Service;
+using Sardanapal.Ef.Repository;
+using Sardanapal.Ef.UnitOfWork;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.ViewModel.Response;
 using Sardanapal.Identity.Contract.IModel;
@@ -12,7 +14,6 @@ using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.Identity.Share.Statics;
-using Sardanapal.Contract.Data;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 

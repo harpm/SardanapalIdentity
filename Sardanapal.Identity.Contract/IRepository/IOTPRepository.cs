@@ -1,6 +1,7 @@
 
 using Sardanapal.Contract.IModel;
 using Sardanapal.Contract.IRepository;
+using Sardanapal.Ef.Repository;
 
 namespace Sardanapal.Identity.Contract.IRepository;
 

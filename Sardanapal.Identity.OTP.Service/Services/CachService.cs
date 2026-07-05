@@ -31,7 +31,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : class, ICachModel<TKey>, IOTPModel<TUserKey, TKey>, new()
+    where TOtpCachModel : class, ICacheModel<TKey>, IOTPModel<TUserKey, TKey>, new()
     where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
     where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
 {
