@@ -1,9 +1,9 @@
 using System.Net;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Share.Static;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 
@@ -31,7 +31,7 @@ public class HasRoleAttribute : ActionFilterAttribute
                 || idProvider.Claims.Claims == null
                 || idProvider.Claims.Claims.Count() == 0
                 || !idProvider.Claims.Claims
-                    .Where(c => c.Type == ClaimTypes.Role // This base ClaimType has been used due to the issue in Identity Token services
+                    .Where(c => c.Type == SdClaimTypes.Roles
                         && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
