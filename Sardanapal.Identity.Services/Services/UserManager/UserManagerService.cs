@@ -166,7 +166,8 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
                 var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
                     , roles?.ToArray() ?? []
-                    , []);
+                    , []
+                    , user.MustChangePassword);
 
                 if (!tokenRes.IsSuccess)
                 {
@@ -377,6 +378,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
             {
                 var hashedPass = Utilities.HashPassword(newPassword);
                 user.HashedPassword = hashedPass;
+                user.MustChangePassword = false;
                 await _repository.UpdateAsync(userId, user);
                 await _dbManager.SaveChangesAsync();
                 result.Set(StatusCode.Succeeded);
@@ -544,7 +546,8 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
                 var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
                     , roles?.ToArray() ?? []
-                    , []);
+                    , []
+                    , user.MustChangePassword);
 
                 if (!tokenRes.IsSuccess)
                 {
@@ -719,6 +722,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             {
                 var hashedPass = Utilities.HashPassword(newPassword);
                 user.HashedPassword = hashedPass;
+                user.MustChangePassword = false;
                 await _repository.UpdateAsync(userId, user);
                 result.Set(StatusCode.Succeeded);
             }

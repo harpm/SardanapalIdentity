@@ -15,6 +15,7 @@ public abstract class UserBase<TUserKey> : LogicalEntityModel<TUserKey, TUserKey
     public virtual bool VerifiedEmail { get; set; } = false;
     public virtual ulong? PhoneNumber { get; set; }
     public virtual bool VerifiedPhoneNumber { get; set; } = false;
+    public virtual bool MustChangePassword { get; set; } = false;
 }
 
 public class SardanapalUser<TUserKey, TRoleKey, TClaimKey> : UserBase<TUserKey>

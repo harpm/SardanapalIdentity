@@ -1,7 +1,10 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Sardanapal.Identity.Contract.IModel;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.Share.Statics;
 
 namespace Sardanapal.Identity.Domain;
@@ -49,31 +52,40 @@ public static class IdentitySeeds
         if (uow == null)
             throw new NullReferenceException(nameof(uow));
 
-        TUser admin;
+        SDConfigs? config = scope.ServiceProvider.GetService<IOptions<SDConfigs>>()?.Value;
+
+        string username = !string.IsNullOrWhiteSpace(config?.SeedAdminUsername)
+            ? config.SeedAdminUsername!
+            : "admin";
+
+        string? configuredPassword = config?.SeedAdminPassword;
+        bool generatedPassword = string.IsNullOrWhiteSpace(configuredPassword);
+        string password = generatedPassword
+            ? Utilities.GenerateRandomPassword()
+            : configuredPassword!;
 
         // Adding admin user
         if (!uow.Set<TUser>()
-            .Where(u => u.Username.Equals("admin", StringComparison.OrdinalIgnoreCase))
+            .Where(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
             .AsNoTracking()
             .Any())
         {
-            var password = "admin";
             var hashedPassword = Utilities.HashPassword(password);
 
-            admin = new TUser()
+            TUser admin = new TUser()
             {
-                Username = "admin",
+                Username = username,
                 HashedPassword = hashedPassword,
                 FirstName = "کاربر",
                 LastName = "ارشد",
-                Email = "admin",
+                Email = username,
                 PhoneNumber = 0,
                 VerifiedEmail = true,
-                VerifiedPhoneNumber = true
+                VerifiedPhoneNumber = true,
+                MustChangePassword = true
             };
 
             await uow.AddAsync(admin);
-
             await uow.SaveChangesAsync();
 
             foreach (TRoleKey roleEnumMember in typeof(TRoleEnum).GetEnumValues())
@@ -86,6 +98,22 @@ public static class IdentitySeeds
             }
 
             uow.SaveChanges();
+
+            var loggerFactory = scope.ServiceProvider.GetService<ILoggerFactory>();
+            var logger = loggerFactory?.CreateLogger("Sardanapal.Identity.Seeds");
+
+            if (generatedPassword)
+            {
+                logger?.LogWarning(
+                    "Bootstrap admin created. Username: {Username} | Password: {Password} | A password change is required on first login.",
+                    username, password);
+            }
+            else
+            {
+                logger?.LogInformation(
+                    "Bootstrap admin '{Username}' created. A password change is required on first login.",
+                    username);
+            }
         }
 
         return provider;

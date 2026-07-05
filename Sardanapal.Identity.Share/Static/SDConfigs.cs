@@ -10,4 +10,6 @@ public class SDConfigs
     public TokenValidationParameters TokenParameters { get; set; }
     public int ExpirationTime { get; set; }
     public int? OTPLength { get; set; }
+    public string? SeedAdminUsername { get; set; }
+    public string? SeedAdminPassword { get; set; }
 }

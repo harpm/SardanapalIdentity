@@ -13,4 +13,5 @@ public interface IUser<TUserKey> : IEntityModel<TUserKey, TUserKey>, ILogicalEnt
     bool VerifiedEmail { get; set; }
     ulong? PhoneNumber { get; set; }
     bool VerifiedPhoneNumber { get; set; }
+    bool MustChangePassword { get; set; }
 }

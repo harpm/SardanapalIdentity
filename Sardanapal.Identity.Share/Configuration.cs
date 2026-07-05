@@ -12,7 +12,9 @@ public static class Configuration
         , string? redisConnString
         , TokenValidationParameters tokenParams
         , int tokenExpireTime
-        , int? otpCodeLen)
+        , int? otpCodeLen
+        , string? seedAdminUsername = null
+        , string? seedAdminPassword = null)
     {
         services.Configure<SDConfigs>(opt =>
         {
@@ -21,6 +23,8 @@ public static class Configuration
             opt.TokenParameters = tokenParams;
             opt.ExpirationTime = tokenExpireTime;
             opt.OTPLength = otpCodeLen;
+            opt.SeedAdminUsername = seedAdminUsername;
+            opt.SeedAdminPassword = seedAdminPassword;
         });
 
         return services;

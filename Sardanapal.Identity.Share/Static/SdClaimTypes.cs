@@ -7,6 +7,7 @@ public class SdClaimTypes
 
     public const string NameIdentifier = "id";
     public const string Roles = "roles";
+    public const string MustChangePassword = "must_change_pw";
 
     #endregion
 

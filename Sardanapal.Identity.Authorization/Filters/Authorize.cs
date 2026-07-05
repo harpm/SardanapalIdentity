@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Sardanapal.Identity.Contract.IService;
+using Sardanapal.Identity.Share.Static;
 
 namespace Sardanapal.Identity.Authorization.Filters;
 
@@ -25,6 +26,17 @@ public class AuthorizeAttribute : ActionFilterAttribute
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Result = new UnauthorizedResult();
+                return Task.CompletedTask;
+            }
+
+            if (idHolder.IsAuthorized && idHolder.Claims != null
+                && idHolder.Claims.HasClaim(SdClaimTypes.MustChangePassword, "true"))
+            {
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                context.Result = new ObjectResult(new { message = "Password change required." })
+                {
+                    StatusCode = (int)HttpStatusCode.Forbidden
+                };
                 return Task.CompletedTask;
             }
         }

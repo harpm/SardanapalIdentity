@@ -68,4 +68,33 @@ public static class Utilities
 
         return Task.FromResult(sb.ToString());
     }
+
+    private const string PasswordCharsetLower = "abcdefghijklmnopqrstuvwxyz";
+    private const string PasswordCharsetUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private const string PasswordCharsetDigits = "0123456789";
+
+    public static string GenerateRandomPassword(int length = 16)
+    {
+        if (length < 4) length = 4;
+
+        char[] all = (PasswordCharsetLower + PasswordCharsetUpper + PasswordCharsetDigits).ToCharArray();
+        byte[] buffer = RandomNumberGenerator.GetBytes(length);
+
+        char[] chars = new char[length];
+        chars[0] = PasswordCharsetLower[buffer[0] % PasswordCharsetLower.Length];
+        chars[1] = PasswordCharsetUpper[buffer[1] % PasswordCharsetUpper.Length];
+        chars[2] = PasswordCharsetDigits[buffer[2] % PasswordCharsetDigits.Length];
+        for (int i = 3; i < length; i++)
+        {
+            chars[i] = all[buffer[i] % all.Length];
+        }
+
+        for (int i = chars.Length - 1; i > 0; i--)
+        {
+            int j = buffer[i % buffer.Length] % (i + 1);
+            (chars[i], chars[j]) = (chars[j], chars[i]);
+        }
+
+        return new string(chars);
+    }
 }

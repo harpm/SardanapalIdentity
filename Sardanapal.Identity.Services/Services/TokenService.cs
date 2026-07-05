@@ -22,7 +22,7 @@ public class TokenService : ITokenService
         this._configs = config.Value;
     }
 
-    protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, byte[] claimIds)
+    protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, byte[] claimIds, bool mustChangePassword = false)
     {
         if (_configs.TokenParameters == null) throw new NullReferenceException(nameof(SDConfigs.TokenParameters));
 
@@ -39,6 +39,11 @@ public class TokenService : ITokenService
 
         Claims.AddRange(roleClaims);
 
+        if (mustChangePassword)
+        {
+            Claims.Add(new Claim(SdClaimTypes.MustChangePassword, "true"));
+        }
+
         var Credentials = new SigningCredentials(_configs.TokenParameters.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(_configs.TokenParameters.ValidIssuer
             , _configs.TokenParameters.ValidAudience
@@ -49,13 +54,13 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public virtual IResponse<string> GenerateToken(string uid, byte[] roleIds, byte[] claimIds)
+    public virtual IResponse<string> GenerateToken(string uid, byte[] roleIds, byte[] claimIds, bool mustChangePassword = false)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function, _logger);
 
         return result.Fill(() =>
         {
-            string token = GenerateToken(uid, _configs.ExpirationTime, roleIds, []);
+            string token = GenerateToken(uid, _configs.ExpirationTime, roleIds, [], mustChangePassword);
 
             result.Set(StatusCode.Succeeded, token);
         });
