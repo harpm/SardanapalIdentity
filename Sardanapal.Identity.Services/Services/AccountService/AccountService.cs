@@ -29,6 +29,9 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
     protected readonly ILogger _logger;
     protected readonly ILoginAttemptTracker _attemptTracker;
 
+    private static readonly string DummyPasswordHash =
+        Utilities.HashPassword("__sardanapal_dummy_do_not_match__");
+
     public AccountServiceBase(TUserManager _userManager, TRoleManager roleManager, ILogger logger
         , ILoginAttemptTracker attemptTracker = null)
     {
@@ -62,36 +65,33 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
             }
 
             var userRes = await _userManager.GetUser(model.Username);
-            if (userRes.IsSuccess)
-            {
-                if (Utilities.VerifyPassword(model.Password, userRes.Data.HashedPassword))
-                {
-                    var loginRes = await _userManager.Login(userRes.Data.Id);
-                    if (loginRes.IsSuccess)
-                    {
-                        _attemptTracker?.RecordSuccess(identifier);
+            bool userExists = userRes.IsSuccess;
 
-                        LoginDto loginDto = new LoginDto()
-                        {
-                            Token = loginRes.Data
-                        };
-                        result.Set(StatusCode.Succeeded, loginDto);
-                    }
-                    else
+            string storedHash = userExists ? userRes.Data.HashedPassword : DummyPasswordHash;
+            bool passwordValid = Utilities.VerifyPassword(model.Password, storedHash) && userExists;
+
+            if (passwordValid)
+            {
+                var loginRes = await _userManager.Login(userRes.Data.Id);
+                if (loginRes.IsSuccess)
+                {
+                    _attemptTracker?.RecordSuccess(identifier);
+
+                    LoginDto loginDto = new LoginDto()
                     {
-                        loginRes.ConvertTo<LoginDto>(result);
-                    }
+                        Token = loginRes.Data
+                    };
+                    result.Set(StatusCode.Succeeded, loginDto);
                 }
                 else
                 {
-                    _attemptTracker?.RecordFailure(identifier);
-                    result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
+                    loginRes.ConvertTo<LoginDto>(result);
                 }
             }
             else
             {
                 _attemptTracker?.RecordFailure(identifier);
-                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUsername);
+                result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
             }
         });
     }
@@ -125,39 +125,34 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
         await result.FillAsync(async () =>
         {
             var userRes = await _userManager.GetUser(model.Username);
-            if (userRes.IsSuccess)
-            {
-                if (Utilities.VerifyPassword(model.OldPassword, userRes.Data.HashedPassword))
-                {
+            bool userExists = userRes.IsSuccess;
 
-                    if (model.NewPassword == model.OldPassword)
-                    {
-                        result.Set(StatusCode.Failed, Identity_Messages.DifferentPassword);
-                    }
-                    else
-                    {
-                        var changePassRes = await _userManager.ChangePassword(userRes.Data.Id, model.NewPassword);
-                        if (changePassRes.IsSuccess)
-                        {
-                            result.Set(StatusCode.Succeeded, true);
-                        }
-                        else
-                        {
-                            changePassRes.ConvertTo<bool>(result);
-                        }
-                    }
+            string storedHash = userExists ? userRes.Data.HashedPassword : DummyPasswordHash;
+            bool passwordValid = Utilities.VerifyPassword(model.OldPassword, storedHash) && userExists;
+
+            if (passwordValid)
+            {
+                if (model.NewPassword == model.OldPassword)
+                {
+                    result.Set(StatusCode.Failed, Identity_Messages.DifferentPassword);
                 }
                 else
                 {
-                    result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
+                    var changePassRes = await _userManager.ChangePassword(userRes.Data.Id, model.NewPassword);
+                    if (changePassRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, true);
+                    }
+                    else
+                    {
+                        changePassRes.ConvertTo<bool>(result);
+                    }
                 }
             }
             else
             {
-                userRes.ConvertTo<bool>(result);
+                result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
             }
-
-
         });
 
         return result;
