@@ -14,7 +14,8 @@ public static class Configuration
         , int tokenExpireTime
         , int? otpCodeLen
         , string? seedAdminUsername = null
-        , string? seedAdminPassword = null)
+        , string? seedAdminPassword = null
+        , int tokenRefreshThresholdMinutes = 10)
     {
         services.Configure<SDConfigs>(opt =>
         {
@@ -25,6 +26,7 @@ public static class Configuration
             opt.OTPLength = otpCodeLen;
             opt.SeedAdminUsername = seedAdminUsername;
             opt.SeedAdminPassword = seedAdminPassword;
+            opt.TokenRefreshThresholdMinutes = tokenRefreshThresholdMinutes;
         });
 
         return services;

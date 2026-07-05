@@ -14,4 +14,5 @@ public class SDConfigs
     public string? SeedAdminPassword { get; set; }
     public int MaxLoginAttempts { get; set; } = 5;
     public int LockoutMinutes { get; set; } = 15;
+    public int TokenRefreshThresholdMinutes { get; set; } = 10;
 }
