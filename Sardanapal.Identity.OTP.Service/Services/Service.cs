@@ -147,7 +147,7 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
         return await result.FillAsync(async () =>
         {
             var now = DateTime.UtcNow;
-            var otpModel = await _repository.FetchAll().AsNoTracking()
+            var otpModel = await _repository.FetchAll()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
                 .FirstOrDefaultAsync();
 
@@ -159,6 +159,9 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
                     result.UserMessage = Identity_Messages.OtpCodeExpired;
                     return;
                 }
+
+                await _repository.DeleteAsync(otpModel.Id);
+                await _dbManager.SaveChangesAsync();
 
                 var data = _mapper.Map<TVM>(otpModel);
                 result.Set(StatusCode.Succeeded, data);
@@ -283,11 +286,11 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM
             .ToList());
     }
 
-    public virtual Task<IResponse<TVM>> ValidateCode(TNewVM model)
+    public virtual async Task<IResponse<TVM>> ValidateCode(TNewVM model)
     {
         IResponse<TVM> result = new Response<TVM>(ServiceName, OperationType.Fetch, _logger);
 
-        return Task.FromResult(result.Fill(() =>
+        await result.FillAsync(async () =>
         {
             var now = DateTime.UtcNow;
             var otpModel = _repository.FetchAll()
@@ -303,6 +306,8 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM
                     return;
                 }
 
+                await _repository.DeleteAsync(otpModel.Id);
+
                 var data = _mapper.Map<TVM>(otpModel);
                 result.Set(StatusCode.Succeeded, data);
             }
@@ -310,7 +315,8 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM
             {
                 result.Set(StatusCode.NotExists);
             }
+        });
 
-        }));
+        return result;
     }
 }
