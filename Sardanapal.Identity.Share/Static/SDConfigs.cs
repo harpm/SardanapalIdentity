@@ -12,4 +12,6 @@ public class SDConfigs
     public int? OTPLength { get; set; }
     public string? SeedAdminUsername { get; set; }
     public string? SeedAdminPassword { get; set; }
+    public int MaxLoginAttempts { get; set; } = 5;
+    public int LockoutMinutes { get; set; } = 15;
 }

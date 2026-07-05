@@ -27,12 +27,15 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
     protected readonly TUserManager _userManager;
     protected readonly TRoleManager _roleManager;
     protected readonly ILogger _logger;
+    protected readonly ILoginAttemptTracker _attemptTracker;
 
-    public AccountServiceBase(TUserManager _userManager, TRoleManager roleManager, ILogger logger)
+    public AccountServiceBase(TUserManager _userManager, TRoleManager roleManager, ILogger logger
+        , ILoginAttemptTracker attemptTracker = null)
     {
         this._userManager = _userManager;
         this._roleManager = roleManager;
         this._logger = logger;
+        this._attemptTracker = attemptTracker;
     }
 
     public virtual async Task<IResponse> Edit(TUserKey id, TUserEditable model)
@@ -48,6 +51,16 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
 
         return await result.FillAsync(async () =>
         {
+            string identifier = model?.Username ?? string.Empty;
+
+            if (_attemptTracker != null && _attemptTracker.IsLockedOut(identifier))
+            {
+                int remaining = (int)Math.Ceiling(_attemptTracker.GetLockoutRemaining(identifier)?.TotalMinutes ?? 0);
+                result.Set(StatusCode.Failed);
+                result.UserMessage = string.Format(Identity_Messages.AccountLockedOut, remaining);
+                return;
+            }
+
             var userRes = await _userManager.GetUser(model.Username);
             if (userRes.IsSuccess)
             {
@@ -56,6 +69,8 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
                     var loginRes = await _userManager.Login(userRes.Data.Id);
                     if (loginRes.IsSuccess)
                     {
+                        _attemptTracker?.RecordSuccess(identifier);
+
                         LoginDto loginDto = new LoginDto()
                         {
                             Token = loginRes.Data
@@ -69,11 +84,13 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
                 }
                 else
                 {
+                    _attemptTracker?.RecordFailure(identifier);
                     result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
                 }
             }
             else
             {
+                _attemptTracker?.RecordFailure(identifier);
                 result.Set(StatusCode.NotExists, Identity_Messages.InvalidUsername);
             }
         });

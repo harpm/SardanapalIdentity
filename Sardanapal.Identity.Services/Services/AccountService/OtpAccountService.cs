@@ -31,11 +31,15 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
     public OtpAccountServiceBase(TOtpUserManager _userManager
         , TRoleManager roleManager
         , IOtpService<TUserKey, Guid, OtpVM<TUserKey>, NewOtpVM<TUserKey>, OtpEditableVM<TUserKey>> otpService
-        , ILogger logger)
-        : base(_userManager, roleManager, logger)
+        , ILogger logger
+        , ILoginAttemptTracker attemptTracker = null)
+        : base(_userManager, roleManager, logger, attemptTracker)
     {
         _otpService = otpService;
     }
+
+    protected virtual string OtpKey(TUserKey userId, byte roleId)
+        => $"otp:{userId}:{roleId}";
 
     public virtual async Task<IResponse<TUserKey>> RequestLoginOtp(OtpRequestVM model)
     {
@@ -79,6 +83,16 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
         return await result.FillAsync(async () =>
         {
+            string otpKey = OtpKey(model.UserId, model.RoleId);
+
+            if (_attemptTracker != null && _attemptTracker.IsLockedOut(otpKey))
+            {
+                int remaining = (int)Math.Ceiling(_attemptTracker.GetLockoutRemaining(otpKey)?.TotalMinutes ?? 0);
+                result.Set(StatusCode.Failed);
+                result.UserMessage = string.Format(Identity_Messages.AccountLockedOut, remaining);
+                return;
+            }
+
             var validateRes = await _otpService.ValidateCode(new NewOtpVM<TUserKey>()
             {
                 UserId = model.UserId,
@@ -88,6 +102,8 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
             if (validateRes.IsSuccess)
             {
+                _attemptTracker?.RecordSuccess(otpKey);
+
                 var loginRes = await _userManager.Login(model.UserId);
                 if (loginRes.IsSuccess)
                 {
@@ -101,6 +117,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             }
             else
             {
+                _attemptTracker?.RecordFailure(otpKey);
                 validateRes.ConvertTo<LoginDto>(result);
             }
         });
@@ -147,6 +164,16 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
         await result.FillAsync(async () =>
         {
+            string otpKey = OtpKey(model.UserId, model.RoleId);
+
+            if (_attemptTracker != null && _attemptTracker.IsLockedOut(otpKey))
+            {
+                int remaining = (int)Math.Ceiling(_attemptTracker.GetLockoutRemaining(otpKey)?.TotalMinutes ?? 0);
+                result.Set(StatusCode.Failed);
+                result.UserMessage = string.Format(Identity_Messages.AccountLockedOut, remaining);
+                return;
+            }
+
             var validateRes = await _otpService.ValidateCode(new NewOtpVM<TUserKey>()
             {
                 Code = model.Code,
@@ -156,6 +183,8 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
             if (validateRes.IsSuccess)
             {
+                _attemptTracker?.RecordSuccess(otpKey);
+
                 IResponse<TUser> userRes = await _userManager.GetUser(model.UserId);
                 if (userRes.IsSuccess)
                 {
@@ -176,6 +205,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             }
             else
             {
+                _attemptTracker?.RecordFailure(otpKey);
                 validateRes.ConvertTo<bool>(result);
             }
         });
@@ -231,6 +261,16 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
         await result.FillAsync(async () =>
         {
+            string otpKey = OtpKey(model.UserId, model.RoleId);
+
+            if (_attemptTracker != null && _attemptTracker.IsLockedOut(otpKey))
+            {
+                int remaining = (int)Math.Ceiling(_attemptTracker.GetLockoutRemaining(otpKey)?.TotalMinutes ?? 0);
+                result.Set(StatusCode.Failed);
+                result.UserMessage = string.Format(Identity_Messages.AccountLockedOut, remaining);
+                return;
+            }
+
             var validateRes = await _otpService.ValidateCode(new NewOtpVM<TUserKey>()
             {
                 Code = model.Code,
@@ -240,6 +280,8 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
             if (validateRes.IsSuccess)
             {
+                _attemptTracker?.RecordSuccess(otpKey);
+
                 IResponse<TUser> userRes = await _userManager.GetUser(model.UserId);
                 if (userRes.IsSuccess)
                 {
@@ -260,6 +302,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             }
             else
             {
+                _attemptTracker?.RecordFailure(otpKey);
                 validateRes.ConvertTo<bool>(result);
             }
         });

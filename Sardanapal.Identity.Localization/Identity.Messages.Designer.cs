@@ -70,6 +70,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Too many failed attempts. Please try again in {0} minute(s)..
+        /// </summary>
+        public static string AccountLockedOut {
+            get {
+                return ResourceManager.GetString("AccountLockedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered Email address is already registered by someone else..
         /// </summary>
         public static string DuplicateEmail {

@@ -120,6 +120,9 @@
   <data name="DifferentPassword" xml:space="preserve">
     <value>رمز عبور جدید باید با رمز عبور قدیم تفاوت داشته باشد.</value>
   </data>
+  <data name="AccountLockedOut" xml:space="preserve">
+    <value>تلاش ناموفق بیش از حد. لطفاً {0} دقیقه دیگر مجدداً تلاش کنید.</value>
+  </data>
   <data name="DuplicateEmail" xml:space="preserve">
     <value>آدرس ایمیل وارد شده قبلا در سیستم ثبت شده است.</value>
   </data>
