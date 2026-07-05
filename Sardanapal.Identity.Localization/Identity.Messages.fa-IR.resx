@@ -172,6 +172,9 @@
   <data name="OtpCooldown" xml:space="preserve">
     <value>برای ارسال کد جدید {0} دقیقه صبر کنید</value>
   </data>
+  <data name="OtpCodeExpired" xml:space="preserve">
+    <value>کد وارد شده منقضی شده است. لطفا کد جدیدی درخواست کنید.</value>
+  </data>
   <data name="PhonenumberNotFound" xml:space="preserve">
     <value>شماره تلفن همراه وارد شده در سیستم ثبت نشده است.</value>
   </data>

@@ -211,6 +211,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The entered code has expired. Please request a new code..
+        /// </summary>
+        public static string OtpCodeExpired {
+            get {
+                return ResourceManager.GetString("OtpCodeExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered phone number doesn&apos;t exist..
         /// </summary>
         public static string PhonenumberNotFound {

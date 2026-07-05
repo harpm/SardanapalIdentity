@@ -146,12 +146,20 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
 
         return await result.FillAsync(async () =>
         {
+            var now = DateTime.UtcNow;
             var otpModel = await _repository.FetchAll().AsNoTracking()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
                 .FirstOrDefaultAsync();
 
             if (otpModel != null)
             {
+                if (otpModel.ExpireTime <= now)
+                {
+                    result.Set(StatusCode.Failed);
+                    result.UserMessage = Identity_Messages.OtpCodeExpired;
+                    return;
+                }
+
                 var data = _mapper.Map<TVM>(otpModel);
                 result.Set(StatusCode.Succeeded, data);
             }
@@ -281,12 +289,20 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM
 
         return Task.FromResult(result.Fill(() =>
         {
+            var now = DateTime.UtcNow;
             var otpModel = _repository.FetchAll()
                 .Where(x => x.RoleId == model.RoleId && x.Code == model.Code && x.UserId.Equals(model.UserId))
                 .FirstOrDefault();
 
             if (otpModel != null)
             {
+                if (otpModel.ExpireTime <= now)
+                {
+                    result.Set(StatusCode.Failed);
+                    result.UserMessage = Identity_Messages.OtpCodeExpired;
+                    return;
+                }
+
                 var data = _mapper.Map<TVM>(otpModel);
                 result.Set(StatusCode.Succeeded, data);
             }
