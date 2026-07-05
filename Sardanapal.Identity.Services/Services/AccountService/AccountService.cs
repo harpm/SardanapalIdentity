@@ -51,7 +51,7 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
             var userRes = await _userManager.GetUser(model.Username);
             if (userRes.IsSuccess)
             {
-                if (userRes.Data.HashedPassword == await Utilities.EncryptToMd5(model.Password))
+                if (Utilities.VerifyPassword(model.Password, userRes.Data.HashedPassword))
                 {
                     var loginRes = await _userManager.Login(userRes.Data.Id);
                     if (loginRes.IsSuccess)
@@ -110,8 +110,7 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
             var userRes = await _userManager.GetUser(model.Username);
             if (userRes.IsSuccess)
             {
-                var oldPass = await Utilities.EncryptToMd5(model.OldPassword);
-                if (userRes.Data.HashedPassword == oldPass)
+                if (Utilities.VerifyPassword(model.OldPassword, userRes.Data.HashedPassword))
                 {
 
                     if (model.NewPassword == model.OldPassword)

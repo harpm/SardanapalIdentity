@@ -58,7 +58,7 @@ public static class IdentitySeeds
             .Any())
         {
             var password = "admin";
-            var hashedPassword = await Utilities.EncryptToMd5(password);
+            var hashedPassword = Utilities.HashPassword(password);
 
             admin = new TUser()
             {

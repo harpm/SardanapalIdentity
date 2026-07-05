@@ -71,15 +71,15 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         _tokenService = tokenService;
     }
 
-    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
+    protected virtual Task<TUser> CreateNewUser(TRegisterVM model)
     {
-        var hashedPass = await Utilities.EncryptToMd5(model.Password);
+        var hashedPass = Utilities.HashPassword(model.Password);
 
-        return new TUser()
+        return Task.FromResult(new TUser()
         {
             Username = model.Username,
             HashedPassword = hashedPass
-        };
+        });
     }
 
     public virtual async Task<IResponse<TUser>> GetUser(string username)
@@ -375,7 +375,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 .FirstOrDefaultAsync();
             if (user != null)
             {
-                var hashedPass = await Utilities.EncryptToMd5(newPassword);
+                var hashedPass = Utilities.HashPassword(newPassword);
                 user.HashedPassword = hashedPass;
                 await _repository.UpdateAsync(userId, user);
                 await _dbManager.SaveChangesAsync();
@@ -453,15 +453,15 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         return entities;
     }
 
-    protected virtual async Task<TUser> CreateNewUser(TRegisterVM model)
+    protected virtual Task<TUser> CreateNewUser(TRegisterVM model)
     {
-        var hashedPass = await Utilities.EncryptToMd5(model.Password);
+        var hashedPass = Utilities.HashPassword(model.Password);
 
-        return new TUser()
+        return Task.FromResult(new TUser()
         {
             Username = model.Username,
             HashedPassword = hashedPass
-        };
+        });
     }
 
     public virtual async Task<IResponse<TUser>> GetUser(string username)
@@ -717,7 +717,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                 .FirstOrDefault();
             if (user != null)
             {
-                var hashedPass = await Utilities.EncryptToMd5(newPassword);
+                var hashedPass = Utilities.HashPassword(newPassword);
                 user.HashedPassword = hashedPass;
                 await _repository.UpdateAsync(userId, user);
                 result.Set(StatusCode.Succeeded);
