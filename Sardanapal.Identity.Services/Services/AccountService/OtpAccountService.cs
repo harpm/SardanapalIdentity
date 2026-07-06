@@ -224,7 +224,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             if (identifier != null)
             {
                 var userRes = await _userManager.GetUser(identifier);
-                if (!userRes.IsSuccess)
+                if (userRes.IsSuccess)
                 {
                     var otpRes = await _otpService.Add(new NewOtpVM<TUserKey>()
                     {
