@@ -34,7 +34,7 @@ public record LoginVM()
         : this()
     {
         this.Username = username;
-        this.Username = password;
+        this.Password = password;
     }
 
     public string Username { get; init; }
@@ -77,7 +77,7 @@ public record RegisterVM<TRoleKey>()
         : this()
     {
         this.Username = username;
-        this.Username = password;
+        this.Password = password;
     }
 
     public string Username { get; init; }
