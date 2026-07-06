@@ -123,6 +123,9 @@
   <data name="AccountLockedOut" xml:space="preserve">
     <value>تلاش ناموفق بیش از حد. لطفاً {0} دقیقه دیگر مجدداً تلاش کنید.</value>
   </data>
+  <data name="AlreadyVerified" xml:space="preserve">
+    <value>این حساب کاربری قبلاً تایید شده است.</value>
+  </data>
   <data name="DuplicateEmail" xml:space="preserve">
     <value>آدرس ایمیل وارد شده قبلا در سیستم ثبت شده است.</value>
   </data>

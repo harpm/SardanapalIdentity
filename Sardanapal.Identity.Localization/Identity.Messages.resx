@@ -124,6 +124,9 @@
     <value>Too many failed attempts. Please try again in {0} minute(s).</value>
     <comment>Parameter: minutes remaining</comment>
   </data>
+  <data name="AlreadyVerified" xml:space="preserve">
+    <value>This account is already verified.</value>
+  </data>
   <data name="DuplicateEmail" xml:space="preserve">
     <value>Entered Email address is already registered by someone else.</value>
   </data>

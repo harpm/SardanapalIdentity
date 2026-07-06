@@ -79,6 +79,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This account is already verified..
+        /// </summary>
+        public static string AlreadyVerified {
+            get {
+                return ResourceManager.GetString("AlreadyVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered Email address is already registered by someone else..
         /// </summary>
         public static string DuplicateEmail {

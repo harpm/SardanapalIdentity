@@ -137,6 +137,18 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
                 if (userRes.IsSuccess)
                 {
+                    bool isEmail = !model.PhoneNumber.HasValue;
+                    bool alreadyVerified = isEmail
+                        ? userRes.Data.VerifiedEmail
+                        : userRes.Data.VerifiedPhoneNumber;
+
+                    if (alreadyVerified)
+                    {
+                        result.Set(StatusCode.Duplicate);
+                        result.UserMessage = Identity_Messages.AlreadyVerified;
+                        return;
+                    }
+
                     await _otpService.Add(new NewOtpVM<TUserKey>()
                     {
                         Recipient = identifier,
