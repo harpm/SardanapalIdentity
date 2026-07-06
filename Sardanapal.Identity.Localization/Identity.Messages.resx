@@ -133,6 +133,9 @@
   <data name="DuplicatePhoneNumber" xml:space="preserve">
     <value>Entered Phonenumber is already registered by someone else.</value>
   </data>
+  <data name="DuplicateUsername" xml:space="preserve">
+    <value>The entered username is already taken.</value>
+  </data>
   <data name="EmailNotFound" xml:space="preserve">
     <value>Entered  Email address doesn't exist.</value>
   </data>

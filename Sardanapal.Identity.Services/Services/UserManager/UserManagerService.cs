@@ -226,14 +226,13 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         await result.FillAsync(async () =>
         {
 
-            var newUserRes = await GetUser(model.Username);
-            if (newUserRes.StatusCode == StatusCode.Exception)
+            var existingUser = await _repository.FetchAll().AsNoTracking()
+                .Where(x => x.Username == model.Username)
+                .AnyAsync();
+
+            if (existingUser)
             {
-                newUserRes.ConvertTo<TUserKey>(result);
-            }
-            else if (newUserRes.IsSuccess)
-            {
-                result.Set(StatusCode.Duplicate, newUserRes.Data.Id);
+                result.Set(StatusCode.Duplicate, Identity_Messages.DuplicateUsername);
                 return;
             }
 
@@ -619,14 +618,13 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         await result.FillAsync(async () =>
         {
 
-            var newUserRes = await GetUser(model.Username);
-            if (newUserRes.StatusCode == StatusCode.Exception)
+            var existingUser = _repository.FetchAll()
+                .Where(x => x.Username == model.Username)
+                .Any();
+
+            if (existingUser)
             {
-                newUserRes.ConvertTo<TUserKey>(result);
-            }
-            else if (newUserRes.IsSuccess)
-            {
-                result.Set(StatusCode.Duplicate, newUserRes.Data.Id);
+                result.Set(StatusCode.Duplicate, Identity_Messages.DuplicateUsername);
                 return;
             }
 

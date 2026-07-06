@@ -132,6 +132,9 @@
   <data name="DuplicatePhoneNumber" xml:space="preserve">
     <value>شماره تلفن همراه وارد شده قبلا در سیستم ثبت شده است.</value>
   </data>
+  <data name="DuplicateUsername" xml:space="preserve">
+    <value>نام کاربری وارد شده قبلا انتخاب شده است.</value>
+  </data>
   <data name="EmailNotFound" xml:space="preserve">
     <value>ادرس ایمیل وارد شده در سیستم ثبت نشده است.</value>
   </data>

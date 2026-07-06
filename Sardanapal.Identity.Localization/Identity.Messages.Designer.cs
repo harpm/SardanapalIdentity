@@ -106,6 +106,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The entered username is already taken..
+        /// </summary>
+        public static string DuplicateUsername {
+            get {
+                return ResourceManager.GetString("DuplicateUsername", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Entered  Email address doesn&apos;t exist..
         /// </summary>
         public static string EmailNotFound {
