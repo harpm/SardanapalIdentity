@@ -127,4 +127,21 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR>
         var addedUserRole = await Task.FromResult(_turDB.GetOrAdd(userRole.Id, userRole));
         return addedUserRole.Id;
     }
+
+    public Task<bool> DeleteUserRolesAsync(TUserKey userId, TRoleKey[] roleIds)
+    {
+        var toRemove = _turDB.Values
+            .Where(ur => ur.UserId.Equals(userId) && roleIds.Contains(ur.RoleId))
+            .Select(ur => ur.Id)
+            .ToList();
+
+        bool allRemoved = true;
+        foreach (var id in toRemove)
+        {
+            if (!_turDB.TryRemove(id, out _))
+                allRemoved = false;
+        }
+
+        return Task.FromResult(allRemoved && toRemove.Count > 0);
+    }
 }

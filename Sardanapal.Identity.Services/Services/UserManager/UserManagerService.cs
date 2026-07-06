@@ -713,6 +713,24 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
                 await _repository.UpdateAsync(id, user);
 
+                var currentRoles = _repository.FetchAllUserRoles()
+                        .Where(r => r.UserId.Equals(id))
+                        .Select(r => r.RoleId)
+                        .ToArray();
+
+                await _repository.DeleteUserRolesAsync(id,
+                    currentRoles.Where(r => !model.Roles.Contains(r)).ToArray());
+
+                foreach (var role in model.Roles.Where(r => !currentRoles.Contains(r)))
+                {
+                    var userRole = new TUR()
+                    {
+                        UserId = id,
+                        RoleId = role
+                    };
+                    await _repository.AddUserRoleAsync(userRole);
+                }
+
                 result.Set(StatusCode.Succeeded, true);
             }
             else
