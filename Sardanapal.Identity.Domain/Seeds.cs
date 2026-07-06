@@ -26,11 +26,18 @@ public static class IdentitySeeds
 
         foreach (TRoleKey roleEnumMember in typeof(TRoleEnum).GetEnumValues())
         {
-            uow.Add(new TRole()
+            bool exists = uow.Set<TRole>()
+                .AsNoTracking()
+                .Any(r => r.Id.Equals(roleEnumMember));
+
+            if (!exists)
             {
-                Id = roleEnumMember,
-                Title = Enum.GetName(typeof(TRoleEnum), roleEnumMember)
-            });
+                uow.Add(new TRole()
+                {
+                    Id = roleEnumMember,
+                    Title = Enum.GetName(typeof(TRoleEnum), roleEnumMember)
+                });
+            }
         }
 
         uow.SaveChanges();
