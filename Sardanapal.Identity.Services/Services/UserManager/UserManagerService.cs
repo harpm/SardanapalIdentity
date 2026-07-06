@@ -40,21 +40,21 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
     protected override IQueryable<TUser> Search(IQueryable<TUser> entities, TUserSearchVM searchVM)
     {
-        if (searchVM == null)
+        if (searchVM != null)
         {
             if (!string.IsNullOrWhiteSpace(searchVM.Username))
             {
-                entities.Where(u => u.Username.Contains(searchVM.Username));
+                entities = entities.Where(u => u.Username.Contains(searchVM.Username));
             }
 
             if (!string.IsNullOrWhiteSpace(searchVM.Email))
             {
-                entities.Where(u => u.Username.Contains(searchVM.Email));
+                entities = entities.Where(u => u.Email.Contains(searchVM.Email));
             }
 
             if (searchVM.PhoneNumber.HasValue)
             {
-                entities.Where(u => u.Username.Contains(searchVM.PhoneNumber.ToString()));
+                entities = entities.Where(u => u.PhoneNumber.HasValue && u.PhoneNumber.Value.ToString().Contains(searchVM.PhoneNumber.ToString()));
             }
         }
 
@@ -449,6 +449,16 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             if (!string.IsNullOrWhiteSpace(searchVM.Username))
             {
                 entities = entities.Where(u => u.Username.Contains(searchVM.Username));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchVM.Email))
+            {
+                entities = entities.Where(u => u.Email != null && u.Email.Contains(searchVM.Email));
+            }
+
+            if (searchVM.PhoneNumber.HasValue)
+            {
+                entities = entities.Where(u => u.PhoneNumber.HasValue && u.PhoneNumber.Value.ToString().Contains(searchVM.PhoneNumber.ToString()));
             }
         }
 
