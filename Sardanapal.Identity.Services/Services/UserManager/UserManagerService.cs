@@ -189,27 +189,30 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
         await result.FillAsync(async () =>
         {
+            bool userExists = await _repository.FetchAll().AsNoTracking()
+                .Where(x => x.Id.Equals(userId))
+                .AnyAsync();
+
+            if (!userExists)
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                return;
+            }
+
             var roles = await _repository.FetchAllUserRoles().AsNoTracking()
                 .Where(x => x.UserId.Equals(userId))
                 .Select(x => x.RoleId)
                 .ToArrayAsync();
 
-            if (roles != null && roles.Any())
-            {
-                var resultModel = _tokenService.GenerateToken(userId.ToString(), roles, []);
+            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles ?? [], []);
 
-                if (resultModel.IsSuccess)
-                {
-                    result.Set(StatusCode.Succeeded, resultModel.Data);
-                }
-                else
-                {
-                    resultModel.ConvertTo<string>(result);
-                }
+            if (resultModel.IsSuccess)
+            {
+                result.Set(StatusCode.Succeeded, resultModel.Data);
             }
             else
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUserId);
+                resultModel.ConvertTo<string>(result);
             }
         });
 
@@ -579,27 +582,30 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
         await result.FillAsync(async () =>
         {
+            bool userExists = _repository.FetchAll()
+                .Where(x => x.Id.Equals(userId))
+                .Any();
+
+            if (!userExists)
+            {
+                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                return;
+            }
+
             var roles = _repository.FetchAllUserRoles()
                 .Where(x => x.UserId.Equals(userId))
                 .Select(x => x.RoleId)
                 .ToArray();
 
-            if (roles != null && roles.Any())
-            {
-                var resultModel = _tokenService.GenerateToken(userId.ToString(), roles, []);
+            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles ?? [], []);
 
-                if (resultModel.IsSuccess)
-                {
-                    result.Set(StatusCode.Succeeded, resultModel.Data);
-                }
-                else
-                {
-                    resultModel.ConvertTo<string>(result);
-                }
+            if (resultModel.IsSuccess)
+            {
+                result.Set(StatusCode.Succeeded, resultModel.Data);
             }
             else
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.InvalidUserId);
+                resultModel.ConvertTo<string>(result);
             }
         });
 
