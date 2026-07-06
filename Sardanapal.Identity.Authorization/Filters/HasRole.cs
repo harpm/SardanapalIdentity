@@ -19,29 +19,36 @@ public class HasRoleAttribute : ActionFilterAttribute
 
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        IIdentityProvider idProvider;
         try
         {
-            IIdentityProvider idProvider = context?.HttpContext?.RequestServices?.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
-
-            if (idProvider?.IsAnanymous ?? false)
-                return base.OnActionExecutionAsync(context, next);
-
-            if (!idProvider.IsAuthorized
-                || idProvider.Claims == null
-                || idProvider.Claims.Claims == null
-                || idProvider.Claims.Claims.Count() == 0
-                || !idProvider.Claims.Claims
-                    .Where(c => c.Type == SdClaimTypes.Roles
-                        && roleIds.Select(r => r.ToString()).Contains(c.Value)).Any())
-            {
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                context.Result = new UnauthorizedResult();
-            }
+            idProvider = context?.HttpContext?.RequestServices?.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
         }
-        catch
+        catch (InvalidOperationException)
         {
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Result = new UnauthorizedResult();
+            return Task.CompletedTask;
+        }
+
+        if (idProvider == null)
+        {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            context.Result = new UnauthorizedResult();
+            return Task.CompletedTask;
+        }
+
+        if (idProvider.IsAnanymous)
+            return base.OnActionExecutionAsync(context, next);
+
+        if (!idProvider.IsAuthorized
+            || idProvider.Claims == null
+            || !idProvider.Claims.HasClaim(c => c.Type == SdClaimTypes.Roles
+                && roleIds.Select(r => r.ToString()).Contains(c.Value)))
+        {
+            context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+            context.Result = new UnauthorizedResult();
+            return Task.CompletedTask;
         }
 
         return base.OnActionExecutionAsync(context, next);
