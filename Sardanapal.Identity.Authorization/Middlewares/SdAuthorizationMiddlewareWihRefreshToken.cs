@@ -4,8 +4,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
+using Sardanapal.Identity.Share.Types;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Authorization.Middlewares;
@@ -47,12 +49,54 @@ public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddlewar
 
         bool mustChangePassword = identityProvider.Claims.HasClaim(SdClaimTypes.MustChangePassword, "true");
 
-        var token = tokenService.GenerateToken(uid, roles, [], mustChangePassword);
+        // Rebuild the user's claim set from the expiring token so the refreshed
+        // token keeps the same access. AccessRight claims serialize to a plain id;
+        // ControllerAction claims serialize to "{ControllerId}:{ActionType}" (see
+        // TokenService.MapTokenClaims).
+        var claimsData = new List<IClaim>();
+
+        foreach (var accessClaim in identityProvider.Claims.FindAll(SdClaimTypes.AccessRights))
+        {
+            if (byte.TryParse(accessClaim.Value, NumberStyles.None, CultureInfo.InvariantCulture, out byte accessId))
+            {
+                claimsData.Add(new RefreshClaim
+                {
+                    ClaimType = (byte)SdClaimType.AccessRight,
+                    Id = accessId
+                });
+            }
+        }
+
+        foreach (var controllerActionClaim in identityProvider.Claims.FindAll(SdClaimTypes.ControllerAction))
+        {
+            var parts = controllerActionClaim.Value.Split(':');
+            if (parts.Length == 2
+                && Guid.TryParse(parts[0], out Guid controllerId)
+                && byte.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out byte actionType))
+            {
+                claimsData.Add(new RefreshClaim
+                {
+                    ClaimType = (byte)SdClaimType.ControllerAction,
+                    ControllerId = controllerId,
+                    ActionType = actionType
+                });
+            }
+        }
+
+        var token = tokenService.GenerateToken(uid, roles, claimsData.ToArray(), mustChangePassword);
 
         if (token.StatusCode == StatusCode.Succeeded)
         {
             context.Response.Headers[ConstantKeys.AUTH_HEADER_KEY] = token.Data;
         }
+    }
+
+    private sealed class RefreshClaim : IControllerActionClaim<byte>
+    {
+        public byte Id { get; set; }
+        public byte ClaimType { get; set; }
+        public Guid ControllerId { get; set; }
+        public byte ActionType { get; set; }
     }
 
     private static DateTime? TryGetTokenExpiry(ClaimsPrincipal principal)

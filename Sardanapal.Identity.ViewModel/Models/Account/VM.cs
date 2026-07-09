@@ -25,7 +25,7 @@ public record NewUserVM
 
 public record UserEditableVM : NewUserVM
 {
-
+    public List<byte> Claims { get; init; }
 }
 
 public record LoginVM()

@@ -19,16 +19,17 @@ namespace Sardanapal.Identity.Services.Services.UserManager;
 
 #region EF
 
-public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
+public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC, TClaim>
     : EFPanelServiceBase<TEFDatabaseManager, TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
     , IUserManager<TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
     where TEFDatabaseManager : IEFDatabaseManager
-    where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR>
+    where TRepository : IEFUserRepository<TUserKey, byte, TUser, TUR, TUC, TClaim>
         , IEFCrudRepository<TUserKey, TUser>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
+    where TClaim : class, IClaim<byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
     where TRegisterVM : RegisterVM<byte>, new()
@@ -164,9 +165,17 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                     .Select(x => x.RoleId)
                     .ToListAsync();
 
+                var claimEntities = await _repository.FetchUserClaims(user.Id)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var claims = claimEntities
+                    .Select(c => (IClaim)c)
+                    .ToArray();
+
                 var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
                     , roles?.ToArray() ?? []
-                    , []
+                    , claims ?? []
                     , user.MustChangePassword);
 
                 if (!tokenRes.IsSuccess)
@@ -204,7 +213,14 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 .Select(x => x.RoleId)
                 .ToArrayAsync();
 
-            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles ?? [], []);
+            var claimEntities = await _repository.FetchUserClaims(userId).AsNoTracking()
+                .ToListAsync();
+
+            var claims = claimEntities
+                .Select(c => (IClaim)c)
+                .ToArray();
+
+            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles ?? [], claims ?? []);
 
             if (resultModel.IsSuccess)
             {
@@ -355,6 +371,26 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                     await _repository.AddUserRoleAsync(userRole);
                 }
 
+                var modelClaims = model.Claims ?? new List<byte>();
+                var currentClaims = await _repository.FetchAllUserClaims()
+                        .AsNoTracking()
+                        .Where(c => c.UserId.Equals(id))
+                        .Select(c => c.ClaimId)
+                        .ToArrayAsync();
+
+                await _repository.DeleteUserClaimsAsync(id,
+                    currentClaims.Where(c => !modelClaims.Contains(c)).ToArray());
+
+                foreach (var claimId in modelClaims.Where(c => !currentClaims.Contains(c)))
+                {
+                    var userClaim = new TUC()
+                    {
+                        UserId = id,
+                        ClaimId = claimId
+                    };
+                    await _repository.AddUserClaimAsync(userClaim);
+                }
+
                 await _dbManager.SaveChangesAsync();
 
                 result.Set(StatusCode.Succeeded, true);
@@ -420,14 +456,15 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
 #region Memory
 
-public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC>
+public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM, TUR, TUC, TClaim>
     : MemoryPanelServiceBase<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
     , IUserManager<TUserKey, TUser, TUserSearchVM, TUserVM, TRegisterVM, TUserEditableVM>
-    where TRepository : class, IMemoryRepository<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR>
+    where TRepository : class, IMemoryRepository<TUserKey, TUser>, IUserRepository<TUserKey, byte, TUser, TUR, TUC, TClaim>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TUser : class, IUser<TUserKey>, new()
     where TUR : class, IUserRole<TUserKey, byte>, new()
     where TUC : class, IUserClaim<TUserKey, byte>, new()
+    where TClaim : class, IClaim<byte>, new()
     where TUserVM : UserVM<TUserKey>, new()
     where TUserSearchVM : UserSearchVM, new()
     where TRegisterVM : RegisterVM<byte>, new()
@@ -556,9 +593,16 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                     .Select(x => x.RoleId)
                     .ToList();
 
+                var claimEntities = _repository.FetchUserClaims(user.Id)
+                    .ToList();
+
+                var claims = claimEntities
+                    .Select(c => (IClaim)c)
+                    .ToArray();
+
                 var tokenRes = _tokenService.GenerateToken(user.Id.ToString()
                     , roles?.ToArray() ?? []
-                    , []
+                    , claims ?? []
                     , user.MustChangePassword);
 
                 if (!tokenRes.IsSuccess)
@@ -596,7 +640,14 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                 .Select(x => x.RoleId)
                 .ToArray();
 
-            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles ?? [], []);
+            var claimEntities = _repository.FetchUserClaims(userId)
+                .ToList();
+
+            var claims = claimEntities
+                .Select(c => (IClaim)c)
+                .ToArray();
+
+            var resultModel = _tokenService.GenerateToken(userId.ToString(), roles ?? [], claims ?? []);
 
             if (resultModel.IsSuccess)
             {
@@ -729,6 +780,25 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                         RoleId = role
                     };
                     await _repository.AddUserRoleAsync(userRole);
+                }
+
+                var modelClaims = model.Claims ?? new List<byte>();
+                var currentClaims = _repository.FetchAllUserClaims()
+                        .Where(c => c.UserId.Equals(id))
+                        .Select(c => c.ClaimId)
+                        .ToArray();
+
+                await _repository.DeleteUserClaimsAsync(id,
+                    currentClaims.Where(c => !modelClaims.Contains(c)).ToArray());
+
+                foreach (var claimId in modelClaims.Where(c => !currentClaims.Contains(c)))
+                {
+                    var userClaim = new TUC()
+                    {
+                        UserId = id,
+                        ClaimId = claimId
+                    };
+                    await _repository.AddUserClaimAsync(userClaim);
                 }
 
                 result.Set(StatusCode.Succeeded, true);

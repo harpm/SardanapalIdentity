@@ -3,8 +3,10 @@ using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
+using Sardanapal.Identity.Share.Types;
 using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Services.Services;
@@ -22,7 +24,7 @@ public class TokenService : ITokenService
         this._configs = config.Value;
     }
 
-    protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, byte[] claimIds, bool mustChangePassword = false)
+    protected virtual string GenerateToken(string uid, int expireTime, byte[] roleIds, IClaim[] claims, bool mustChangePassword = false)
     {
         if (_configs.TokenParameters == null) throw new NullReferenceException(nameof(SDConfigs.TokenParameters));
 
@@ -38,6 +40,7 @@ public class TokenService : ITokenService
             };
 
         Claims.AddRange(roleClaims);
+        Claims.AddRange(MapTokenClaims(claims));
 
         if (mustChangePassword)
         {
@@ -54,13 +57,36 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public virtual IResponse<string> GenerateToken(string uid, byte[] roleIds, byte[] claimIds, bool mustChangePassword = false)
+    protected virtual IEnumerable<Claim> MapTokenClaims(IClaim[] claims)
+    {
+        if (claims == null)
+            yield break;
+
+        foreach (var claim in claims)
+        {
+            if (claim == null)
+                continue;
+
+            switch ((SdClaimType)claim.ClaimType)
+            {
+                case SdClaimType.ControllerAction when claim is IControllerActionClaim<byte> ca:
+                    yield return new Claim(SdClaimTypes.ControllerAction,
+                        $"{ca.ControllerId}:{ca.ActionType}");
+                    break;
+                case SdClaimType.AccessRight when claim is IClaim<byte> ac:
+                    yield return new Claim(SdClaimTypes.AccessRights, ac.Id.ToString());
+                    break;
+            }
+        }
+    }
+
+    public virtual IResponse<string> GenerateToken(string uid, byte[] roleIds, IClaim[] claims, bool mustChangePassword = false)
     {
         IResponse<string> result = new Response<string>(ServiceName, OperationType.Function, _logger);
 
         return result.Fill(() =>
         {
-            string token = GenerateToken(uid, _configs.ExpirationTime, roleIds, [], mustChangePassword);
+            string token = GenerateToken(uid, _configs.ExpirationTime, roleIds, claims ?? [], mustChangePassword);
 
             result.Set(StatusCode.Succeeded, token);
         });
@@ -87,7 +113,7 @@ public class TokenService : ITokenService
         return result;
     }
 
-    public virtual IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds, byte[] claimIds)
+    public virtual IResponse<bool> ValidateTokenRoles(string token, byte[] roleIds, IClaim[] claims)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Fetch, _logger);
 
@@ -100,15 +126,39 @@ public class TokenService : ITokenService
             var hasRole = claimsPrinc.HasClaim(c => c.Type == SdClaimTypes.Roles
                 && roleIds.Select(r => r.ToString()).Contains(c.Value));
 
-            if (hasRole)
+            bool hasClaim = HasClaims(claimsPrinc, claims);
+
+            if (hasRole && hasClaim)
             {
-                result.Set(StatusCode.Succeeded, hasRole);
+                result.Set(StatusCode.Succeeded, true);
             }
             else
             {
                 result.Set(StatusCode.NotExists, false);
             }
 
+        });
+    }
+
+    protected virtual bool HasClaims(ClaimsPrincipal claimsPrincipal, IClaim[] claims)
+    {
+        if (claims == null || claims.Length == 0)
+            return true;
+
+        return claims.Any(claim =>
+        {
+            if (claim == null) return false;
+
+            switch ((SdClaimType)claim.ClaimType)
+            {
+                case SdClaimType.ControllerAction when claim is IControllerActionClaim<byte> ca:
+                    return claimsPrincipal.HasClaim(SdClaimTypes.ControllerAction,
+                        $"{ca.ControllerId}:{ca.ActionType}");
+                case SdClaimType.AccessRight when claim is IClaim<byte> ac:
+                    return claimsPrincipal.HasClaim(SdClaimTypes.AccessRights, ac.Id.ToString());
+                default:
+                    return false;
+            }
         });
     }
 }
