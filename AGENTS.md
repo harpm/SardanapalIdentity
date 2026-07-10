@@ -134,7 +134,6 @@ User-facing strings live in `Sardanapal.Identity.Localization`:
 
 ## 8. Known Footguns
 
-- **Namespace split:** `Utilities.cs` lives under namespace `Sardanapal.Identity.Share.Statics` (plural) while the rest of `Share` uses `Sardanapal.Identity.Share.Static` (singular). Watch the import.
 - **Compat-locked typos** in public API (kept intentionally to avoid breaking consumers): `Ananymous` (Anonymous), `Cach` (Cache), `Wih` (With), `recepient` (recipient), `IsAnanymous`.
 - **Reflection audit fields:** `SdIdentityUnitOfWorkBase.SetBaseValues` sets `CreateBy/ModifiedBy/CreatedOnUtc/ModifiedOnUtc` by string property name — no compile-time safety; property renames silently break audit.
 - **Memory repo:** null guards are commented out in `UserRepositoryBase.AddUserRole*`; id assignment `Max()+1` is not atomic (issue D-1).

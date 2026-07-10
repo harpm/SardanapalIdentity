@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Sardanapal.Identity.Share.Statics;
+namespace Sardanapal.Identity.Share.Static;
 public static class Utilities
 {
     private const int SaltSize = 16;

@@ -13,7 +13,6 @@ using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
 using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.ViewModel.Models.Account;
-using Sardanapal.Identity.Share.Statics;
 
 namespace Sardanapal.Identity.Services.Services.UserManager;
 

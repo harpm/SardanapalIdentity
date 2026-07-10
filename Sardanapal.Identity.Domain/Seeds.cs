@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Share.Static;
-using Sardanapal.Identity.Share.Statics;
 
 namespace Sardanapal.Identity.Domain;
 

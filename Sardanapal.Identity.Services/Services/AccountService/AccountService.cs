@@ -3,7 +3,7 @@ using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Domain.Model;
 using Sardanapal.Identity.Localization;
-using Sardanapal.Identity.Share.Statics;
+using Sardanapal.Identity.Share.Static;
 using Sardanapal.Identity.ViewModel.Models.Account;
 using Sardanapal.ViewModel.Response;
 
