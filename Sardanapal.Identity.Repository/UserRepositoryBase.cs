@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using Sardanapal.Ef.Repository;
 using Sardanapal.Identity.Contract.IModel;
@@ -146,6 +147,9 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
     protected virtual ConcurrentDictionary<long, TUC> _tucDB { get; set; } = new ConcurrentDictionary<long, TUC>();
     protected virtual ConcurrentDictionary<TRoleKey, TClaim> _claimDB { get; set; } = new ConcurrentDictionary<TRoleKey, TClaim>();
 
+    protected long _turIdCounter;
+    protected long _tucIdCounter;
+
     protected UserRepositoryBase()
         : base()
     {
@@ -166,17 +170,17 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
     public virtual long AddUserRole(TUR userRole)
     {
         EnsureNotNullReference(userRole);
-        userRole.Id = _turDB.Count > 0 ? _turDB.Keys.Max() + 1 : 0;
-        var addedUserRole = _turDB.GetOrAdd(userRole.Id, userRole);
-        return addedUserRole.Id;
+        userRole.Id = Interlocked.Increment(ref _turIdCounter);
+        _turDB.TryAdd(userRole.Id, userRole);
+        return userRole.Id;
     }
 
     public virtual async Task<long> AddUserRoleAsync(TUR userRole)
     {
         EnsureNotNullReference(userRole);
-        userRole.Id = _turDB.Count > 0 ? _turDB.Keys.Max() + 1 : 0;
-        var addedUserRole = await Task.FromResult(_turDB.GetOrAdd(userRole.Id, userRole));
-        return addedUserRole.Id;
+        userRole.Id = Interlocked.Increment(ref _turIdCounter);
+        _turDB.TryAdd(userRole.Id, userRole);
+        return await Task.FromResult(userRole.Id);
     }
 
     public virtual Task<bool> DeleteUserRolesAsync(TUserKey userId, TRoleKey[] roleIds)
@@ -217,17 +221,17 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
     public virtual long AddUserClaim(TUC userClaim)
     {
         EnsureNotNullReference(userClaim);
-        userClaim.Id = _tucDB.Count > 0 ? _tucDB.Keys.Max() + 1 : 0;
-        var addedUserClaim = _tucDB.GetOrAdd(userClaim.Id, userClaim);
-        return addedUserClaim.Id;
+        userClaim.Id = Interlocked.Increment(ref _tucIdCounter);
+        _tucDB.TryAdd(userClaim.Id, userClaim);
+        return userClaim.Id;
     }
 
     public virtual async Task<long> AddUserClaimAsync(TUC userClaim)
     {
         EnsureNotNullReference(userClaim);
-        userClaim.Id = _tucDB.Count > 0 ? _tucDB.Keys.Max() + 1 : 0;
-        var addedUserClaim = await Task.FromResult(_tucDB.GetOrAdd(userClaim.Id, userClaim));
-        return addedUserClaim.Id;
+        userClaim.Id = Interlocked.Increment(ref _tucIdCounter);
+        _tucDB.TryAdd(userClaim.Id, userClaim);
+        return await Task.FromResult(userClaim.Id);
     }
 
     public virtual Task<bool> DeleteUserClaimsAsync(TUserKey userId, TRoleKey[] claimIds)
