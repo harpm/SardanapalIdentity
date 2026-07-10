@@ -76,7 +76,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
 
                 if (expireTime > 0)
                 {
-                    await GetCurrentDatabase().ExecuteAsync($"HEXPIRE {key} {expireTime * 60} FIELDS 1 {newId.ToString()}");
+                    await GetCurrentDatabase().ExecuteAsync("HEXPIRE", key, (long)(expireTime * 60), "FIELDS", 1, new RedisValue(newId.ToString()));
                 }
 
                 if (long.TryParse(model.Recipient, out long _))
