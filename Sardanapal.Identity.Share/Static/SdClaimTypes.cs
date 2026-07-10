@@ -1,6 +1,6 @@
 ﻿namespace Sardanapal.Identity.Share.Static;
 
-public class SdClaimTypes
+public static class SdClaimTypes
 {
     #region Base Claim Keys
 
