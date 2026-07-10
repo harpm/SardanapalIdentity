@@ -135,26 +135,4 @@ public class OtpCacheService<TUserKey, TKey, TOtpCacheModel, TNewVM, TEditableVM
             }
         });
     }
-
-    /// <summary>
-    /// Otps have Expire time will be automatically removed,
-    /// So don't use it, unless in special cases
-    /// </summary>
-    /// <returns></returns>
-    public virtual async Task RemoveExpireds()
-    {
-        var allOtps = await GetCurrentDatabase().HashGetAllAsync(new RedisKey(key));
-
-        var ids = allOtps
-            .Select(x => JsonSerializer.Deserialize<OTPModel<TUserKey, TKey>>(x.Value))
-            .AsEnumerable()
-            .Where(x => x?.ExpireTime <= DateTime.UtcNow)
-            .Select(x => x.Id)
-            .ToList();
-
-        foreach (var id in ids)
-        {
-            await Delete(id);
-        }
-    }
 }

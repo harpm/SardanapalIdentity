@@ -12,8 +12,6 @@ public interface IOtpServiceBase<TUserKey, TKey, TNewVM>
     where TKey : IComparable<TKey>, IEquatable<TKey>
     where TNewVM : class, new()
 {
-    [Obsolete("Use expire time on the cache provider instead of this method")]
-    Task RemoveExpireds();
 }
 
 public interface IOtpService<TUserKey, TKey, TVM, TNewVM, TEditableVM>

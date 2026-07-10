@@ -129,17 +129,6 @@ public class EFOtpService<TEFDatabaseManager, TRepository, TUserKey, TKey, TOTPM
         });
     }
 
-    // TODO: this method should be removed and handled by a background service or cache expiration
-    public virtual async Task RemoveExpireds()
-    {
-        await this._repository.DeleteRangeAsync(_repository
-            .FetchAll()
-            .Where(x => x.ExpireTime <= DateTime.UtcNow)
-            .Select(x => x.Id)
-            .ToList());
-        await this._dbManager.SaveChangesAsync();
-    }
-
     public virtual async Task<IResponse<TVM>> ValidateCode(TNewVM model)
     {
         IResponse<TVM> result = new Response<TVM>(ServiceName, OperationType.Fetch, _logger);
@@ -274,16 +263,6 @@ public class OtpService<TRepository, TUserKey, TKey, TOTPModel, TListItemVM, TVM
                 result.UserMessage = string.Format(Identity_Messages.OtpCooldown, expireTime);
             }
         });
-    }
-
-    [Obsolete("Use expire time on the cache provider instead of this method")]
-    public virtual async Task RemoveExpireds()
-    {
-        await this._repository.DeleteRangeAsync(_repository
-            .FetchAll()
-            .Where(x => x.ExpireTime <= DateTime.UtcNow)
-            .Select(x => x.Id)
-            .ToList());
     }
 
     public virtual async Task<IResponse<TVM>> ValidateCode(TNewVM model)
