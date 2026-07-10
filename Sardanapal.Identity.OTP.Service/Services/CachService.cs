@@ -14,18 +14,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public interface IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
-    : ICacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpServiceBase<TUserKey, TKey, TNewVM>
-    where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
-    where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : IOTPModel<TUserKey, TKey>, new()
-    where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
-    where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
-{
-
-}
-
 public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
     , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
