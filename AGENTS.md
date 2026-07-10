@@ -135,12 +135,11 @@ User-facing strings live in `Sardanapal.Identity.Localization`:
 ## 8. Known Footguns
 
 - **Compat-locked typos** in public API (kept intentionally to avoid breaking consumers): `Ananymous` (Anonymous), `Cach` (Cache), `Wih` (With), `recepient` (recipient), `IsAnanymous`.
-- **Reflection audit fields:** `SdIdentityUnitOfWorkBase.SetBaseValues` sets `CreateBy/ModifiedBy/CreatedOnUtc/ModifiedOnUtc` by string property name — no compile-time safety; property renames silently break audit.
 - **Memory repo:** null guards are commented out in `UserRepositoryBase.AddUserRole*`; id assignment `Max()+1` is not atomic (issue D-1).
 - **`IOtpServiceBase.RemoveExpireds`** is `[Obsolete]` but still required by the interface (issue C-7).
 
 ### Open work items (from `Issues.csv`, state `pending`)
-- `C-4..C-11` design cleanups (Redis command interpolation, static class fixups, etc.).
+- `C-6..C-11` design cleanups (static class fixups, etc.).
 - `D-1` memory AddUserRole race.
 - `E-1` no test project exists yet.
 

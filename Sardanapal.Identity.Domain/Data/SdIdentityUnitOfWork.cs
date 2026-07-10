@@ -4,7 +4,6 @@ using Sardanapal.Ef.UnitOfWork;
 using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Share.Static;
-using Sardanapal.Share.Extensions;
 
 namespace Sardanapal.Identity.Domain.Data;
 
@@ -54,46 +53,17 @@ public abstract class SdIdentityUnitOfWorkBase<TUserKey, TRoleKey, TClaimKey, TU
 
     protected abstract TUserKey CreateUserKey(string rawUserKey);
 
-    protected override void SetBaseValues(object? sender, SavingChangesEventArgs e)
+    protected override object GetCurrentUserKey()
     {
-        base.SetBaseValues(sender, e);
-
-        var EntityModels = ChangeTracker
-            .Entries()
-            .Where(e => e.Entity.GetType().ImplementsRawGeneric(typeof(IEntityModel<,>))
-                && (e.State == EntityState.Added || e.State == EntityState.Modified))
-            .ToList();
-
-        foreach (var model in EntityModels)
+        if (_reqClaim?.IsAuthorized ?? false)
         {
-            var entity = model.Entity;
-            var t = entity.GetType();
-            if (_reqClaim?.IsAuthorized ?? false)
+            var id = _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrWhiteSpace(id))
             {
-                var id = _reqClaim?.Claims?.FindFirst(SdClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrWhiteSpace(id))
-                {
-                    var userId = CreateUserKey(id);
-                    if (model.State == EntityState.Added)
-                    {
-                        t.GetProperty("CreateBy")?.SetValue(entity, userId);
-                    }
-                    else if (model.State == EntityState.Modified)
-                    {
-                        t.GetProperty("ModifiedBy")?.SetValue(entity, userId);
-                    }
-                }
+                return CreateUserKey(id);
             }
-
-            if (model.State == EntityState.Added)
-            {
-                t.GetProperty("CreatedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-            }
-            else if (model.State == EntityState.Modified)
-            {
-                t.GetProperty("ModifiedOnUtc")?.SetValue(entity, DateTime.UtcNow);
-            }
-
         }
+
+        return null;
     }
 }
