@@ -165,7 +165,7 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
 
     public virtual long AddUserRole(TUR userRole)
     {
-        //EnsureNotNullReference(userRole);
+        EnsureNotNullReference(userRole);
         userRole.Id = _turDB.Count > 0 ? _turDB.Keys.Max() + 1 : 0;
         var addedUserRole = _turDB.GetOrAdd(userRole.Id, userRole);
         return addedUserRole.Id;
@@ -173,7 +173,7 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
 
     public virtual async Task<long> AddUserRoleAsync(TUR userRole)
     {
-        //EnsureNotNullReference(userRole);
+        EnsureNotNullReference(userRole);
         userRole.Id = _turDB.Count > 0 ? _turDB.Keys.Max() + 1 : 0;
         var addedUserRole = await Task.FromResult(_turDB.GetOrAdd(userRole.Id, userRole));
         return addedUserRole.Id;
@@ -216,6 +216,7 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
 
     public virtual long AddUserClaim(TUC userClaim)
     {
+        EnsureNotNullReference(userClaim);
         userClaim.Id = _tucDB.Count > 0 ? _tucDB.Keys.Max() + 1 : 0;
         var addedUserClaim = _tucDB.GetOrAdd(userClaim.Id, userClaim);
         return addedUserClaim.Id;
@@ -223,6 +224,7 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
 
     public virtual async Task<long> AddUserClaimAsync(TUC userClaim)
     {
+        EnsureNotNullReference(userClaim);
         userClaim.Id = _tucDB.Count > 0 ? _tucDB.Keys.Max() + 1 : 0;
         var addedUserClaim = await Task.FromResult(_tucDB.GetOrAdd(userClaim.Id, userClaim));
         return addedUserClaim.Id;
@@ -254,5 +256,10 @@ public abstract class UserRepositoryBase<TUserKey, TRoleKey, TUserModel, TUR, TU
     {
         AddClaim(claim);
         return Task.CompletedTask;
+    }
+
+    protected static void EnsureNotNullReference<T>(T values)
+    {
+        if (values == null) throw new ArgumentNullException(nameof(values));
     }
 }
