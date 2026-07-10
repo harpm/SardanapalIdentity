@@ -286,15 +286,15 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
         return result;
     }
 
-    public virtual async Task<IResponse> VerifyUser(string recepient)
+    public virtual async Task<IResponse> VerifyUser(string recipient)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
         await result.FillAsync(async () =>
         {
-            if (!string.IsNullOrWhiteSpace(recepient))
+            if (!string.IsNullOrWhiteSpace(recipient))
             {
                 TUser? user = null;
-                if (ulong.TryParse(recepient, out ulong phoneNumber))
+                if (ulong.TryParse(recipient, out ulong phoneNumber))
                 {
                     user = await _repository.FetchAll()
                         .Where(x => x.PhoneNumber.HasValue && x.PhoneNumber.Value == phoneNumber)
@@ -308,7 +308,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 else
                 {
                     user = await _repository.FetchAll()
-                        .Where(x => x.Email == recepient)
+                        .Where(x => x.Email == recipient)
                         .FirstOrDefaultAsync();
 
                     if (user != null)
@@ -698,15 +698,15 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
         return result;
     }
 
-    public virtual async Task<IResponse> VerifyUser(string recepient)
+    public virtual async Task<IResponse> VerifyUser(string recipient)
     {
         IResponse<bool> result = new Response(ServiceName, OperationType.Edit, _logger);
         await result.FillAsync(async () =>
         {
-            if (!string.IsNullOrWhiteSpace(recepient))
+            if (!string.IsNullOrWhiteSpace(recipient))
             {
                 TUser? user = null;
-                if (ulong.TryParse(recepient, out ulong phoneNumber))
+                if (ulong.TryParse(recipient, out ulong phoneNumber))
                 {
                     user = _repository.FetchAll()
                         .Where(x => x.PhoneNumber.HasValue && x.PhoneNumber.Value == phoneNumber)
@@ -720,7 +720,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                 else
                 {
                     user = _repository.FetchAll()
-                        .Where(x => x.Email == recepient)
+                        .Where(x => x.Email == recipient)
                         .FirstOrDefault();
 
                     if (user != null)

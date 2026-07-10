@@ -38,7 +38,7 @@ public class HasRoleAttribute : ActionFilterAttribute
             return Task.CompletedTask;
         }
 
-        if (idProvider.IsAnanymous)
+        if (idProvider.IsAnonymous)
             return base.OnActionExecutionAsync(context, next);
 
         if (!idProvider.IsAuthorized

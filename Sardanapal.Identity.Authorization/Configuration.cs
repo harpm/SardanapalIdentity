@@ -34,7 +34,7 @@ public static class Configuration
         }
         else
         {
-            app.UseMiddleware<SdAuthorizationMiddlewareWihRefreshToken>();
+            app.UseMiddleware<SdAuthorizationMiddlewareWithRefreshToken>();
         }
 
         return app;

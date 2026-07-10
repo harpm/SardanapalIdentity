@@ -12,9 +12,9 @@ using Sardanapal.ViewModel.Response;
 
 namespace Sardanapal.Identity.Authorization.Middlewares;
 
-public class SdAuthorizationMiddlewareWihRefreshToken : SdAuthorizationMiddleware
+public class SdAuthorizationMiddlewareWithRefreshToken : SdAuthorizationMiddleware
 {
-    public SdAuthorizationMiddlewareWihRefreshToken(RequestDelegate next) : base(next)
+    public SdAuthorizationMiddlewareWithRefreshToken(RequestDelegate next) : base(next)
     {
 
     }

@@ -43,12 +43,12 @@ public class IdentityProvider : IIdentityProvider
         }
     }
 
-    protected bool _isAnanymous;
-    public bool IsAnanymous
+    protected bool _isAnonymous;
+    public bool IsAnonymous
     {
         get
         {
-            return _isAnanymous;
+            return _isAnonymous;
         }
     }
 
@@ -68,9 +68,9 @@ public class IdentityProvider : IIdentityProvider
         this._tokenService = tokenService;
     }
 
-    public virtual void SetAnanymous()
+    public virtual void SetAnonymous()
     {
-        _isAnanymous = true;
+        _isAnonymous = true;
     }
 
     public virtual void SetAuthorize()

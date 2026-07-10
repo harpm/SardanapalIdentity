@@ -6,9 +6,9 @@ using Sardanapal.Identity.Contract.IService;
 namespace Sardanapal.Identity.Authorization.Filters;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public class AnanymousAttribute : ActionFilterAttribute
+public class AnonymousAttribute : ActionFilterAttribute
 {
-    public AnanymousAttribute()
+    public AnonymousAttribute()
     {
         this.Order = 0;
     }
@@ -16,7 +16,7 @@ public class AnanymousAttribute : ActionFilterAttribute
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         IIdentityProvider? idProvider = context?.HttpContext?.RequestServices?.GetRequiredService(typeof(IIdentityProvider)) as IIdentityProvider;
-        idProvider?.SetAnanymous();
+        idProvider?.SetAnonymous();
 
         return base.OnActionExecutionAsync(context, next);
     }

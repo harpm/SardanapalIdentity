@@ -14,14 +14,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Sardanapal.Identity.OTP.Services;
 
-public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
-    : CacheService<TOtpCachModel, TKey, OtpSearchVM, CachOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
-    , IOtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
+public class OtpCacheService<TUserKey, TKey, TOtpCacheModel, TNewVM, TEditableVM>
+    : CacheService<TOtpCacheModel, TKey, OtpSearchVM, CacheOtpVM<TUserKey, TKey>, TNewVM, TEditableVM>
+    , IOtpCacheService<TUserKey, TKey, TOtpCacheModel, TNewVM, TEditableVM>
     where TUserKey : IComparable<TUserKey>, IEquatable<TUserKey>
     where TKey : IComparable<TKey>, IEquatable<TKey>
-    where TOtpCachModel : class, ICacheModel<TKey>, IOTPModel<TUserKey, TKey>, new()
-    where TNewVM : CachNewOtpVM<TUserKey, TKey>, new()
-    where TEditableVM : CachOtpEditableVM<TUserKey, TKey>, new()
+    where TOtpCacheModel : class, ICacheModel<TKey>, IOTPModel<TUserKey, TKey>, new()
+    where TNewVM : CacheNewOtpVM<TUserKey, TKey>, new()
+    where TEditableVM : CacheOtpEditableVM<TUserKey, TKey>, new()
 {
     protected override string key => "Otp";
     public override string ServiceName => "OtpService";
@@ -32,7 +32,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
     protected IEmailService emailService { get; set; }
     protected ISmsService smsService { get; set; }
 
-    public OtpCachService(IConnectionMultiplexer _conn
+    public OtpCacheService(IConnectionMultiplexer _conn
         , IMapper _mapper
         , IOtpHelper _otpHelper
         , IEmailService _emailService
@@ -64,7 +64,7 @@ public class OtpCachService<TUserKey, TKey, TOtpCachModel, TNewVM, TEditableVM>
         return await result.FillAsync(async () =>
         {
             TKey newId = model.Id;
-            TOtpCachModel value = mapper.Map<TNewVM, TOtpCachModel>(model);
+            TOtpCacheModel value = mapper.Map<TNewVM, TOtpCacheModel>(model);
             var items = await InternalGetAll();
 
             if (!items.Where(x => x.UserId.Equals(model.UserId) && x.RoleId == model.RoleId).Any())

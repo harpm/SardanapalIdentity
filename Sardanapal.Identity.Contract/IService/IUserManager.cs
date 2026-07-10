@@ -23,6 +23,6 @@ public interface IUserManager<TUserKey, TUser, TSearchVM, TUserVM, TRegisterVM, 
     Task<IResponse<TUserKey>> RegisterUser(TRegisterVM model);
     Task<IResponse> Edit(TUserKey id, TUserEditableVM model);
     Task<IResponse> ChangePassword(TUserKey userId, string newPassword);
-    Task<IResponse> VerifyUser(string recepient);
+    Task<IResponse> VerifyUser(string recipient);
     Task<IResponse> DeleteUser(TUserKey userId);
 }
