@@ -141,7 +141,6 @@ User-facing strings live in `Sardanapal.Identity.Localization`:
 - **`IOtpServiceBase.RemoveExpireds`** is `[Obsolete]` but still required by the interface (issue C-7).
 
 ### Open work items (from `Issues.csv`, state `pending`)
-- `C-1` `IdentityProvider.IsAuthorized` true when anonymous.
 - `C-2..C-11` design cleanups (duplicate `IOtpCachService`, Redis command interpolation, static class fixups, etc.).
 - `D-1` memory AddUserRole race.
 - `E-1` no test project exists yet.

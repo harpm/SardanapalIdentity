@@ -39,7 +39,7 @@ public class IdentityProvider : IIdentityProvider
     {
         get
         {
-            return _authorized || _isAnanymous;
+            return _authorized;
         }
     }
 
