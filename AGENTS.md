@@ -135,7 +135,6 @@ User-facing strings live in `Sardanapal.Identity.Localization`:
 ## 8. Known Footguns
 
 ### Open work items (from `Issues.csv`, state `pending`)
-- `C-11` design cleanups (AUTH header documentation, etc.).
 - `D-1` memory AddUserRole race.
 - `E-1` no test project exists yet.
 
