@@ -108,8 +108,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
             }
             else
             {
-                throw new ArgumentNullException(
-                    StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber("Email", "Phone Number"));
+                result.Set(StatusCode.Failed, [], Identity_Messages.InvalidUserIdentifier);
             }
         });
 
@@ -539,8 +538,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             }
             else
             {
-                throw new ArgumentNullException(
-                    StringResourceHelper.CreateNullReferenceEmailOrPhoneNumber("Email", "Phone Number"));
+                result.Set(StatusCode.Failed, [], Identity_Messages.InvalidUserIdentifier);
             }
         });
 

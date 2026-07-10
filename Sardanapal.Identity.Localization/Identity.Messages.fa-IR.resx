@@ -173,6 +173,9 @@
   <data name="InvalidUserId" xml:space="preserve">
     <value>شناسه کاربری وارد شده معتبر نمی باشد</value>
   </data>
+  <data name="InvalidUserIdentifier" xml:space="preserve">
+    <value>نام کاربری، آدرس ایمیل یا شماره تلفن همراه الزامی است.</value>
+  </data>
   <data name="InvalidUsername" xml:space="preserve">
     <value>نام کاربری باید شامل:
 - حداقل دارای {0} کاراکتر

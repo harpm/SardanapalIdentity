@@ -218,6 +218,15 @@ namespace Sardanapal.Identity.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A username, email address, or phone number is required..
+        /// </summary>
+        public static string InvalidUserIdentifier {
+            get {
+                return ResourceManager.GetString("InvalidUserIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username must have:
         ///- characters
         ///- At least {0} characters.
