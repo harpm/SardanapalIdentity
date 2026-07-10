@@ -28,15 +28,8 @@ public record UserEditableVM : NewUserVM
     public List<byte> Claims { get; init; }
 }
 
-public record LoginVM()
+public record LoginVM
 {
-    public LoginVM(string username, string password)
-        : this()
-    {
-        this.Username = username;
-        this.Password = password;
-    }
-
     public string Username { get; init; }
     public string Password { get; init; }
 }
@@ -70,16 +63,9 @@ public record ResetPasswordVM<TUserKey>
     public string NewPassword { get; init; }
 }
 
-public record RegisterVM<TRoleKey>()
+public record RegisterVM<TRoleKey>
     where TRoleKey : IComparable<TRoleKey>, IEquatable<TRoleKey>
 {
-    public RegisterVM(string username, string password)
-        : this()
-    {
-        this.Username = username;
-        this.Password = password;
-    }
-
     public string Username { get; init; }
     public string Password { get; init; }
     public List<TRoleKey> Roles { get; init; }
