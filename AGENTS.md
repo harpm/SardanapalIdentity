@@ -19,12 +19,28 @@
 - **What it is:** A .NET 8 identity-management **framework** shipped as NuGet packages (not a runnable app). Consumed by other solutions by subclassing its generic bases.
 - **Version:** Package version `0.9.9` lives in `Build.json`. Core dependency version `1.0.0` lives in `Directory.Build.props` as `CoreVersion`.
 - **Distribution:** Published to GitHub Packages at `https://nuget.pkg.github.com/harpm/index.json`.
-- **Build/Release:** `SDBuild.go` (Go 1.21) reads `Build.json` and runs clean → restore → build (`-p:Version=`) → `dotnet nuget push` for each project. CI: `.github/workflows/dotnet.yml` triggers on push to `master` (needs .NET 8 + Go 1.21 + `GITHUBTOKEN` secret).
+- **Build/Release:** `SDBuild.go` (Go 1.21) reads `Build.json` and runs clean → restore → build (`-p:Version=`) → `dotnet nuget push` for each project under `Src\`. CI: `.github/workflows/dotnet.yml` triggers on push to `master` (needs .NET 8 + Go 1.21 + `GITHUBTOKEN` secret).
 - **Companion repo:** `SardanapalCore` (sibling directory `../SardanapalCore`) holds the foundational abstractions. SardanapalIdentity extends them.
+
+### 2.1 Repository layout (mirrors `SardanapalCore`)
+
+```
+Sardanapal Identity.sln      Solution at repo root; project paths are Src\<Project>\<Project>.csproj
+SDBuild.go                   Reads Build.json and prepends Src\ to each project path before clean/restore/build/publish
+Build.json                   Version + ordered projects_path (bare project names, no Src\ prefix)
+Directory.Build.props        Shared MSBuild props (net8.0, CPM on, CoreVersion=1.0.0, ...)
+Directory.Packages.props     Central Package Management — all package versions live here
+Src/
+  .editorconfig              C# style/naming rules (enforced: _camelCase private fields, severity error)
+  Sardanapal.Identity.*      The 11 source projects (shipped as NuGet packages)
+Tests/
+  Directory.Build.props      Imports root Directory.Build.props and sets IsPackable=false, IsTestProject=true
+  Sardanapal.Identity.*.Tests   Test projects (one per source project, xUnit) — being added to close E-1
+```
 
 ---
 
-## 3. Code Style (enforced by `.editorconfig`)
+## 3. Code Style (enforced by `Src/.editorconfig`)
 
 - **Indentation:** 4 spaces, CRLF line endings, file ends with a newline.
 - **Braces:** Allman style (`csharp_new_line_before_open_brace = all`), always use braces.
@@ -135,12 +151,13 @@ User-facing strings live in `Sardanapal.Identity.Localization`:
 ## 8. Known Footguns
 
 ### Open work items (from `Issues.csv`, state `pending`)
-- `E-1` no test project exists yet.
+- `E-1` no test project exists yet — **structure is now in place** (`Tests/` + `Tests/Directory.Build.props` mirroring `SardanapalCore`); test projects under `Tests/Sardanapal.Identity.*.Tests/` still need to be created and populated.
 
 ---
 
 ## 9. Local Build & Validation
 
 - **Build solution:** `dotnet build "Sardanapal Identity.sln"` (Windows PowerShell). NuGet source for Core packages must be configured (GitHub Packages auth).
-- **No test project** (`E-1`); verify by building and, where possible, by exercising the consuming app.
+- **Build a single project:** `dotnet build Src\Sardanapal.Identity.Services`.
+- **Tests:** once `Tests/Sardanapal.Identity.*.Tests/` projects are added, run `dotnet test "Sardanapal Identity.sln"`.
 - After edits, run the solution build to confirm generics/contracts still resolve. There is no separate lint/typecheck command beyond the compiler.

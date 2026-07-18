@@ -48,43 +48,44 @@ func main() {
 	Log(fmt.Sprintf("Projects Path: \n%s", data.Projects_Path[:]), Info_Level)
 
 	for i := 0; i < len(data.Projects_Path); i++ {
-		Log(fmt.Sprintf("-------------------- Started pipeline for project: %s --------------------", data.Projects_Path[i]), Info_Level)
+		fullPath := `.\Src\` + data.Projects_Path[i]
+		Log(fmt.Sprintf("-------------------- Started pipeline for project: %s --------------------", fullPath), Info_Level)
 
-		Log(fmt.Sprintf("Cleaning project...\n\tPath: %s", data.Projects_Path[i]), Info_Level)
+		Log(fmt.Sprintf("Cleaning project...\n\tPath: %s", fullPath), Info_Level)
 
 		clean_cmd := exec.Command("dotnet",
 			"clean",
-			data.Projects_Path[i])
+			fullPath)
 
 		output, err := clean_cmd.Output()
 
 		if err != nil {
-			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
-			panic(err);
+			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", fullPath, output, err), Error_Level)
+			continue
 		}
 
 		fmt.Printf("Output: \t%s", string(output[:]))
 
-		Log(fmt.Sprintf("Restoring project...\n\tPath: %s", data.Projects_Path[i]), Info_Level)
+		Log(fmt.Sprintf("Restoring project...\n\tPath: %s", fullPath), Info_Level)
 
 		restore_cmd := exec.Command("dotnet",
 			"restore",
-			data.Projects_Path[i])
+			fullPath)
 
 		output, err = restore_cmd.Output()
 
 		if err != nil {
-			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
+			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", fullPath, output, err), Error_Level)
 			panic(err);
 		}
 
 		fmt.Printf("Output: \t%s", string(output[:]))
 
-		Log(fmt.Sprintf("Building project...\n\tPath: %s", data.Projects_Path[i]), Info_Level)
+		Log(fmt.Sprintf("Building project...\n\tPath: %s", fullPath), Info_Level)
 
 		build_cmd := exec.Command("dotnet",
 			"build",
-			data.Projects_Path[i],
+			fullPath,
 			"--no-restore",
 			"--configuration",
 			"release",
@@ -93,23 +94,24 @@ func main() {
 		output, err = build_cmd.Output()
 
 		if err != nil {
-			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
+			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", fullPath, output, err), Error_Level)
 			panic(err);
 		}
 
 		// log output message
 		fmt.Printf("Output: \t%s", string(output[:]))
 
-		Log(fmt.Sprintf("-------------------- Ended pipeline for project: %s --------------------", data.Projects_Path[i]), Info_Level)
+		Log(fmt.Sprintf("-------------------- Ended pipeline for project: %s --------------------", fullPath), Info_Level)
 	}
 
 	for i := 0; i < len(data.Projects_Path); i++ {
-		Log(fmt.Sprintf("Publishing project artifacts...\n\tPath: %s", data.Projects_Path[i]), Info_Level)
+		fullPath := `./Src/` + data.Projects_Path[i]
+		Log(fmt.Sprintf("Publishing project artifacts...\n\tPath: %s", fullPath), Info_Level)
 
 		publish_cmd := exec.Command("dotnet",
 			"nuget",
 			"push",
-			fmt.Sprintf("/home/runner/work/SardanapalIdentity/SardanapalIdentity/%s/bin/release/%s.%s.nupkg", data.Projects_Path[i], data.Projects_Path[i], data.Version),
+			fmt.Sprintf("/home/runner/work/SardanapalIdentity/SardanapalIdentity/%s/bin/release/%s.%s.nupkg", fullPath, data.Projects_Path[i], data.Version),
 			"-s",
 			data.Nuget_Provider,
 			"--skip-duplicate")
@@ -117,11 +119,14 @@ func main() {
 		output, err := publish_cmd.Output()
 
 		if err != nil {
-			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", data.Projects_Path[i], output, err), Error_Level)
-			panic(err)
+			Log(fmt.Sprintf("Failed project %s\nResult:%s\nError: %s", fullPath, output, err), Error_Level)
 		}
 
-		fmt.Printf("Output: \t%s", string(output[:]))
+		if output != nil {
+			fmt.Printf("Output: \t%s", string(output[:]))
+		}
+
+		Log(fmt.Sprintf("-------------------- Ended pipeline for project: %s --------------------", fullPath), Info_Level)
 	}
 
 	if err != nil {

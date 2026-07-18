@@ -449,3 +449,8 @@ $RECYCLE.BIN/
 ##
 .vscode/*
 /.vscode/
+
+##
+## Work-tracking CSVs (per AGENTS.md: never commit CSV files)
+##
+*.csv

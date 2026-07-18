@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Services", "Sardanapal.Identity.Services\Sardanapal.Identity.Services.csproj", "{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Services", "Src\Sardanapal.Identity.Services\Sardanapal.Identity.Services.csproj", "{9B0F7FC6-6DB1-49DF-B58C-2ED7152BAD41}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Share", "Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj", "{ED689051-EC8E-4D76-AF62-C3173C352747}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Share", "Src\Sardanapal.Identity.Share\Sardanapal.Identity.Share.csproj", "{ED689051-EC8E-4D76-AF62-C3173C352747}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.ViewModel", "Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj", "{27DF0AEE-F314-4880-93E0-033A48CAE15F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.ViewModel", "Src\Sardanapal.Identity.ViewModel\Sardanapal.Identity.ViewModel.csproj", "{27DF0AEE-F314-4880-93E0-033A48CAE15F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Domain", "Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj", "{7D390899-0469-47E5-884F-A9DA3B04F6DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Domain", "Src\Sardanapal.Identity.Domain\Sardanapal.Identity.Domain.csproj", "{7D390899-0469-47E5-884F-A9DA3B04F6DC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Authorization", "Sardanapal.Identity.Authorization\Sardanapal.Identity.Authorization.csproj", "{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Authorization", "Src\Sardanapal.Identity.Authorization\Sardanapal.Identity.Authorization.csproj", "{5A372BDD-FF4A-4E96-B6A2-3A171751D6FF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Authorization.Data", "Sardanapal.Identity.Authorization.Data\Sardanapal.Identity.Authorization.Data.csproj", "{49E8F317-127E-41DE-95A2-3B17C7C911DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Authorization.Data", "Src\Sardanapal.Identity.Authorization.Data\Sardanapal.Identity.Authorization.Data.csproj", "{49E8F317-127E-41DE-95A2-3B17C7C911DA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP", "Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj", "{4905E863-B192-4452-949D-1CB1C92431DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP", "Src\Sardanapal.Identity.OTP\Sardanapal.Identity.OTP.csproj", "{4905E863-B192-4452-949D-1CB1C92431DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP.Service", "Sardanapal.Identity.OTP.Service\Sardanapal.Identity.OTP.Service.csproj", "{1083B670-E675-4B57-A7AA-E633012B149C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP.Service", "Src\Sardanapal.Identity.OTP.Service\Sardanapal.Identity.OTP.Service.csproj", "{1083B670-E675-4B57-A7AA-E633012B149C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9F427EC-BCAC-46A9-92FE-A9F4E3D36E60}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,18 +26,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{B9F427EC
 		SDBuild.go = SDBuild.go
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Contract", "Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj", "{0D735DB1-8255-464E-A953-94E1A6C7091D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Contract", "Src\Sardanapal.Identity.Contract\Sardanapal.Identity.Contract.csproj", "{0D735DB1-8255-464E-A953-94E1A6C7091D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Repository", "Sardanapal.Identity.Repository\Sardanapal.Identity.Repository.csproj", "{572139A6-D809-4F6E-9063-C97CBF320C95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Repository", "Src\Sardanapal.Identity.Repository\Sardanapal.Identity.Repository.csproj", "{572139A6-D809-4F6E-9063-C97CBF320C95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Localization", "Sardanapal.Identity.Localization\Sardanapal.Identity.Localization.csproj", "{F5F8A21A-CC27-4DE9-9EBE-430C6618E7BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sardanapal.Identity.Localization", "Src\Sardanapal.Identity.Localization\Sardanapal.Identity.Localization.csproj", "{F5F8A21A-CC27-4DE9-9EBE-430C6618E7BF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configs", "Configs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
+		Src\.editorconfig = Src\.editorconfig
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7E9F7560-C303-447B-AA81-20C2D598745A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
