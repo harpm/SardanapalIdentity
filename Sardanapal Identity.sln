@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configs", "Configs", "{02EA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7E9F7560-C303-447B-AA81-20C2D598745A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Share.Tests", "Tests\Sardanapal.Identity.Share.Tests\Sardanapal.Identity.Share.Tests.csproj", "{136C313E-F2C3-4EB2-84D2-3E19452156C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,9 +93,16 @@ Global
 		{F5F8A21A-CC27-4DE9-9EBE-430C6618E7BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5F8A21A-CC27-4DE9-9EBE-430C6618E7BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5F8A21A-CC27-4DE9-9EBE-430C6618E7BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{136C313E-F2C3-4EB2-84D2-3E19452156C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{136C313E-F2C3-4EB2-84D2-3E19452156C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{136C313E-F2C3-4EB2-84D2-3E19452156C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{136C313E-F2C3-4EB2-84D2-3E19452156C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{136C313E-F2C3-4EB2-84D2-3E19452156C0} = {7E9F7560-C303-447B-AA81-20C2D598745A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DD1AF8CA-5CC7-428B-8A62-B5CA8816B63B}
