@@ -11,6 +11,9 @@
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="AutoMapper" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+        <PackageReference Include="Microsoft.Data.Sqlite" />
     </ItemGroup>
 
     <ItemGroup>
