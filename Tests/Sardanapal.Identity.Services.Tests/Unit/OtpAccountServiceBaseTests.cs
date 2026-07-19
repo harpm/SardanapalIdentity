@@ -21,8 +21,12 @@ public sealed class FakeUserManager : IUserManager<long, TestUser, UserSearchVM,
     public StatusCode GetUserStatus { get; set; } = StatusCode.Succeeded;
     public string TokenToReturn { get; set; } = "otp-jwt";
     public StatusCode LoginStatus { get; set; } = StatusCode.Succeeded;
+    public StatusCode ChangePasswordStatus { get; set; } = StatusCode.Succeeded;
+    public StatusCode VerifyUserStatus { get; set; } = StatusCode.Succeeded;
     public List<object> GetUserCalls { get; } = new();
     public List<long> LoginCalls { get; } = new();
+    public List<(long userId, string newPassword)> ChangePasswordCalls { get; } = new();
+    public List<string> VerifyUserCalls { get; } = new();
 
     private IResponse<TestUser> MakeGetUserResponse()
     {
@@ -71,8 +75,20 @@ public sealed class FakeUserManager : IUserManager<long, TestUser, UserSearchVM,
     public Task<IResponse<string>> RefreshToken(long userId) => throw new NotSupportedException();
     public Task<IResponse<long>> RegisterUser(RegisterVM<byte> model) => throw new NotSupportedException();
     public Task<IResponse> Edit(long id, UserEditableVM model) => throw new NotSupportedException();
-    public Task<IResponse> ChangePassword(long userId, string newPassword) => throw new NotSupportedException();
-    public Task<IResponse> VerifyUser(string recipient) => throw new NotSupportedException();
+
+    public Task<IResponse> ChangePassword(long userId, string newPassword)
+    {
+        ChangePasswordCalls.Add((userId, newPassword));
+        Response r = new Response(NullLogger.Instance) { StatusCode = ChangePasswordStatus };
+        return Task.FromResult((IResponse)r);
+    }
+
+    public Task<IResponse> VerifyUser(string recipient)
+    {
+        VerifyUserCalls.Add(recipient ?? string.Empty);
+        Response r = new Response(NullLogger.Instance) { StatusCode = VerifyUserStatus };
+        return Task.FromResult((IResponse)r);
+    }
     public Task<IResponse> DeleteUser(long userId) => throw new NotSupportedException();
     public Task<IResponse<UserVM<long>>> Get(long Id, CancellationToken ct = default) => throw new NotSupportedException();
     public Task<IResponse<GridVM<long, T>>> GetAll<T>(GridSearchModelVM<long, UserSearchVM> SearchModel = null, CancellationToken ct = default) where T : class => throw new NotSupportedException();
@@ -124,6 +140,24 @@ public class OtpAccountServiceBaseTests
         Username = Username,
         Email = Email,
         PhoneNumber = Phone
+    };
+
+    private static TestUser UserWithVerifiedEmail() => new TestUser
+    {
+        Id = UserId,
+        Username = Username,
+        Email = Email,
+        PhoneNumber = Phone,
+        VerifiedEmail = true
+    };
+
+    private static TestUser UserWithVerifiedPhone() => new TestUser
+    {
+        Id = UserId,
+        Username = Username,
+        Email = Email,
+        PhoneNumber = Phone,
+        VerifiedPhoneNumber = true
     };
 
     private static IResponse<T> Ok<T>(T data) => new Response<T>(NullLogger.Instance)
@@ -308,5 +342,228 @@ public class OtpAccountServiceBaseTests
         Func<Task> act = async () => await service.LoginWithOtp(model);
 
         await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task RequestRegisterOtp_Already_Verified_Email_Returns_Duplicate_AlreadyVerified()
+    {
+        FakeUserManager um = UserManager();
+        um.UserToReturn = UserWithVerifiedEmail();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        TestableOtpAccountService service = CreateService(um, otp);
+        OtpRequestVM model = new OtpRequestVM { Email = Email, Role = RoleId };
+
+        IResponse<long> result = await service.RequestRegisterOtp(model);
+
+        result.StatusCode.Should().Be(StatusCode.Duplicate);
+        result.UserMessage.Should().Be(Identity_Messages.AlreadyVerified);
+        await otp.DidNotReceive().Add(Arg.Any<NewOtpVM<long>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RequestRegisterOtp_Already_Verified_Phone_Returns_Duplicate_AlreadyVerified()
+    {
+        FakeUserManager um = UserManager();
+        um.UserToReturn = UserWithVerifiedPhone();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        TestableOtpAccountService service = CreateService(um, otp);
+        OtpRequestVM model = new OtpRequestVM { PhoneNumber = Phone, Role = RoleId };
+
+        IResponse<long> result = await service.RequestRegisterOtp(model);
+
+        result.StatusCode.Should().Be(StatusCode.Duplicate);
+        result.UserMessage.Should().Be(Identity_Messages.AlreadyVerified);
+        await otp.DidNotReceive().Add(Arg.Any<NewOtpVM<long>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RequestRegisterOtp_Not_Verified_Calls_Add()
+    {
+        FakeUserManager um = UserManager();
+        um.UserToReturn = ExistingUser();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.Add(Arg.Any<NewOtpVM<long>>(), Arg.Any<CancellationToken>())
+           .Returns(Task.FromResult((IResponse<Guid>)Ok(Guid.NewGuid())));
+        TestableOtpAccountService service = CreateService(um, otp);
+        OtpRequestVM model = new OtpRequestVM { Email = Email, Role = RoleId };
+
+        await service.RequestRegisterOtp(model);
+
+        await otp.Received(1).Add(Arg.Any<NewOtpVM<long>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RegisterWithOtp_Lockout_Path()
+    {
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        tracker.IsLockedOut(Arg.Any<string>()).Returns(true);
+        tracker.GetLockoutRemaining(Arg.Any<string>()).Returns(TimeSpan.FromMinutes(9));
+        TestableOtpAccountService service = CreateService(UserManager(), tracker: tracker);
+        OTPResponseVM<long> model = new OTPResponseVM<long> { UserId = UserId, RoleId = RoleId, Code = "1234" };
+
+        IResponse result = await service.RegisterWithOtp(model);
+
+        result.StatusCode.Should().Be(StatusCode.Failed);
+        result.UserMessage.Should().Be(string.Format(Identity_Messages.AccountLockedOut, 9));
+    }
+
+    [Fact]
+    public async Task RegisterWithOtp_Validate_Fail_Propagates()
+    {
+        FakeUserManager um = UserManager();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.ValidateCode(Arg.Any<NewOtpVM<long>>())
+           .Returns(Task.FromResult(Fail<OtpVM<long>>(StatusCode.Failed, Identity_Messages.InvalidOtpCode)));
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        TestableOtpAccountService service = CreateService(um, otp, tracker);
+        OTPResponseVM<long> model = new OTPResponseVM<long> { UserId = UserId, RoleId = RoleId, Code = "0000" };
+
+        IResponse result = await service.RegisterWithOtp(model);
+
+        result.StatusCode.Should().Be(StatusCode.Failed);
+        result.UserMessage.Should().Be(Identity_Messages.InvalidOtpCode);
+        tracker.Received(1).RecordFailure(Arg.Any<string>());
+        tracker.DidNotReceive().RecordSuccess(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task RegisterWithOtp_Success_Calls_VerifyUser()
+    {
+        const string recipient = Email;
+        FakeUserManager um = UserManager();
+        um.UserToReturn = ExistingUser();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.ValidateCode(Arg.Any<NewOtpVM<long>>())
+           .Returns(Task.FromResult((IResponse<OtpVM<long>>)Ok(new OtpVM<long> { Recipient = recipient })));
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        TestableOtpAccountService service = CreateService(um, otp, tracker);
+        OTPResponseVM<long> model = new OTPResponseVM<long> { UserId = UserId, RoleId = RoleId, Code = "1234" };
+
+        IResponse result = await service.RegisterWithOtp(model);
+
+        result.StatusCode.Should().Be(StatusCode.Succeeded);
+        tracker.Received(1).RecordSuccess(Arg.Any<string>());
+        um.VerifyUserCalls.Should().ContainSingle().Which.Should().Be(recipient);
+    }
+
+    [Fact]
+    public async Task RegisterWithOtp_User_Missing_Propagates_ConvertTo()
+    {
+        FakeUserManager um = UserManager();
+        um.UserToReturn = null;
+        um.GetUserStatus = StatusCode.NotExists;
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.ValidateCode(Arg.Any<NewOtpVM<long>>())
+           .Returns(Task.FromResult((IResponse<OtpVM<long>>)Ok(new OtpVM<long>())));
+        TestableOtpAccountService service = CreateService(um, otp);
+        OTPResponseVM<long> model = new OTPResponseVM<long> { UserId = UserId, RoleId = RoleId, Code = "1234" };
+
+        IResponse result = await service.RegisterWithOtp(model);
+
+        result.StatusCode.Should().Be(StatusCode.NotExists);
+        um.VerifyUserCalls.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task RequestResetPassword_Resolves_Identifier_And_Calls_Add()
+    {
+        FakeUserManager um = UserManager();
+        um.UserToReturn = ExistingUser();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.Add(Arg.Any<NewOtpVM<long>>(), Arg.Any<CancellationToken>())
+           .Returns(Task.FromResult((IResponse<Guid>)Ok(Guid.NewGuid())));
+        TestableOtpAccountService service = CreateService(um, otp);
+        ResetPasswordRequestVM model = new ResetPasswordRequestVM { Email = Email };
+
+        IResponse<long> result = await service.RequestResetPassword(model);
+
+        result.StatusCode.Should().Be(StatusCode.Succeeded);
+        result.Data.Should().Be(UserId);
+        um.GetUserCalls.Should().Contain(Email);
+        await otp.Received(1).Add(Arg.Any<NewOtpVM<long>>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RequestResetPassword_No_Identifier_Returns_Canceled()
+    {
+        TestableOtpAccountService service = CreateService(UserManager());
+        ResetPasswordRequestVM model = new ResetPasswordRequestVM();
+
+        IResponse<long> result = await service.RequestResetPassword(model);
+
+        result.StatusCode.Should().Be(StatusCode.Canceled);
+        result.UserMessage.Should().Be(Identity_Messages.InvalidEmailOrNumber);
+    }
+
+    [Fact]
+    public async Task ResetPassword_Lockout_Path()
+    {
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        tracker.IsLockedOut(Arg.Any<string>()).Returns(true);
+        tracker.GetLockoutRemaining(Arg.Any<string>()).Returns(TimeSpan.FromMinutes(11));
+        TestableOtpAccountService service = CreateService(UserManager(), tracker: tracker);
+        ResetPasswordVM<long> model = new ResetPasswordVM<long>
+        {
+            UserId = UserId,
+            RoleId = RoleId,
+            Code = "1234",
+            NewPassword = "NewP4ss"
+        };
+
+        IResponse result = await service.ResetPassword(model);
+
+        result.StatusCode.Should().Be(StatusCode.Failed);
+        result.UserMessage.Should().Be(string.Format(Identity_Messages.AccountLockedOut, 11));
+    }
+
+    [Fact]
+    public async Task ResetPassword_Validate_Fail_Propagates()
+    {
+        FakeUserManager um = UserManager();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.ValidateCode(Arg.Any<NewOtpVM<long>>())
+           .Returns(Task.FromResult(Fail<OtpVM<long>>(StatusCode.NotExists, Identity_Messages.InvalidOtpCode)));
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        TestableOtpAccountService service = CreateService(um, otp, tracker);
+        ResetPasswordVM<long> model = new ResetPasswordVM<long>
+        {
+            UserId = UserId,
+            RoleId = RoleId,
+            Code = "0000",
+            NewPassword = "NewP4ss"
+        };
+
+        IResponse result = await service.ResetPassword(model);
+
+        result.StatusCode.Should().Be(StatusCode.NotExists);
+        result.UserMessage.Should().Be(Identity_Messages.InvalidOtpCode);
+        tracker.Received(1).RecordFailure(Arg.Any<string>());
+        tracker.DidNotReceive().RecordSuccess(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ResetPassword_Success_Calls_ChangePassword()
+    {
+        const string newPassword = "NewP4ss";
+        FakeUserManager um = UserManager();
+        um.UserToReturn = ExistingUser();
+        IOtpService<long, Guid, OtpVM<long>, NewOtpVM<long>, OtpEditableVM<long>> otp = OtpService();
+        otp.ValidateCode(Arg.Any<NewOtpVM<long>>())
+           .Returns(Task.FromResult((IResponse<OtpVM<long>>)Ok(new OtpVM<long>())));
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        TestableOtpAccountService service = CreateService(um, otp, tracker);
+        ResetPasswordVM<long> model = new ResetPasswordVM<long>
+        {
+            UserId = UserId,
+            RoleId = RoleId,
+            Code = "1234",
+            NewPassword = newPassword
+        };
+
+        IResponse result = await service.ResetPassword(model);
+
+        result.StatusCode.Should().Be(StatusCode.Succeeded);
+        tracker.Received(1).RecordSuccess(Arg.Any<string>());
+        um.ChangePasswordCalls.Should().ContainSingle().Which.Should().Be((UserId, newPassword));
     }
 }
