@@ -10,10 +10,12 @@
         <PackageReference Include="xunit.runner.visualstudio" />
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="NSubstitute" />
+        <PackageReference Include="AutoMapper" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Src\Sardanapal.Identity.Services\Sardanapal.Identity.Services.csproj" />
+        <ProjectReference Include="..\..\Src\Sardanapal.Identity.Repository\Sardanapal.Identity.Repository.csproj" />
     </ItemGroup>
 
 </Project>
