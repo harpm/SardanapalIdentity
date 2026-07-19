@@ -45,6 +45,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.Share.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.OTP.Service.Tests", "Tests\Sardanapal.Identity.OTP.Service.Tests\Sardanapal.Identity.OTP.Service.Tests.csproj", "{79734C88-9B45-493C-A4F9-E05320EE97AA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sardanapal.Identity.ViewModel.Tests", "Tests\Sardanapal.Identity.ViewModel.Tests\Sardanapal.Identity.ViewModel.Tests.csproj", "{C14BB1D8-166C-41B3-AFA2-DA9A8D438B7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{79734C88-9B45-493C-A4F9-E05320EE97AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79734C88-9B45-493C-A4F9-E05320EE97AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79734C88-9B45-493C-A4F9-E05320EE97AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C14BB1D8-166C-41B3-AFA2-DA9A8D438B7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C14BB1D8-166C-41B3-AFA2-DA9A8D438B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C14BB1D8-166C-41B3-AFA2-DA9A8D438B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C14BB1D8-166C-41B3-AFA2-DA9A8D438B7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,6 +116,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{136C313E-F2C3-4EB2-84D2-3E19452156C0} = {7E9F7560-C303-447B-AA81-20C2D598745A}
 		{79734C88-9B45-493C-A4F9-E05320EE97AA} = {7E9F7560-C303-447B-AA81-20C2D598745A}
+		{C14BB1D8-166C-41B3-AFA2-DA9A8D438B7B} = {7E9F7560-C303-447B-AA81-20C2D598745A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DD1AF8CA-5CC7-428B-8A62-B5CA8816B63B}
