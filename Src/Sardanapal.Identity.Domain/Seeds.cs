@@ -17,24 +17,25 @@ public static class IdentitySeeds
     {
         var scope = provider.CreateScope();
 
-        var uow = scope.ServiceProvider.GetRequiredService(typeof(DbContext)) as DbContext;
+        var uow = scope.ServiceProvider.GetService(typeof(DbContext)) as DbContext;
 
         if (uow == null)
             throw new NullReferenceException(nameof(uow));
         
 
-        foreach (TRoleKey roleEnumMember in typeof(TRoleEnum).GetEnumValues())
+        foreach (TRoleEnum roleEnum in typeof(TRoleEnum).GetEnumValues())
         {
+            TRoleKey roleKey = (TRoleKey)Convert.ChangeType(roleEnum, typeof(TRoleKey));
             bool exists = uow.Set<TRole>()
                 .AsNoTracking()
-                .Any(r => r.Id.Equals(roleEnumMember));
+                .Any(r => r.Id.Equals(roleKey));
 
             if (!exists)
             {
                 uow.Add(new TRole()
                 {
-                    Id = roleEnumMember,
-                    Title = Enum.GetName(typeof(TRoleEnum), roleEnumMember)
+                    Id = roleKey,
+                    Title = Enum.GetName(typeof(TRoleEnum), roleEnum)
                 });
             }
         }
@@ -53,7 +54,7 @@ public static class IdentitySeeds
     {
         var scope = provider.CreateScope();
 
-        var uow = scope.ServiceProvider.GetRequiredService(typeof(DbContext)) as DbContext;
+        var uow = scope.ServiceProvider.GetService(typeof(DbContext)) as DbContext;
 
         if (uow == null)
             throw new NullReferenceException(nameof(uow));
@@ -72,7 +73,7 @@ public static class IdentitySeeds
 
         // Adding admin user
         if (!uow.Set<TUser>()
-            .Where(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
+            .Where(u => u.Username.ToLower() == username.ToLower())
             .AsNoTracking()
             .Any())
         {
@@ -94,12 +95,13 @@ public static class IdentitySeeds
             await uow.AddAsync(admin);
             await uow.SaveChangesAsync();
 
-            foreach (TRoleKey roleEnumMember in typeof(TRoleEnum).GetEnumValues())
+            foreach (TRoleEnum roleEnum in typeof(TRoleEnum).GetEnumValues())
             {
+                TRoleKey roleKey = (TRoleKey)Convert.ChangeType(roleEnum, typeof(TRoleKey));
                 uow.Add(new TUserRole()
                 {
                     UserId = admin.Id,
-                    RoleId = roleEnumMember,
+                    RoleId = roleKey,
                 });
             }
 

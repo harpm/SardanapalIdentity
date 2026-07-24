@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Title>Sardanapal.Identity.Services Tests</Title>
+        <Title>Sardanapal.Identity.Authorization Tests</Title>
     </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
@@ -10,17 +14,12 @@
         <PackageReference Include="xunit.runner.visualstudio" />
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="NSubstitute" />
-        <PackageReference Include="AutoMapper" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
-        <PackageReference Include="Microsoft.Data.Sqlite" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Options" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Src\Sardanapal.Identity.Services\Sardanapal.Identity.Services.csproj" />
-        <ProjectReference Include="..\..\Src\Sardanapal.Identity.Repository\Sardanapal.Identity.Repository.csproj" />
+        <ProjectReference Include="..\..\Src\Sardanapal.Identity.Authorization\Sardanapal.Identity.Authorization.csproj" />
     </ItemGroup>
 
 </Project>
