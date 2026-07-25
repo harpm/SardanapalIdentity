@@ -69,6 +69,16 @@ public class OtpServiceSecurityTests
         ExpireTime = expire
     };
 
+    private static TestOtpModel OtpWithRole(long userId, byte roleId, string code, DateTime expire, Guid? id = null)
+        => new TestOtpModel
+        {
+            Id = id ?? Guid.NewGuid(),
+            Code = code,
+            UserId = userId,
+            RoleId = roleId,
+            ExpireTime = expire
+        };
+
     private static void SetupRepo(ITestOtpRepository repo, params TestOtpModel[] items)
     {
         List<TestOtpModel> list = new List<TestOtpModel>(items);
@@ -160,5 +170,48 @@ public class OtpServiceSecurityTests
 
         differentRoleResult.StatusCode.Should().Be(StatusCode.Succeeded);
         await fresh.Repo.Received(1).AddAsync(Arg.Any<TestOtpModel>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Add_Cooldown_Isolates_Per_User_Role_In_Same_Store()
+    {
+        const byte otherRoleId = (byte)(RoleId + 1);
+
+        List<TestOtpModel> store = new List<TestOtpModel>
+        {
+            OtpWithRole(UserId, RoleId, "9999", DateTime.UtcNow.AddMinutes(2))
+        };
+
+        Deps d = new Deps();
+        d.Repo.FetchAll().Returns(store);
+        d.Repo.FetchAllAsync(Arg.Any<CancellationToken>()).Returns(store);
+        d.Repo.AddAsync(Arg.Do<TestOtpModel>(m => m.Id = Guid.NewGuid()), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask)
+            .AndDoes(c => store.Add((TestOtpModel)c[0]));
+        d.Helper.GenerateNewOtp().Returns("4242");
+        var svc = d.BuildService(6);
+
+        IResponse<Guid> sameRoleResult = await svc.Add(d.NewModel());
+
+        sameRoleResult.StatusCode.Should().Be(StatusCode.Canceled,
+            "an active OTP for the same user and role must trigger cooldown even when other roles exist");
+        sameRoleResult.UserMessage.Should().Be(string.Format(Identity_Messages.OtpCooldown, 6));
+        await d.Repo.DidNotReceiveWithAnyArgs().AddAsync(Arg.Any<TestOtpModel>(), Arg.Any<CancellationToken>());
+
+        IResponse<Guid> differentRoleResult = await svc.Add(new NewOtpVM<long>
+        {
+            UserId = UserId,
+            RoleId = otherRoleId,
+            Recipient = Recipient,
+            Username = "bob"
+        });
+
+        differentRoleResult.StatusCode.Should().Be(StatusCode.Succeeded,
+            "a different role on the same user must NOT be blocked by an OTP held under another role in the same store");
+        await d.Repo.Received(1).AddAsync(
+            Arg.Is<TestOtpModel>(m => m.UserId == UserId && m.RoleId == otherRoleId),
+            Arg.Any<CancellationToken>());
+        store.Should().HaveCount(2,
+            "the new OTP for the other role must have been persisted alongside the original one");
     }
 }
