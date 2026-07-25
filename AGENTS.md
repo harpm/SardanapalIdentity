@@ -11,6 +11,7 @@
 3. **Commit messages:** `<type>: <lowercase description>` where `type` is one of `resolve | update | release`. Never amend or force-push unless explicitly asked.
 4. **Do not commit secrets** (connection strings, signing keys, nuget tokens).
 5. **Never assume a library is available.** This solution depends on the `SardanapalCore` packages (`Sardanapal.Contract`, `Sardanapal.Domain`, `Sardanapal.Ef`, `Sardanapal.Service`, `Sardanapal.Http.Service`, `Sardanapal.RedisCache`, `Sardanapal.Share`, `Sardanapal.ViewModel`) referenced via central package management (`Directory.Packages.props`, `CoreVersion` = `1.0.0`).
+6. **Do not commit if tests are failing.** Run the affected test project(s) (`dotnet test` on the relevant `Tests/Sardanapal.Identity.*.Tests` project, or the full solution) before committing and ensure all tests pass. If any test fails, fix the issue (source or test) before staging the commit.
 
 ---
 
