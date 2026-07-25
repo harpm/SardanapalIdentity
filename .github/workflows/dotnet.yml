@@ -25,6 +25,9 @@ jobs:
 
       - name: Add nuget source
         run: dotnet nuget add source --username harpm --password ${{ secrets.GITHUBTOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/harpm/index.json"
-      
+
+      - name: Run tests
+        run: dotnet test "Sardanapal Identity.sln" --configuration release --verbosity normal
+
       - name: Runing Build Script
         run: go run /home/runner/work/SardanapalIdentity/SardanapalIdentity/SDBuild.go
