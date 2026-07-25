@@ -11,10 +11,14 @@
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="NSubstitute" />
         <PackageReference Include="AutoMapper" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+        <PackageReference Include="Microsoft.Data.Sqlite" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Src\Sardanapal.Identity.OTP.Service\Sardanapal.Identity.OTP.Service.csproj" />
+        <ProjectReference Include="..\..\Src\Sardanapal.Identity.Repository\Sardanapal.Identity.Repository.csproj" />
     </ItemGroup>
 
 </Project>

@@ -2,10 +2,8 @@ using AutoMapper;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
-using Sardanapal.Contract.IModel;
 using Sardanapal.Contract.IRepository;
 using Sardanapal.Contract.IService;
-using Sardanapal.Identity.Contract.IModel;
 using Sardanapal.Identity.Contract.IRepository;
 using Sardanapal.Identity.Contract.IService;
 using Sardanapal.Identity.Localization;
@@ -268,40 +266,5 @@ public class OtpServiceTests
         result.Data.List.Should().NotBeNull();
         result.Data.List.Should().HaveCount(2);
         result.Data.List.Select(x => x.Code).Should().BeEquivalentTo(new[] { "1111", "2222" });
-    }
-
-    [Fact]
-    public void EF_And_Memory_Variants_Produce_Same_Outcomes_For_Same_Inputs()
-    {
-        Type efType = typeof(EFOtpService<,,,,,,,,>);
-        Type memType = typeof(OtpService<,,,,,,,>);
-
-        ImplementsOpenGeneric(efType, typeof(IOtpService<,,,,>)).Should().BeTrue();
-        ImplementsOpenGeneric(memType, typeof(IOtpService<,,,,>)).Should().BeTrue();
-
-        HashSet<string> efMethods = PublicMethodSignatures(efType);
-        HashSet<string> memMethods = PublicMethodSignatures(memType);
-
-        foreach (string key in new[] { "Add", "ValidateCode", "GetAll" })
-        {
-            memMethods.Should().Contain(key);
-            efMethods.Should().Contain(key);
-        }
-    }
-
-    private static bool ImplementsOpenGeneric(Type type, Type openGenericInterface)
-    {
-        return type.GetInterfaces()
-            .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == openGenericInterface);
-    }
-
-    private static HashSet<string> PublicMethodSignatures(Type openGenericType)
-    {
-        HashSet<string> names = new HashSet<string>();
-        foreach (System.Reflection.MethodInfo m in openGenericType.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly))
-        {
-            names.Add(m.Name);
-        }
-        return names;
     }
 }
