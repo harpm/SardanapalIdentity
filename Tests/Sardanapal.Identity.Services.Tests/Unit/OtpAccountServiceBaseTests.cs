@@ -233,7 +233,7 @@ public class OtpAccountServiceBaseTests
         IResponse<long> result = await service.RequestLoginOtp(model);
 
         result.StatusCode.Should().Be(StatusCode.Canceled);
-        result.DeveloperMessages.Should().Contain(Identity_Messages.InvalidEmailOrNumber);
+        result.UserMessage.Should().Be(Identity_Messages.InvalidEmailOrNumber);
     }
 
     [Fact]
@@ -565,5 +565,29 @@ public class OtpAccountServiceBaseTests
         result.StatusCode.Should().Be(StatusCode.Succeeded);
         tracker.Received(1).RecordSuccess(Arg.Any<string>());
         um.ChangePasswordCalls.Should().ContainSingle().Which.Should().Be((UserId, newPassword));
+    }
+
+    [Fact]
+    public async Task All_Request_Methods_Report_InvalidEmailOrNumber_On_UserMessage_When_No_Identifier()
+    {
+        TestableOtpAccountService service = CreateService(UserManager());
+        OtpRequestVM otpModel = new OtpRequestVM { Role = RoleId };
+        ResetPasswordRequestVM resetModel = new ResetPasswordRequestVM();
+
+        IResponse<long> login = await service.RequestLoginOtp(otpModel);
+        IResponse<long> register = await service.RequestRegisterOtp(otpModel);
+        IResponse<long> reset = await service.RequestResetPassword(resetModel);
+
+        login.StatusCode.Should().Be(StatusCode.Canceled);
+        register.StatusCode.Should().Be(StatusCode.Canceled);
+        reset.StatusCode.Should().Be(StatusCode.Canceled);
+
+        login.UserMessage.Should().Be(Identity_Messages.InvalidEmailOrNumber);
+        register.UserMessage.Should().Be(Identity_Messages.InvalidEmailOrNumber);
+        reset.UserMessage.Should().Be(Identity_Messages.InvalidEmailOrNumber);
+
+        login.UserMessage.Should().Be(register.UserMessage,
+            "RequestLoginOtp and RequestRegisterOtp must report the no-identifier message on the same property as RequestResetPassword");
+        reset.UserMessage.Should().Be(register.UserMessage);
     }
 }
