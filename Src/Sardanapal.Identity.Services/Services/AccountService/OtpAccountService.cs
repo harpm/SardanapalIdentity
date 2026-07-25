@@ -71,7 +71,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             }
             else
             {
-                result.Set(StatusCode.Canceled, Identity_Messages.InvalidEmailOrNumber);
+                result.Set(StatusCode.Canceled, [], Identity_Messages.InvalidEmailOrNumber);
             }
         });
     }
@@ -163,7 +163,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             }
             else
             {
-                result.Set(StatusCode.Canceled, Identity_Messages.InvalidEmailOrNumber);
+                result.Set(StatusCode.Canceled, [], Identity_Messages.InvalidEmailOrNumber);
             }
         });
     }
@@ -258,7 +258,7 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
             }
             else
             {
-                result.Set(StatusCode.Canceled, Identity_Messages.InvalidEmailOrNumber);
+                result.Set(StatusCode.Canceled, [], Identity_Messages.InvalidEmailOrNumber);
             }
         });
 

@@ -202,7 +202,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
             if (!userExists)
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 return;
             }
 
@@ -246,7 +246,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
 
             if (existingUser)
             {
-                result.Set(StatusCode.Duplicate, Identity_Messages.DuplicateUsername);
+                result.Set(StatusCode.Duplicate, [], Identity_Messages.DuplicateUsername);
                 return;
             }
 
@@ -325,12 +325,12 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
                 }
                 else
                 {
-                    result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                    result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 }
             }
             else
             {
-                result.Set(StatusCode.Failed, Identity_Messages.InvalidEmailOrNumber);
+                result.Set(StatusCode.Failed, [], Identity_Messages.InvalidEmailOrNumber);
             }
             
         });
@@ -421,7 +421,7 @@ public class EFUserManager<TEFDatabaseManager, TRepository, TUserKey, TUser, TUs
             }
             else
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
             }
         });
         return result;
@@ -628,7 +628,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
             if (!userExists)
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 return;
             }
 
@@ -672,7 +672,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
 
             if (existingUser)
             {
-                result.Set(StatusCode.Duplicate, Identity_Messages.DuplicateUsername);
+                result.Set(StatusCode.Duplicate, [], Identity_Messages.DuplicateUsername);
                 return;
             }
 
@@ -736,12 +736,12 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
                 }
                 else
                 {
-                    result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                    result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
                 }
             }
             else
             {
-                result.Set(StatusCode.Failed, Identity_Messages.InvalidEmailOrNumber);
+                result.Set(StatusCode.Failed, [], Identity_Messages.InvalidEmailOrNumber);
             }
 
         });
@@ -827,7 +827,7 @@ public class UserManager<TRepository, TUserKey, TUser, TUserSearchVM, TUserVM, T
             }
             else
             {
-                result.Set(StatusCode.NotExists, Identity_Messages.UserNotFound);
+                result.Set(StatusCode.NotExists, [], Identity_Messages.UserNotFound);
             }
         });
         return result;

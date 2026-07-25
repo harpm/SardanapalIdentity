@@ -91,7 +91,7 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
             else
             {
                 _attemptTracker?.RecordFailure(identifier);
-                result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
+                result.Set(StatusCode.Failed, [], Identity_Messages.WrongPassword);
             }
         });
     }
@@ -134,7 +134,7 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
             {
                 if (model.NewPassword == model.OldPassword)
                 {
-                    result.Set(StatusCode.Failed, Identity_Messages.DifferentPassword);
+                    result.Set(StatusCode.Failed, [], Identity_Messages.DifferentPassword);
                 }
                 else
                 {
@@ -151,7 +151,7 @@ public abstract class AccountServiceBase<TUserManager, TRoleManager, TUserKey, T
             }
             else
             {
-                result.Set(StatusCode.Failed, Identity_Messages.WrongPassword);
+                result.Set(StatusCode.Failed, [], Identity_Messages.WrongPassword);
             }
         });
 

@@ -97,6 +97,7 @@ public sealed class FakeUserManager : IUserManager<long, TestUser, UserSearchVM,
     public Task<IResponse<bool>> Edit(long Id, UserEditableVM Model, CancellationToken ct = default) => throw new NotSupportedException();
     public Task<IResponse<bool>> Delete(long Id, CancellationToken ct = default) => throw new NotSupportedException();
     public Task<IResponse<GridVM<long, SelectOptionVM<long, object>>>> GetDictionary(GridSearchModelVM<long, UserSearchVM> SearchModel = null, CancellationToken ct = default) => throw new NotSupportedException();
+    public Task<IResponse<byte[]>> GetExcel<T>(GridSearchModelVM<long, UserSearchVM> SearchModel = null, CancellationToken ct = default) where T : class => throw new NotSupportedException();
 }
 
 public sealed class TestableOtpAccountService
