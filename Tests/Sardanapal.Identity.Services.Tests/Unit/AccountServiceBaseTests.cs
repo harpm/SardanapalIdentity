@@ -92,6 +92,14 @@ public class AccountServiceBaseTests
         return tracker;
     }
 
+    private static ILoginAttemptTracker LockedTracker(TimeSpan remaining)
+    {
+        ILoginAttemptTracker tracker = Substitute.For<ILoginAttemptTracker>();
+        tracker.IsLockedOut(Arg.Any<string>()).Returns(true);
+        tracker.GetLockoutRemaining(Arg.Any<string>()).Returns(remaining);
+        return tracker;
+    }
+
     private static TestUser ExistingUser() => new TestUser
     {
         Id = UserId,
@@ -133,6 +141,25 @@ public class AccountServiceBaseTests
 
         result.UserMessage.Should().Contain(remaining.ToString());
         result.UserMessage.Should().Be(string.Format(Identity_Messages.AccountLockedOut, remaining));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(15)]
+    [InlineData(30)]
+    [InlineData(59)]
+    public async Task Login_Lockout_Message_Ceilings_Subminute_Remainder_To_One(int seconds)
+    {
+        TestAccountService service = CreateService(UserManager(), LockedTracker(TimeSpan.FromSeconds(seconds)));
+        LoginVM model = new LoginVM { Username = Username, Password = Password };
+
+        IResponse<LoginDto> result = await service.Login(model);
+
+        result.StatusCode.Should().Be(StatusCode.Failed);
+        result.UserMessage.Should().Be(string.Format(Identity_Messages.AccountLockedOut, 1),
+            "a sub-minute lockout remainder must be ceilinged to 1 minute, not truncated to 0");
+        result.UserMessage.Should().NotContain("0 minute(s)",
+            "truncation would wrongly report 0 minutes for a sub-minute remainder");
     }
 
     [Fact]
