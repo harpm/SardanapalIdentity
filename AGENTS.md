@@ -20,7 +20,7 @@
 - **What it is:** A .NET 8 identity-management **framework** shipped as NuGet packages (not a runnable app). Consumed by other solutions by subclassing its generic bases.
 - **Version:** Package version `0.9.9` lives in `Build.json`. Core dependency version `1.0.0` lives in `Directory.Build.props` as `CoreVersion`.
 - **Distribution:** Published to GitHub Packages at `https://nuget.pkg.github.com/harpm/index.json`.
-- **Build/Release:** `SDBuild.go` (Go 1.21) reads `Build.json` and runs clean → restore → build (`-p:Version=`) → `dotnet nuget push` for each project under `Src\`. CI: `.github/workflows/dotnet.yml` triggers on push to `master` (needs .NET 8 + Go 1.21 + `GITHUBTOKEN` secret).
+- **Build/Release:** `SDBuild.go` (Go 1.21) reads `Build.json` and runs clean → restore → build (`-p:Version=`) → restore + debug build (`-p:Version=<version>-debug`) → `dotnet nuget push` (release and `-debug` nupkg) for each project under `Src\`. CI: `.github/workflows/dotnet.yml` triggers on push to `master` (needs .NET 8 + Go 1.21 + `GITHUBTOKEN` secret). When `Version` ends with `-debug`, `Directory.Build.props` appends `-debug` to `CoreVersion` so debug Identity packages depend on the `-debug` SardanapalCore packages.
 - **Companion repo:** `SardanapalCore` (sibling directory `../SardanapalCore`) holds the foundational abstractions. SardanapalIdentity extends them.
 
 ### 2.1 Repository layout (mirrors `SardanapalCore`)

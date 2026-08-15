@@ -8,5 +8,6 @@
 		<Authors>harpm</Authors>
 		<Company>Sardanapal</Company>
 		<CoreVersion>1.1.0</CoreVersion>
+		<CoreVersion Condition="'$(Version)' != '' and $(Version.EndsWith('-debug'))">$(CoreVersion)-debug</CoreVersion>
    </PropertyGroup>
 </Project>
