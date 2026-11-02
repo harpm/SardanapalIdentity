@@ -56,13 +56,21 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
 
                 if (userRes.IsSuccess)
                 {
-                    await _otpService.Add(new NewOtpVM<TUserKey>()
+                    var otpRes = await _otpService.Add(new NewOtpVM<TUserKey>()
                     {
                         Recipient = identifier,
                         Username = userRes.Data.Username,
                         UserId = userRes.Data.Id,
                         RoleId = model.Role
                     });
+                    if (otpRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, userRes.Data.Id);
+                    }
+                    else
+                    {
+                        otpRes.ConvertTo<TUserKey>(result);
+                    }
                 }
                 else
                 {
@@ -148,13 +156,21 @@ public abstract class OtpAccountServiceBase<TOtpUserManager, TRoleManager, TUser
                         return;
                     }
 
-                    await _otpService.Add(new NewOtpVM<TUserKey>()
+                    var otpRes = await _otpService.Add(new NewOtpVM<TUserKey>()
                     {
                         Recipient = identifier,
                         Username = userRes.Data.Username,
                         UserId = userRes.Data.Id,
                         RoleId = model.Role
                     });
+                    if (otpRes.IsSuccess)
+                    {
+                        result.Set(StatusCode.Succeeded, userRes.Data.Id);
+                    }
+                    else
+                    {
+                        otpRes.ConvertTo<TUserKey>(result);
+                    }
                 }
                 else
                 {
